@@ -1,0 +1,23 @@
+name: فحص أساسي لملفات Python
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: سحب الكود
+        uses: actions/checkout@v4
+
+      - name: إعداد Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: فحص syntax لكل ملفات .py
+        run: |
+          find . -name "*.py" -print0 | xargs -0 -n1 python3 -m py_compile
