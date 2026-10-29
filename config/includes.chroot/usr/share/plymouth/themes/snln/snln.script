@@ -1,0 +1,28 @@
+// ═══════════════════════════════════════════════
+//  شاشة إقلاع snlnOs — شعار + نقاط نابضة متحركة
+// ═══════════════════════════════════════════════
+window.SetBackgroundTopColor(0.024, 0.125, 0.200);
+window.SetBackgroundBottomColor(0.043, 0.235, 0.365);
+
+logo = Image("logo-256.png");
+logo_s = Sprite(logo);
+logo_s.SetX((Window.GetWidth()  - logo.GetWidth())  / 2);
+logo_s.SetY((Window.GetHeight() - logo.GetHeight()) / 2 - 70);
+
+dots = [];
+for (i = 0; i < 5; i++) {
+    s = Sprite(Image("dot.png"));
+    s.SetX(Window.GetWidth()  / 2 - 100 + i * 44);
+    s.SetY(Window.GetHeight() / 2 + 110);
+    dots[i] = s;
+}
+
+counter = 0;
+fun refresh_callback() {
+    counter++;
+    for (i = 0; i < 5; i++) {
+        op = 0.25 + 0.75 * Math.abs(Math.sin((counter + i * 12) / 22));
+        dots[i].SetOpacity(op);
+    }
+}
+Plymouth.SetRefreshFunction(refresh_callback);

@@ -1,0 +1,68 @@
+# ═══════════════════════════════════════════════
+#  قائمة حزم snlnOs — كل سطر اسم حزمة تُثبَّت تلقائياً
+# ═══════════════════════════════════════════════
+
+# سطح المكتب XFCE الكامل
+task-xfce-desktop
+xfce4-goodies
+xfce4-terminal
+xfce4-screenshooter
+
+# إدارة الجلسات وشاشة الدخول
+lightdm
+slick-greeter
+
+# الهوية البصرية: ثيم، أيقونات، وخطوط
+materia-gtk-theme
+papirus-icon-theme
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+
+# دعم اللغة العربية الكامل (نظام + تطبيقات)
+task-arabic
+firefox-esr-l10n-ar
+libreoffice-l10n-ar
+thunderbird-l10n-ar
+
+# شاشة الإقلاع
+plymouth
+plymouth-themes
+
+# التطبيقات الأساسية
+firefox-esr
+thunderbird
+libreoffice
+vlc
+mousepad
+ristretto
+evince
+gparted
+htop
+neofetch
+git
+curl
+wget
+
+# أساسيات الشبكة والوسائط
+network-manager
+network-manager-gnome
+pulseaudio
+pulseaudio-utils
+alsa-utils
+pavucontrol
+bluez
+blueman
+
+# دعم أفضل للفيديو/الصوت داخل الأجهزة الافتراضية (QEMU/VirtualBox)
+qemu-guest-agent
+spice-vdagent
+xserver-xorg-video-qxl
+
+# الحزم التي يحتاجها نظام الحياة (Live)
+live-boot
+live-config
+live-tools
+
+# اللغة العربية
+locales
