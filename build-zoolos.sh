@@ -15,7 +15,7 @@ OUT="${ZOOL_OUT:-$PWD/out}"
 echo "═══ [0/4] فحص المتطلبات ═══"
 if [ ! -f /etc/arch-release ]; then
   echo "✗ هذا السكربت يعمل على Arch Linux فقط (أو حاوية archlinux)."
-  echo "  على غير Arch: docker run --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Sy --noconfirm archiso git && bash build-zoolos.sh'"
+  echo "  على غير Arch: docker run --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Syu --noconfirm archiso git && bash build-zoolos.sh'"
   exit 1
 fi
 for cmd in mkarchiso git grub-mkstandalone mksquashfs xorriso mformat; do
