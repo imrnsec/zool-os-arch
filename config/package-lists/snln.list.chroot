@@ -35,7 +35,7 @@ xdg-user-dirs
 xdg-utils
 
 # ── الثيم والخطوط ──
-materia-gtk-theme
+gnome-themes-extra
 papirus-icon-theme
 adwaita-icon-theme
 fonts-jetbrains-mono
