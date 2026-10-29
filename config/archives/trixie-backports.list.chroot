@@ -1,0 +1,2 @@
+# Hyprland غير موجود في Debian 13 الأساسي — يأتي من trixie-backports
+deb http://deb.debian.org/debian trixie-backports main contrib non-free-firmware

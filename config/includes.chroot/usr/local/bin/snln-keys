@@ -1,0 +1,22 @@
+#!/bin/sh
+# عرض الاختصارات — SUPER+F1
+printf '%s\n' \
+  "SUPER + Enter        الطرفية (foot)" \
+  "SUPER + Space        قائمة التطبيقات" \
+  "SUPER + B            المتصفح" \
+  "SUPER + E            مدير الملفات" \
+  "SUPER + W            إغلاق النافذة" \
+  "SUPER + F            ملء الشاشة" \
+  "SUPER + V            نافذة عائمة / مثبّتة" \
+  "SUPER + J            تبديل اتجاه التقسيم" \
+  "SUPER + 1..9         مساحة العمل" \
+  "SUPER+SHIFT + 1..9   نقل النافذة لمساحة عمل" \
+  "SUPER + الأسهم       التنقل بين النوافذ" \
+  "SUPER + C            سجل الحافظة" \
+  "SUPER + L            قفل الشاشة" \
+  "SUPER + Esc          قائمة الطاقة" \
+  "Print                لقطة لمنطقة (تُنسخ وتُحفظ)" \
+  "SHIFT + Print        لقطة للشاشة كاملة" \
+  "ALT + SHIFT          تبديل اللغة (EN / عربي)" \
+  "SUPER+SHIFT + M      الخروج من Hyprland" \
+  | wofi --dmenu --prompt "Keybindings" --width 560 --height 520 >/dev/null

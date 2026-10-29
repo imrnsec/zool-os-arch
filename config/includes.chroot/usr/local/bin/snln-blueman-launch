@@ -1,0 +1,6 @@
+#!/bin/sh
+# يشغّل blueman-applet فقط إذا وُجد عتاد بلوتوث فعلي (يتجنب التأخير في الأجهزة الافتراضية)
+if [ -d /sys/class/bluetooth ] && [ -n "$(ls -A /sys/class/bluetooth 2>/dev/null)" ]; then
+    exec blueman-applet
+fi
+exit 0

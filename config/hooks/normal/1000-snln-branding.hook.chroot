@@ -6,7 +6,7 @@
 set -e
 
 echo "[snln] تفعيل ثيم Plymouth..."
-# الطريقة المضمونة: ملف الإعداد الرئيسي مباشرة
+mkdir -p /etc/plymouth
 cat > /etc/plymouth/plymouthd.conf <<'EOF'
 [Daemon]
 Theme=snln
@@ -15,12 +15,14 @@ update-alternatives --set default.plymouth \
     /usr/share/plymouth/themes/snln/snln.plymouth 2>/dev/null || true
 update-initramfs -u 2>/dev/null || true
 
-echo "[snln] تفعيل مدير الدخول LightDM..."
-systemctl enable lightdm.service 2>/dev/null || true
+echo "[snln] تفعيل مدير الدخول SDDM..."
+echo "/usr/bin/sddm" > /etc/X11/default-display-manager
+systemctl enable sddm.service 2>/dev/null || true
 
 echo "[snln] ضبط الأذونات..."
 chmod 644 /usr/share/backgrounds/snln/*.png || true
 chmod 644 /usr/share/snln/splash.png || true
 chmod 644 /boot/grub/themes/snln/* || true
+chmod 755 /usr/local/bin/snln-* || true
 
 echo "[snln] الهوية جاهزة ✔"

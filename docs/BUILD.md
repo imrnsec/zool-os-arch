@@ -1,37 +1,66 @@
-# snlnOS — Sudan Learning National Network
+# snlnOS — دليل البناء
 
 > توزيعة لينكس تعليمية سودانية. الشعار: **Learn. Practice. Secure.**
+> سطح المكتب: **Hyprland** (طراز Omarchy بألوان الهوية) على **Debian 13 (trixie)**.
 
 ---
 
-## 📖 مفردات أساسية (اقرأها أولاً)
+## 📖 مفردات أساسية
 
 | المصطلح | معناه ببساطة |
 |---------|---------------|
 | **ISO** | ملف القرص الذي تحرقه على USB — هو "صورة" التوزيعة |
-| **Live Build (lb)** | أداة Debian التي تبني التوزيعة — تنفّذ ملفات `config/` |
-| **chroot** | "بيئة داخل بيئة" — نظام تجريبي يُبنى داخل جهازك أثناء البناء |
-| **hook** | سكربت يعمل تلقائياً أثناء البناء (هنا: سكربت الهوية) |
-| **includes.chroot** | "الملفات التي تُنسخ" — كل ما تضعه هنا يظهر داخل التوزيعة |
+| **live-build (lb)** | أداة Debian التي تبني التوزيعة وتنفّذ ملفات `config/` |
+| **chroot** | نظام مصغّر يُبنى داخل جهازك أثناء البناء |
+| **hook** | سكربت يعمل تلقائياً أثناء البناء |
+| **includes.chroot** | كل ما يوضع هنا يُنسخ كما هو إلى داخل التوزيعة |
+| **backports** | مستودع Debian لحزم أحدث؛ منه نأخذ Hyprland |
 
 ---
 
-## 🚀 البدء (أول مرة)
+## 🚀 البناء (أول مرة)
+
+يلزم جهاز **Debian 13** (أو VM أو حاوية `debian:trixie --privileged`) بمساحة حرة 20GB+ وإنترنت.
 
 ```bash
-# 1. جهّز نظام بناء (Debian 12 أو Ubuntu 22.04+ في VM)
+# 1) المتطلبات
 sudo apt update
-sudo apt install live-build qemu-system-x86
+sudo apt install live-build debootstrap squashfs-tools xorriso \
+     grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
+     qemu-system-x86 ovmf git
 
-# 2. انسخ مجلد المشروع وادخله
+# 2) انسخ المشروع
+git clone -b import-project-v7 https://github.com/imrnsec/snlnos
 cd snlnos
 
-# 3. ابنِ التوزيعة (أول مرة: 20–60 دقيقة)
+# 3) ابنِ (30–90 دقيقة؛ السجل في build.log)
 bash build-snlnos.sh
 
-# 4. اختبر الناتج دون حرق USB
-qemu-system-x86_64 -cdrom snlnos-*.iso -m 4096 -enable-kvm
+# 4) اختبر دون حرق USB (Hyprland يحتاج virtio-vga-gl)
+qemu-system-x86_64 -enable-kvm -m 4096 -smp 2 -cdrom snlnos-amd64.hybrid.iso \
+    -device virtio-vga-gl -display gtk,gl=on
 ```
+
+> ⚠️ لا تستخدم `-vga qxl` — Hyprland لا يعمل جيداً عليه.
+> ⚠️ على Ubuntu أو Debian 12 قد يفشل البناء (إصدار live-build/debootstrap أقدم).
+
+---
+
+## ⌨️ اختصارات سطح المكتب
+
+اضغط **SUPER + F1** داخل النظام لعرضها. أهمها:
+
+| الاختصار | الوظيفة |
+|----------|---------|
+| `SUPER + Enter` | الطرفية |
+| `SUPER + Space` | قائمة التطبيقات |
+| `SUPER + B` / `E` | المتصفح / الملفات |
+| `SUPER + W` | إغلاق النافذة |
+| `SUPER + 1..9` | مساحات العمل |
+| `SUPER + L` | قفل الشاشة |
+| `SUPER + Esc` | قائمة الطاقة |
+| `Print` | لقطة منطقة |
+| `Alt + Shift` | تبديل اللغة EN/عربي |
 
 ---
 
@@ -39,66 +68,80 @@ qemu-system-x86_64 -cdrom snlnos-*.iso -m 4096 -enable-kvm
 
 ```
 snlnos/
-├── build-snlnos.sh          ← زر البناء — لا تلمسه إلا لتعديل إعدادات lb
-├── README.md                ← أنت تقرأه الآن
-└── config/                  ← قلب المشروع — كل التخصيص هنا
+├── build-snlnos.sh        ← زر البناء (يفحص المتطلبات ثم يبني ويحسب SHA256)
+├── auto/config            ← كل خيارات live-build (التوزيعة، الـ ISO، معاملات الإقلاع)
+├── docs/BUILD.md          ← هذا الملف
+└── config/
+    ├── archives/          ← مستودع trixie-backports + تثبيت (pin) حزم Hyprland منه
     ├── package-lists/
-    │   └── snln.list.chroot     ← الحزم المثبتة (عدّل بحرية)
+    │   └── snln.list.chroot   ← الحزم المثبّتة
     ├── hooks/normal/
-    │   └── 1000-snln-branding.hook.chroot  ← يفعّل الهوية تلقائياً
-    └── includes.chroot/       ← الملفات التي تدخل التوزيعة كما هي
-        ├── etc/skel/.config/xfce4/  ← إعدادات XFCE الافتراضية
-        ├── etc/lightdm/             ← شاشة الدخول
-        ├── etc/default/grub.d/      ← إعدادات GRUB
-        ├── boot/grub/themes/snln/   ← ثيم GRUB + خلفيته
-        └── usr/share/
-            ├── backgrounds/snln/    ← خلفيات سطح المكتب والدخول
-            ├── snln/logo/           ← شعارك الرسمي
-            └── plymouth/themes/snln/← شاشة الإقلاع
+    │   ├── 1000-snln-branding.hook.chroot  ← Plymouth + SDDM + الأذونات
+    │   ├── 2000-snln-liveboot.hook.binary  ← ثيم قائمة الإقلاع (GRUB/syslinux)
+    │   └── 3000-snln-tweaks.hook.chroot    ← تسريع الإقلاع + فحص جلسة Hyprland
+    └── includes.chroot/
+        ├── etc/skel/.config/   ← hypr · waybar · wofi · mako · foot · gtk (إعدادات المستخدم)
+        ├── etc/sddm.conf.d/    ← دخول تلقائي في نظام الحياة
+        ├── etc/default/grub.d/ ← إعدادات GRUB
+        ├── boot/grub/themes/snln/  ← ثيم GRUB
+        └── usr/
+            ├── local/bin/      ← snln-power · snln-keys · snln-screenshot
+            └── share/          ← backgrounds · logo · plymouth
 ```
 
 ---
 
-## 🎓 طريقة التعلم الصحيحة مع هذا المشروع
+## 🛠️ حل المشاكل المتوقعة
 
-1. **لا تعدّل كل شيء دفعة واحدة.** عدّل ملفاً واحداً، أعد البناء، لاحظ الفرق.
-2. **سجل تجاربك** في ملف `NOTES.md` خاص بك: ما الذي نجح؟ ما الذي فشل؟
-3. **كل خطأ هو درس.** اقرأ آخر 20 سطراً من رسالة الخطأ — دائماً هي تشرح المشكلة.
-4. **خلفيات حالياً مؤقتة** (مولّدة من الشعار). المهمة القادمة: صور سودانية مرخّصة.
+**فشل تثبيت Hyprland (`unmet dependencies` / `libxkbcommon0`)**
+Hyprland يأتي من backports ويحتاج مكتبات أحدث. افتح `config/archives/trixie-backports.pref.chroot` وأضف اسم المكتبة التي ذكرتها الرسالة إلى سطر `Package:` ثم أعد البناء.
+
+**البناء يتوقف عند "hyprland.desktop غير موجود"**
+يعني أن الحزمة لم تُثبَّت من backports. راجع `build.log` وتأكد من وجود `trixie-backports` في ملف `config/archives/trixie-backports.list.chroot`.
+
+**شاشة سوداء أو أخطاء في VM**
+استخدم `virtio-vga-gl` مع `-display gtk,gl=on`. على VirtualBox فعّل "3D Acceleration" ومحوّل VMSVGA.
+
+**الحاجة لإعادة البناء من الصفر**
+`sudo lb clean` (يحذف chroot/binary لكن يُبقي كاش الحزم). للحذف الكامل: `sudo lb clean --purge`.
 
 ---
 
 ## ✅ ترتيب المهام المقترح
 
-- [ ] بناء أول ISO ناجح في QEMU
-- [ ] رؤية الهوية: شاشة الإقلاع + الدخول + سطح المكتب
-- [ ] استبدال الخلفيات بصور سودانية (انظر `usr/share/backgrounds/snln/`)
-- [ ] تثبيت Calamares (المثبّت)
+- [ ] بناء أول ISO ناجح واختباره في QEMU
+- [ ] التأكد من: الإقلاع ← الدخول التلقائي ← Waybar ← wofi ← الطرفية
+- [ ] ثيم SDDM مخصص (للنظام المثبّت)
+- [ ] استبدال الخلفيات بصور سودانية مرخّصة
+- [ ] تثبيت Calamares (المثبّت) وإزالة الدخول التلقائي من النظام المثبّت
+- [ ] إضافة أدوات الأمن السيبراني (Nmap, tshark, ...) بحسب اتجاه المشروع
 - [ ] الإصدار التجريبي v0.1
 
 ---
 
 ## ⚠️ قواعد ذهبية
 
-1. ابنِ دائماً داخل **جهاز افتراضي**، لا على نظامك اليومي.
-2. لا ترفع ISO إلى الإنترنت قبل إضافة SHA256 (سيأتي لاحقاً).
-3. كل صورة تضيفها يجب أن تكون مرخّصة (صوّرها أنت أو بإذن).
+1. ابنِ دائماً داخل **جهاز افتراضي أو حاوية**، لا على نظامك اليومي.
+2. انشر ملف `.sha256` مع كل ISO (ينتجه سكربت البناء).
+3. كل صورة تضيفها يجب أن تكون مرخّصة.
+4. لا ترفع `chroot/` أو `binary/` أو `*.iso` إلى Git (محمية في `.gitignore`).
 
 ---
 
 ## 🔄 سجل التغييرات
 
-### الإصدار 0.2 — الهوية المصممة
-- خلفية سطح المكتب: تصميم سوداني (توتي، الأهرامات، النيل، خريطة السودان)
-- شاشة الدخول: تصميم موحد بألوان الشعار
-- ثيم GRUB كامل مع زر تحديد أزرق مستدير
-- شاشة إقلاع متحركة: شعار + 5 نقاط نابضة (Plymouth)
-- قائمة GRUB مخفية افتراضياً لتظهر الأنيميشن فوراً (Shift أو Esc لإظهارها)
-
-**ملاحظة**: الصور المعتمدة الآن توليدية. قبل النشر الرسمي: استبدلها بصور سودانية حقيقية مرخّصة.
+### الإصدار 0.4 — الانتقال إلى Hyprland
+- القاعدة: Debian 13 (trixie) بدل bookworm
+- سطح المكتب: Hyprland + Waybar + Wofi + Mako + Foot بألوان الهوية (بدل XFCE/LightDM)
+- مدير الدخول: SDDM مع دخول تلقائي في نظام الحياة
+- الصوت: PipeWire بدل PulseAudio
+- أدوات جديدة: `snln-power` و`snln-keys` و`snln-screenshot`
+- ملف الـ ISO الناتج باسم `snlnos-amd64.hybrid.iso` + SHA256
+- نقل خيارات البناء إلى `auto/config`، وتحديث `.gitignore` لملفات البناء
+- إزالة `fonts-noto-cjk` لتقليل الحجم
 
 ### الإصدار 0.3 — إصلاحات ما بعد أول اختبار
-- إصلاح Plymouth: تفعيل مضمون عبر plymouthd.conf (كان يظهر ثيم Debian)
-- تخصيص قائمة الإقلاع الحية نفسها (GRUB لـ UEFI + خلفية syslinux لـ BIOS)
-- هوية المستخدم: hostname=snlnos، username=snln، المنطقة الزمنية الخرطوم
-- دعم العربية: locales + تخطيط لوحة مفاتيح عربي/إنجليزي
+- Plymouth عبر plymouthd.conf، تخصيص قائمة الإقلاع، هوية المستخدم، دعم العربية
+
+### الإصدار 0.2 — الهوية المصممة
+- خلفيات سودانية مولّدة، ثيم GRUB، شاشة إقلاع Plymouth متحركة

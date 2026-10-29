@@ -1,0 +1,20 @@
+#!/bin/sh
+# ═══════════════════════════════════════════════
+#  إعدادات live-build لـ snlnOS — يستدعيها الأمر: lb config
+#  كل خيارات البناء في مكان واحد (وتُولَّد ملفات config/ الباقية منها)
+# ═══════════════════════════════════════════════
+set -e
+
+lb config noauto \
+  --distribution trixie \
+  --architectures amd64 \
+  --archive-areas "main contrib non-free-firmware" \
+  --binary-images iso-hybrid \
+  --bootloaders "syslinux,grub-efi" \
+  --debian-installer none \
+  --image-name snlnos \
+  --iso-application "snlnOS" \
+  --iso-publisher "snlnOS Project" \
+  --iso-volume "snlnOS" \
+  --bootappend-live "boot=live components quiet splash hostname=snlnos username=snln timezone=Africa/Khartoum locales=ar_SD.UTF-8,en_US.UTF-8 keyboard-layouts=us,ara" \
+  "${@}"

@@ -1,68 +1,107 @@
 # ═══════════════════════════════════════════════
-#  قائمة حزم snlnOs — كل سطر اسم حزمة تُثبَّت تلقائياً
+#  قائمة حزم snlnOS (Hyprland) — كل سطر اسم حزمة تُثبَّت تلقائياً
+#  القاعدة: Debian 13 (trixie) + مستودع trixie-backports لـ Hyprland
 # ═══════════════════════════════════════════════
 
-# سطح المكتب XFCE الكامل
-task-xfce-desktop
-xfce4-goodies
-xfce4-terminal
-xfce4-screenshooter
+# ── Hyprland (من trixie-backports — انظر config/archives/) ──
+hyprland
+hyprlock
+xdg-desktop-portal-hyprland
+hyprpolkitagent
+xwayland
 
-# إدارة الجلسات وشاشة الدخول
-lightdm
-slick-greeter
+# ── مكوّنات سطح المكتب (على طراز Omarchy) ──
+waybar
+wofi
+mako-notifier
+libnotify-bin
+swaybg
+foot
+grim
+slurp
+wl-clipboard
+cliphist
+brightnessctl
+playerctl
+jq
 
-# الهوية البصرية: ثيم، أيقونات، وخطوط
+# ── شاشة الدخول والجلسة ──
+sddm
+dbus-user-session
+libpam-systemd
+polkitd
+xdg-desktop-portal-gtk
+xdg-user-dirs
+xdg-utils
+
+# ── الثيم والخطوط ──
 materia-gtk-theme
 papirus-icon-theme
-fonts-noto
-fonts-noto-cjk
+adwaita-icon-theme
+fonts-jetbrains-mono
+fonts-font-awesome
+fonts-noto-core
 fonts-noto-color-emoji
 
-# دعم اللغة العربية الكامل (نظام + تطبيقات)
+# ── دعم اللغة العربية (نظام + تطبيقات) ──
 task-arabic
 firefox-esr-l10n-ar
 libreoffice-l10n-ar
 thunderbird-l10n-ar
 
-# شاشة الإقلاع
+# ── شاشة الإقلاع ──
 plymouth
 plymouth-themes
 
-# التطبيقات الأساسية
+# ── التطبيقات الأساسية ──
 firefox-esr
 thunderbird
-libreoffice
-vlc
+libreoffice-writer
+libreoffice-calc
+libreoffice-gtk3
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+tumbler
+gvfs
+gvfs-backends
 mousepad
-ristretto
+imv
 evince
+vlc
 gparted
 htop
-neofetch
+btop
+fastfetch
 git
 curl
 wget
+sudo
 
-# أساسيات الشبكة والوسائط
+# ── الشبكة والصوت والبلوتوث ──
 network-manager
 network-manager-gnome
-pulseaudio
-pulseaudio-utils
-alsa-utils
+pipewire
+pipewire-pulse
+wireplumber
 pavucontrol
+alsa-utils
 bluez
 blueman
 
-# دعم أفضل للفيديو/الصوت داخل الأجهزة الافتراضية (QEMU/VirtualBox)
+# ── العتاد والبرامج الثابتة (للأجهزة الحقيقية) ──
+firmware-linux
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+
+# ── دعم الأجهزة الافتراضية (QEMU/VirtualBox) ──
 qemu-guest-agent
 spice-vdagent
-xserver-xorg-video-qxl
 
-# الحزم التي يحتاجها نظام الحياة (Live)
+# ── نظام الحياة (Live) ──
 live-boot
 live-config
 live-tools
-
-# اللغة العربية
 locales

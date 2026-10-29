@@ -1,0 +1,17 @@
+#!/bin/sh
+# قائمة الطاقة — SUPER+Escape
+choice=$(printf '%s\n' \
+  "Lock | قفل الشاشة" \
+  "Logout | تسجيل الخروج" \
+  "Suspend | سكون" \
+  "Reboot | إعادة التشغيل" \
+  "Shutdown | إيقاف التشغيل" \
+  | wofi --dmenu --prompt "Power" --width 360 --height 280)
+
+case "$choice" in
+    Lock*)     hyprlock ;;
+    Logout*)   hyprctl dispatch exit ;;
+    Suspend*)  systemctl suspend ;;
+    Reboot*)   systemctl reboot ;;
+    Shutdown*) systemctl poweroff ;;
+esac

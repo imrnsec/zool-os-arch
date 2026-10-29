@@ -1,4 +1,21 @@
 *.iso
 *.img
+*.iso.sha256
 snlnos-base/
 *.log
+
+# ملفات تولّدها أداة live-build أثناء البناء — لا تُرفع أبداً
+/chroot/
+/binary/
+/cache/
+/.build/
+/config/binary
+/config/bootstrap
+/config/chroot
+/config/common
+/config/source
+/*.contents
+/*.files
+/*.packages
+/*.buildlog
+/live-image-*

@@ -1,0 +1,83 @@
+/* snlnOS — Waybar (طراز Omarchy بألوان الهوية) */
+* {
+    font-family: "JetBrains Mono", "Font Awesome 5 Free", "FontAwesome", "Noto Sans Arabic", sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: #dbe7f5;
+}
+
+#custom-launcher,
+#workspaces,
+#clock,
+#tray,
+#language,
+#cpu,
+#memory,
+#pulseaudio,
+#bluetooth,
+#network,
+#battery,
+#custom-power {
+    background: rgba(10, 20, 40, 0.85);
+    padding: 0 12px;
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 160, 240, 0.25);
+}
+
+#custom-launcher {
+    color: #00a0f0;
+    font-weight: bold;
+}
+
+#workspaces {
+    padding: 0 4px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #6b819f;
+    background: transparent;
+    border-radius: 8px;
+    margin: 3px 1px;
+}
+
+#workspaces button.active {
+    color: #0a1428;
+    background: #00a0f0;
+    font-weight: bold;
+}
+
+#workspaces button:hover {
+    background: rgba(0, 160, 240, 0.25);
+    color: #dbe7f5;
+}
+
+#clock {
+    color: #4cc2ff;
+    font-weight: bold;
+}
+
+#network.disconnected,
+#pulseaudio.muted {
+    color: #ff6b81;
+}
+
+#battery.warning { color: #ffd166; }
+#battery.critical { color: #ff6b81; }
+
+#custom-power {
+    color: #ff6b81;
+}
+
+tooltip {
+    background: #0a1428;
+    border: 1px solid #00a0f0;
+    border-radius: 8px;
+}

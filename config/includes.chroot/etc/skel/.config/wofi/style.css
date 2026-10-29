@@ -1,0 +1,43 @@
+/* snlnOS — Wofi */
+* {
+    font-family: "JetBrains Mono", "Noto Sans Arabic", sans-serif;
+    font-size: 14px;
+}
+
+window {
+    background-color: rgba(10, 20, 40, 0.95);
+    border: 2px solid #00a0f0;
+    border-radius: 14px;
+}
+
+#outer-box {
+    margin: 14px;
+}
+
+#input {
+    background-color: #0f1f3d;
+    color: #dbe7f5;
+    border: 1px solid rgba(0, 160, 240, 0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+}
+
+#input:focus {
+    border-color: #00a0f0;
+}
+
+#entry {
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #dbe7f5;
+}
+
+#entry:selected {
+    background-color: #00a0f0;
+    color: #0a1428;
+}
+
+#text:selected {
+    color: #0a1428;
+}

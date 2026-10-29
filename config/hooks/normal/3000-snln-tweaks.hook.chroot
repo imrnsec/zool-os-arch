@@ -1,9 +1,8 @@
 #!/bin/sh
 # ═══════════════════════════════════════════════
-#  Hook تحسينات snlnOs — يعمل داخل chroot
+#  Hook تحسينات snlnOS — يعمل داخل chroot
 #  1) تسريع الإقلاع (تعطيل خدمات تنتظر شبكة/أجهزة غير ضرورية)
-#  2) تلوين أيقونات Papirus باللون الأزرق ليطابق الهوية
-#  3) التأكد من صلاحيات الصوت للمستخدم الافتراضي
+#  2) التأكد من وجود جلسة Hyprland لـ SDDM
 # ═══════════════════════════════════════════════
 set -e
 
@@ -14,41 +13,12 @@ for svc in NetworkManager-wait-online.service systemd-networkd-wait-online.servi
     systemctl mask "$svc" 2>/dev/null || true
 done
 
-echo "[snln-tweaks] إضافة فحص ذكي لتفعيل البلوتوث فقط عند وجود عتاد حقيقي..."
-# بدل تعطيل البلوتوث نهائيًا (يعطّله حتى على أجهزة حقيقية فيها بلوتوث)،
-# نضيف فحصًا في autostart يمنع تشغيل blueman-applet فقط إن لم يوجد
-# عتاد بلوتوث فعلي (/sys/class/bluetooth فارغ) — هذا يحل مشكلة
-# انتظار 25 ثانية في الأجهزة الافتراضية دون كسر البلوتوث الحقيقي.
-for autostart_dir in /etc/xdg/autostart /etc/skel/.config/autostart; do
-    if [ -f "$autostart_dir/blueman.desktop" ]; then
-        cp "$autostart_dir/blueman.desktop" "$autostart_dir/blueman.desktop.bak"
-        sed -i '/^Exec=/i Condition=/sys/class/bluetooth' "$autostart_dir/blueman.desktop" 2>/dev/null || true
-    fi
-done
-mkdir -p /usr/local/bin
-cat > /usr/local/bin/snln-blueman-launch <<'WRAP'
-#!/bin/sh
-# يشغّل blueman-applet فقط إذا وُجد عتاد بلوتوث فعلي
-if [ -d /sys/class/bluetooth ] && [ -n "$(ls -A /sys/class/bluetooth 2>/dev/null)" ]; then
-    exec blueman-applet
+echo "[snln-tweaks] فحص جلسة Hyprland..."
+if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
+    echo "[snln-tweaks] جلسة Hyprland موجودة ✔"
+else
+    echo "[snln-tweaks] خطأ: /usr/share/wayland-sessions/hyprland.desktop غير موجود — فشل تثبيت hyprland من backports؟" >&2
+    exit 1
 fi
-exit 0
-WRAP
-chmod +x /usr/local/bin/snln-blueman-launch
-for autostart_dir in /etc/xdg/autostart /etc/skel/.config/autostart; do
-    if [ -f "$autostart_dir/blueman.desktop" ]; then
-        sed -i 's|^Exec=.*|Exec=/usr/local/bin/snln-blueman-launch|' "$autostart_dir/blueman.desktop"
-    fi
-done
-
-echo "[snln-tweaks] تلوين أيقونات Papirus باللون الأزرق..."
-if command -v papirus-folders >/dev/null 2>&1; then
-    papirus-folders -C blue --theme Papirus-Dark 2>/dev/null || true
-fi
-
-echo "[snln-tweaks] التأكد من صلاحيات الصوت والفيديو للمستخدم الافتراضي..."
-for u in $(awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/passwd); do
-    usermod -aG audio,video,pulse,pulse-access,plugdev "$u" 2>/dev/null || true
-done
 
 echo "[snln-tweaks] اكتمل ✔"
