@@ -1,0 +1,80 @@
+/* Zool OS — قائمة التطبيقات (Wofi): بطاقة ناعمة، بحث على شكل حبة، تحديد ذهبي */
+@define-color night    #10181c;
+@define-color surface  #172229;
+@define-color surface2 #213039;
+@define-color sand     #f3e6cc;
+@define-color sand_dim #b9a98a;
+@define-color gold     #e8b04a;
+@define-color terracotta #d46a43;
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans Arabic", "Noto Sans", sans-serif;
+    font-size: 14px;
+}
+
+window {
+    margin: 0;
+    background-color: rgba(16, 24, 28, 0.92);
+    border: 2px solid rgba(232, 176, 74, 0.55);
+    border-radius: 22px;
+}
+
+#outer-box {
+    margin: 22px;
+    background-color: transparent;
+}
+
+#input {
+    background-color: @surface2;
+    color: @sand;
+    border: 1px solid rgba(232, 176, 74, 0.25);
+    border-radius: 999px;
+    padding: 12px 22px;
+    margin-bottom: 18px;
+    box-shadow: none;
+}
+
+#input:focus {
+    border-color: @gold;
+    box-shadow: none;
+}
+
+#scroll {
+    margin: 0;
+}
+
+#inner-box {
+    background-color: transparent;
+}
+
+#entry {
+    padding: 12px 14px;
+    margin: 4px;
+    border-radius: 14px;
+    background-color: transparent;
+    color: @sand;
+    border: 1px solid transparent;
+}
+
+#entry image {
+    margin-right: 12px;
+}
+
+#entry:hover {
+    background-color: rgba(232, 176, 74, 0.10);
+}
+
+#entry:selected {
+    background-color: rgba(232, 176, 74, 0.20);
+    border: 1px solid rgba(232, 176, 74, 0.6);
+    outline: none;
+}
+
+#text {
+    color: @sand;
+}
+
+#text:selected {
+    color: @gold;
+    font-weight: bold;
+}

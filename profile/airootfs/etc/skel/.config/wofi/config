@@ -1,0 +1,16 @@
+show=drun
+prompt=ابحث عن تطبيق…
+width=860
+height=560
+location=center
+columns=3
+orientation=vertical
+halign=fill
+content_halign=fill
+allow_images=true
+image_size=40
+insensitive=true
+no_actions=true
+hide_scroll=true
+gtk_dark=true
+term=kitty

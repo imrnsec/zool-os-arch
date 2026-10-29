@@ -1,0 +1,128 @@
+# ═══════════════════════════════════════════════
+#  حزم Zool OS — كلها من المستودعات الرسمية (core + extra)
+# ═══════════════════════════════════════════════
+
+# ── النظام الأساسي والإقلاع ──
+base
+linux
+linux-firmware
+sof-firmware
+intel-ucode
+amd-ucode
+mkinitcpio
+mkinitcpio-archiso
+grub
+efibootmgr
+edk2-shell
+memtest86+
+memtest86+-efi
+syslinux
+plymouth
+
+# ── التثبيت والأقراص ──
+archinstall
+arch-install-scripts
+parted
+gptfdisk
+gparted
+dosfstools
+e2fsprogs
+btrfs-progs
+xfsprogs
+ntfs-3g
+exfatprogs
+cryptsetup
+lvm2
+mtools
+squashfs-tools
+rsync
+reflector
+
+# ── الشبكة ──
+networkmanager
+network-manager-applet
+wpa_supplicant
+openssh
+curl
+wget
+
+# ── Hyprland وبيئة سطح المكتب ──
+hyprland
+hyprlock
+hypridle
+hyprpolkitagent
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xorg-xwayland
+waybar
+wofi
+mako
+foot
+kitty
+swaybg
+grim
+slurp
+wl-clipboard
+cliphist
+brightnessctl
+playerctl
+jq
+libnotify
+polkit
+sddm
+qt6-svg
+qt6-declarative
+
+# ── الصوت والبلوتوث ──
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+pavucontrol
+alsa-utils
+bluez
+bluez-utils
+blueman
+
+# ── الثيم والخطوط ──
+adw-gtk-theme
+papirus-icon-theme
+adwaita-icon-theme
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+ttf-dejavu
+
+# ── التطبيقات ──
+firefox
+firefox-i18n-ar
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+tumbler
+gvfs
+mousepad
+imv
+evince
+mpv
+btop
+htop
+fastfetch
+
+# ── أدوات عامة ──
+sudo
+nano
+vim
+git
+less
+man-db
+bash-completion
+xdg-user-dirs
+xdg-utils
+usbutils
+pciutils
+
+# ── الأجهزة الافتراضية ──
+qemu-guest-agent
+spice-vdagent

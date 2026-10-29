@@ -1,0 +1,17 @@
+#!/bin/sh
+# لقطة شاشة: zool-screenshot region | full
+dir="${XDG_PICTURES_DIR:-$HOME/Pictures}"
+mkdir -p "$dir"
+file="$dir/screenshot-$(date +%Y%m%d-%H%M%S).png"
+
+case "$1" in
+    full)
+        grim "$file" ;;
+    *)
+        area="$(slurp)" || exit 0
+        grim -g "$area" "$file" ;;
+esac
+
+[ -f "$file" ] || exit 1
+wl-copy < "$file"
+notify-send -i "$file" "لقطة شاشة" "حُفظت في $file ونُسخت إلى الحافظة"

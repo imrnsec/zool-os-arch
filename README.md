@@ -1,15 +1,24 @@
-# SnlnOS
+# Zool OS — زول
 
-توزيعة Linux تعليمية مبنية على Debian، مخصصة لتعليم الأمن السيبراني للمبتدئين الناطقين بالعربية.
+توزيعة Linux سودانية مبنية على **Arch Linux** بسطح مكتب **Hyprland**، بهوية مستوحاة من أهرامات مروي وشمس السودان والتقاء النيلين.
 
-## الحالة الحالية
-مرحلة تطوير مبكرة (Pre-Alpha) — الإصدار 1.0 قيد البناء.
+> الاسم السابق للمشروع: SnlnOS. اسم المستودع ما زال `snlnos`.
 
-## الأدوات المدعومة (المستوى الأول)
-Nmap, tshark, Netcat, Hydra, SQLMap, John the Ripper, Metasploit Framework
+## الحالة
+مرحلة تطوير مبكرة — الملفات جاهزة للبناء ولم تُختبر بعد على جهاز فعلي.
 
-## البناء من المصدر
-راجع `docs/BUILD.md` لخطوات البناء الكاملة عبر debootstrap.
+## البناء
+```bash
+sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools qemu-desktop edk2-ovmf
+bash build-zoolos.sh
+```
+التفاصيل الكاملة في [`docs/BUILD.md`](docs/BUILD.md).
+
+## المميزات
+- GRUB بثيم YoRHa ← أنيميشن شعار زول ← دخول تلقائي إلى Hyprland
+- شريط Waybar وقائمة Wofi وإشعارات Mako بألوان رمل السودان ونيله
+- مساحات عمل بأرقام عربية، وتبديل لغة EN/عربي (`Alt+Shift`)
+- ثلاث خلفيات سودانية (غروب النيل · ليل مروي · فجر الكثبان)
 
 ## الترخيص
-(حدد الترخيص المناسب هنا، مثل MIT أو GPLv3)
+(حدد الترخيص المناسب هنا). ثيم GRUB (YoRHa) من تأليف OliveThePuffin ويُنزَّل وقت البناء.

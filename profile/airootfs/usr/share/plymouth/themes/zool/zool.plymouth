@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Zool OS
+Description=Zool OS animated boot logo (sun rising behind the Meroe pyramids)
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/zool
+ScriptFile=/usr/share/plymouth/themes/zool/zool.script

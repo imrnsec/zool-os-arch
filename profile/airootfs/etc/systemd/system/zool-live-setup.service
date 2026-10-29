@@ -1,0 +1,12 @@
+[Unit]
+Description=Zool OS live session setup (locale + live user)
+After=local-fs.target
+Before=display-manager.service sddm.service getty.target
+ConditionPathExists=!/home/zool
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/zool-live-setup
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+#!/bin/bash
+# تثبيت Zool OS على القرص عبر archinstall (مثبّت Arch الرسمي)
+cat <<'EOF'
+
+  ╭──────────────────────────────────────╮
+  │   تثبيت Zool OS  —  زول              │
+  ╰──────────────────────────────────────╯
+
+  سيُشغَّل archinstall. للحصول على سطح المكتب نفسه اختر:
+    • Profile → Desktop → Hyprland
+    • Audio → pipewire
+    • Network → NetworkManager
+    • حزم إضافية:  kitty waybar wofi mako swaybg grim slurp wl-clipboard
+                    cliphist brightnessctl playerctl hyprlock hypridle
+                    hyprpolkitagent adw-gtk-theme papirus-icon-theme
+                    ttf-jetbrains-mono-nerd noto-fonts firefox thunar
+
+  ملاحظة: تخصيصات زول (الشريط، القوائم، الخلفيات) موجودة في /etc/skel
+  وفي /usr/share/zool — انسخها إلى النظام المثبّت بعد انتهاء التثبيت.
+
+EOF
+read -r -p "اضغط Enter للمتابعة أو Ctrl+C للإلغاء... " _
+exec sudo archinstall

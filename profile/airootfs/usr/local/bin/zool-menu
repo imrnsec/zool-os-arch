@@ -1,0 +1,29 @@
+#!/bin/sh
+# قائمة زول — SUPER+Z : اختصار لكل الإعدادات والأدوات
+choice=$(printf '%s\n' \
+  "Applications | التطبيقات" \
+  "Files | الملفات" \
+  "Browser | المتصفح" \
+  "Network | الشبكة" \
+  "Bluetooth | البلوتوث" \
+  "Sound | الصوت" \
+  "Wallpaper | الخلفية" \
+  "Install Zool OS | تثبيت زول" \
+  "Keybindings | الاختصارات" \
+  "System monitor | مراقب النظام" \
+  "Power | الطاقة" \
+  | wofi --dmenu --prompt "زول" --width 520 --height 520 --columns 1)
+
+case "$choice" in
+    Applications*)  wofi --show drun ;;
+    Files*)         thunar ;;
+    Browser*)       firefox ;;
+    Network*)       nm-connection-editor ;;
+    Bluetooth*)     blueman-manager ;;
+    Sound*)         pavucontrol ;;
+    Wallpaper*)     zool-wallpaper pick ;;
+    Install*)       kitty -e zool-install ;;
+    Keybindings*)   zool-keys ;;
+    "System monitor"*) kitty -e btop ;;
+    Power*)         zool-power ;;
+esac

@@ -1,0 +1,116 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 38,
+    "spacing": 10,
+    "margin-top": 8,
+    "margin-left": 14,
+    "margin-right": 14,
+
+    "modules-left": ["image#logo", "hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["tray", "hyprland/language", "group/sys", "group/media", "battery", "custom/power"],
+
+    "image#logo": {
+        "path": "/usr/share/zool/logo/zool-logo-64.png",
+        "size": 26,
+        "tooltip": false,
+        "on-click": "zool-menu"
+    },
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "١", "2": "٢", "3": "٣", "4": "٤", "5": "٥",
+            "6": "٦", "7": "٧", "8": "٨", "9": "٩"
+        },
+        "on-click": "activate",
+        "persistent-workspaces": { "*": 5 }
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 38,
+        "separate-outputs": true,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": "  $1",
+            "(.*) - Mousepad": "  $1",
+            "^$": "زول"
+        }
+    },
+
+    "clock": {
+        "format": "{:%H:%M  ·  %A %d %B}",
+        "format-alt": "{:%Y-%m-%d  %H:%M:%S}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "format": {
+                "today": "<span color='#e8b04a'><b>{}</b></span>",
+                "months": "<span color='#f3e6cc'><b>{}</b></span>",
+                "weekdays": "<span color='#b9a98a'>{}</span>"
+            }
+        }
+    },
+
+    "hyprland/language": {
+        "format": "  {short}",
+        "on-click": "hyprctl switchxkblayout all next"
+    },
+
+    "group/sys": {
+        "orientation": "inherit",
+        "modules": ["cpu", "memory", "temperature"]
+    },
+    "group/media": {
+        "orientation": "inherit",
+        "modules": ["pulseaudio", "bluetooth", "network"]
+    },
+
+    "cpu": { "format": " {usage}%", "interval": 3, "on-click": "kitty -e btop" },
+    "memory": { "format": " {percentage}%", "interval": 5, "on-click": "kitty -e btop" },
+    "temperature": {
+        "critical-threshold": 85,
+        "format": "{icon} {temperatureC}°",
+        "format-icons": ["", "", ""]
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": " muted",
+        "format-icons": { "default": ["", ""] },
+        "on-click": "pavucontrol",
+        "scroll-step": 5
+    },
+
+    "bluetooth": {
+        "format": "",
+        "format-disabled": "",
+        "format-off": "",
+        "on-click": "blueman-manager",
+        "tooltip-format": "{status}"
+    },
+
+    "network": {
+        "format-wifi": " {signalStrength}%",
+        "format-ethernet": " {ipaddr}",
+        "format-disconnected": " offline",
+        "tooltip-format": "{essid} {ifname}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-icons": ["", "", "", "", ""],
+        "states": { "warning": 25, "critical": 12 }
+    },
+
+    "tray": { "spacing": 10 },
+
+    "custom/power": {
+        "format": "",
+        "on-click": "zool-power",
+        "tooltip": false
+    }
+}

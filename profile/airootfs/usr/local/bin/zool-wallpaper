@@ -1,0 +1,26 @@
+#!/bin/sh
+# الخلفية: بدون معاملات = استعادة المحفوظة (أو الافتراضية)، و "pick" = اختيار من قائمة
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/zool/wallpaper"
+default="/usr/share/zool/wallpapers/nile-sunset.jpg"
+
+apply() {
+    pkill -x swaybg 2>/dev/null
+    setsid swaybg -i "$1" -m fill >/dev/null 2>&1 &
+}
+
+if [ "$1" = "pick" ]; then
+    list=$(ls -1 /usr/share/zool/wallpapers/*.jpg "$HOME"/Pictures/Wallpapers/* 2>/dev/null)
+    names=$(printf '%s\n' "$list" | while read -r p; do [ -n "$p" ] && basename "$p"; done)
+    pick=$(printf '%s\n' "$names" | wofi --dmenu --prompt "الخلفية" --width 460 --height 320 --columns 1)
+    [ -n "$pick" ] || exit 0
+    path=$(printf '%s\n' "$list" | grep -F "/$pick" | head -1)
+    [ -f "$path" ] || exit 1
+    mkdir -p "$(dirname "$conf")"
+    printf '%s\n' "$path" > "$conf"
+    apply "$path"
+    exit 0
+fi
+
+path="$default"
+[ -f "$conf" ] && [ -f "$(cat "$conf")" ] && path="$(cat "$conf")"
+apply "$path"

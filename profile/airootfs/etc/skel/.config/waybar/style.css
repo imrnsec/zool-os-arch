@@ -1,0 +1,123 @@
+/* Zool OS — شريط ناعم بألوان رمل السودان ونيله */
+@define-color night     #10181c;
+@define-color surface   rgba(23, 34, 41, 0.84);
+@define-color surface2  #213039;
+@define-color sand      #f3e6cc;
+@define-color sand_dim  #b9a98a;
+@define-color gold      #e8b04a;
+@define-color terracotta #d46a43;
+@define-color teal      #3ba5a0;
+@define-color blue      #2d86b4;
+@define-color acacia    #8fb35f;
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans Arabic", "Noto Sans", sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @sand;
+}
+
+/* كل مجموعة = "جزيرة" ناعمة */
+#workspaces,
+#window,
+#clock,
+#tray,
+#language,
+#sys,
+#media,
+#battery,
+#custom-power,
+#image {
+    background: @surface;
+    border: 1px solid rgba(232, 176, 74, 0.22);
+    border-radius: 16px;
+    padding: 0 14px;
+    margin: 0;
+}
+
+#image {
+    padding: 0 10px;
+}
+
+#window {
+    color: @sand_dim;
+    font-style: italic;
+}
+
+/* مساحات العمل بأرقام عربية */
+#workspaces {
+    padding: 0 5px;
+}
+
+#workspaces button {
+    padding: 0 10px;
+    margin: 4px 2px;
+    color: @sand_dim;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 15px;
+}
+
+#workspaces button:hover {
+    background: rgba(232, 176, 74, 0.16);
+    color: @sand;
+}
+
+#workspaces button.active {
+    color: @night;
+    font-weight: bold;
+    background: linear-gradient(135deg, @gold, @terracotta);
+}
+
+#workspaces button.urgent {
+    color: @night;
+    background: @terracotta;
+}
+
+#clock {
+    color: @gold;
+    font-weight: bold;
+    padding: 0 20px;
+}
+
+#language { color: @sand; }
+
+#cpu { color: @teal; padding-right: 8px; }
+#memory { color: @acacia; padding: 0 8px; }
+#temperature { color: @sand_dim; padding-left: 8px; }
+#temperature.critical { color: @terracotta; }
+
+#pulseaudio { color: @gold; padding-right: 8px; }
+#pulseaudio.muted { color: @sand_dim; }
+#bluetooth { color: @blue; padding: 0 8px; }
+#network { color: @sand; padding-left: 8px; }
+#network.disconnected { color: @terracotta; }
+
+#battery { color: @acacia; }
+#battery.warning { color: @gold; }
+#battery.critical { color: @terracotta; }
+
+#custom-power {
+    color: @terracotta;
+    padding: 0 14px;
+}
+
+#custom-power:hover {
+    background: rgba(212, 106, 67, 0.25);
+}
+
+tooltip {
+    background: @night;
+    border: 1px solid @gold;
+    border-radius: 12px;
+}
+
+tooltip label {
+    color: @sand;
+}

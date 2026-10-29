@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Install Zool OS
+Name[ar]=تثبيت زول
+Comment=Install Zool OS to disk
+Comment[ar]=تثبيت زول على القرص
+Exec=kitty -e zool-install
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;

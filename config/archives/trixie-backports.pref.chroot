@@ -1,9 +1,0 @@
-# مستودع backports أولويته الافتراضية 100 (لا يُستخدم تلقائياً).
-# نرفع الأولوية فقط لحزم Hyprland ومكتباتها حتى يختارها apt من backports،
-# أما باقي النظام فيبقى من trixie المستقر.
-#
-# إذا فشل البناء برسالة "unmet dependencies" عن مكتبة معيّنة (مثل libxkbcommon0)،
-# أضف اسم تلك المكتبة إلى سطر Package أدناه ثم أعد البناء.
-Package: hyprland hyprland-* hyprlock hypridle hyprpolkitagent xdg-desktop-portal-hyprland libhypr* libaquamarine* aquamarine libxkbcommon* libxkbregistry*
-Pin: release a=trixie-backports
-Pin-Priority: 900

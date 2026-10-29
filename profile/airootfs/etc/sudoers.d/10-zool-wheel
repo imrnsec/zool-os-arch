@@ -1,0 +1,2 @@
+# نظام الحياة فقط: مستخدمو wheel بلا كلمة مرور
+%wheel ALL=(ALL:ALL) NOPASSWD: ALL

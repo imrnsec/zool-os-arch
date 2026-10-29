@@ -1,0 +1,8 @@
+NAME="Zool OS"
+PRETTY_NAME="Zool OS"
+ID=zoolos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;232;176;74"
+HOME_URL="https://github.com/imrnsec/snlnos"
+LOGO=zool-logo
