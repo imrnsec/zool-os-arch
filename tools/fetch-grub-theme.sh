@@ -8,18 +8,51 @@ DEST="profile/grub/themes/yorha"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-if [ -f "$DEST/theme.txt" ]; then
-  echo "ثيم YoRHa موجود مسبقاً: $DEST"
-  exit 0
+if [ ! -f "$DEST/theme.txt" ]; then
+  git clone --depth 1 https://github.com/OliveThePuffin/yorha-grub-theme "$TMP/yorha"
+  rm -rf "$DEST"
+  mkdir -p "$DEST"
+  cp -r "$TMP/yorha/yorha-1920x1080/." "$DEST/"
 fi
 
-git clone --depth 1 https://github.com/OliveThePuffin/yorha-grub-theme "$TMP/yorha"
-rm -rf "$DEST"
-mkdir -p "$DEST"
-cp -r "$TMP/yorha/yorha-1920x1080/." "$DEST/"
-
-# تخصيص النصوص لتحمل اسم النظام
+# تخصيص النصوص لتحمل اسم النظام (آمن عند التكرار)
 sed -i 's/text = "L O A D I N G"/text = "Z O O L   O S"/; s/text = "- BOOTING SYSTEM . . ."/text = "- STARTING ZOOL . . ."/; s/text = "@KEYMAP_SHORT@"/text = "ENTER  boot      E  edit      C  command line"/' "$DEST/theme.txt"
+
+python3 - "$DEST/theme.txt" <<'EPY'
+import re, sys
+p = sys.argv[1]
+t = open(p).read()
+# النص الثاني: left 18% -> 30%
+t = re.sub(r'(\+ label \{\s*left = )18%(\s*top = 70)', r'\g<1>30%\2', t)
+if "zool-cover.png" not in t:
+    block = """+ image {
+    left = 21%
+    top = 28%
+    width = 57%
+    height = 41%
+    file = "zool-cover.png"
+}
+
++ image {
+    left = 64.5%
+    top = 33%
+    file = "zool-logo.png"
+}
+
++ image {
+    left = 58.5%
+    top = 55%
+    width = 25%
+    height = 9%
+    file = "zool-wordmark.png"
+}
+
+"""
+    t = t.replace("+ boot_menu {", block + "+ boot_menu {", 1)
+open(p, "w").write(t)
+EPY
+cp profile/grub/zool-theme/cover.png "$DEST/zool-cover.png"
+cp profile/grub/zool-theme/zool-logo.png profile/grub/zool-theme/zool-wordmark.png "$DEST/"
 
 cat > "$DEST/NOTICE.txt" <<'EON'
 YoRHa GRUB theme — https://github.com/OliveThePuffin/yorha-grub-theme
