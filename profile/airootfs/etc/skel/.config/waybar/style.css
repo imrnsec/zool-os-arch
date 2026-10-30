@@ -27,6 +27,8 @@ window#waybar {
 #workspaces,
 #window,
 #clock,
+#custom-hijri,
+#custom-prayer,
 #tray,
 #language,
 #cpu,
@@ -50,6 +52,7 @@ window#waybar {
     color: @gold;
     font-weight: bold;
     font-size: 15px;
+    font-family: "Reem Kufi", "Noto Sans Arabic", sans-serif;
 }
 
 #window {
@@ -63,6 +66,7 @@ window#waybar {
 }
 
 #workspaces button {
+    font-family: "Reem Kufi", "JetBrainsMono Nerd Font", sans-serif;
     padding: 0 10px;
     margin: 4px 2px;
     color: @sand_dim;
@@ -127,4 +131,19 @@ tooltip {
 
 tooltip label {
     color: @sand;
+}
+
+#custom-hijri {
+    color: @sand;
+    font-family: "Reem Kufi", "Noto Sans Arabic", sans-serif;
+}
+
+#custom-prayer {
+    color: @acacia;
+    font-family: "Noto Sans Arabic", "JetBrainsMono Nerd Font", sans-serif;
+}
+
+#custom-prayer.soon {
+    color: @night;
+    background: linear-gradient(135deg, @gold, @terracotta);
 }

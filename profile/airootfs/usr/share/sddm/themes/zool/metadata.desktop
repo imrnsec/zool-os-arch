@@ -1,0 +1,12 @@
+[SddmGreeterTheme]
+Name=Zool
+Description=شاشة دخول زول — ألوان رمل السودان ونيله
+Author=Zool OS
+Version=1.0
+Type=sddm-theme
+Screenshot=background.jpg
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=zool
+Theme-API=2.0
+QTVersion=6

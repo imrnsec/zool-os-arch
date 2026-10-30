@@ -30,4 +30,6 @@ file_permissions=(
   ["/usr/local/bin/zool-screenshot"]="0:0:755"
   ["/usr/local/bin/zool-wallpaper"]="0:0:755"
   ["/usr/local/bin/zool-blueman-launch"]="0:0:755"
+  ["/usr/local/bin/zool-prayer"]="0:0:755"
+  ["/usr/local/bin/zool-extras"]="0:0:755"
 )

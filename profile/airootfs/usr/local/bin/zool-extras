@@ -1,0 +1,21 @@
+#!/bin/bash
+# برامج إضافية اختيارية — تُثبَّت عند الطلب لتبقى صورة النظام خفيفة (يحتاج إنترنت)
+declare -A PKGS=(
+  ["LibreOffice | حزمة مكتبية (عربي)"]="libreoffice-fresh libreoffice-fresh-ar hunspell-ar"
+  ["GIMP | تحرير الصور"]="gimp"
+  ["Inkscape | رسم متجهي"]="inkscape"
+  ["VLC | مشغّل وسائط"]="vlc"
+  ["Telegram | تيليجرام"]="telegram-desktop"
+  ["Thunderbird | البريد"]="thunderbird thunderbird-i18n-ar"
+  ["OBS Studio | تسجيل الشاشة"]="obs-studio"
+  ["VS Code | محرر شيفرة (Code - OSS)"]="code"
+)
+choice=$(printf '%s\n' "${!PKGS[@]}" | sort | wofi --dmenu --prompt "تثبيت برنامج" --width 520 --height 420 --columns 1)
+[ -z "$choice" ] && exit 0
+pk="${PKGS[$choice]}"
+echo
+echo "  سيُثبَّت:  $pk"
+echo
+read -r -p "  اضغط Enter للمتابعة أو Ctrl+C للإلغاء... " _
+sudo pacman -Sy --needed --noconfirm $pk && notify-send -i /usr/share/zool/logo/zool-logo-128.png "زول" "تم تثبيت: $choice" \
+  || { echo "  فشل التثبيت — تأكد من الاتصال بالإنترنت."; read -r -p "  Enter للإغلاق " _; }

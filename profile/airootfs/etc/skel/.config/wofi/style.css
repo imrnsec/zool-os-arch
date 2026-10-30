@@ -8,7 +8,7 @@
 @define-color terracotta #d46a43;
 
 * {
-    font-family: "JetBrainsMono Nerd Font", "Noto Sans Arabic", "Noto Sans", sans-serif;
+    font-family: "Noto Sans Arabic", "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
     font-size: 14px;
 }
 

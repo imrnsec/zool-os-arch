@@ -8,11 +8,13 @@ choice=$(printf '%s\n' \
   "Bluetooth | البلوتوث" \
   "Sound | الصوت" \
   "Wallpaper | الخلفية" \
+  "Prayer city | مدينة الصلاة" \
+  "Extras | برامج إضافية" \
   "Install Zool OS | تثبيت زول" \
   "Keybindings | الاختصارات" \
   "System monitor | مراقب النظام" \
   "Power | الطاقة" \
-  | wofi --dmenu --prompt "زول" --width 520 --height 520 --columns 1)
+  | wofi --dmenu --prompt "زول" --width 520 --height 600 --columns 1)
 
 case "$choice" in
     Applications*)  wofi --show drun ;;
@@ -22,7 +24,9 @@ case "$choice" in
     Bluetooth*)     blueman-manager ;;
     Sound*)         pavucontrol ;;
     Wallpaper*)     zool-wallpaper pick ;;
-    Install*)       kitty -e zool-install ;;
+    Prayer*)        zool-prayer city ;;
+    Extras*)        kitty -e zool-extras ;;
+    Install*)       zool-install ;;
     Keybindings*)   zool-keys ;;
     "System monitor"*) kitty -e btop ;;
     Power*)         zool-power ;;

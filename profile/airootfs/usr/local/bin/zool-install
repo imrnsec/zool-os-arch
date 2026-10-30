@@ -1,23 +1,325 @@
 #!/bin/bash
-# تثبيت Zool OS على القرص عبر archinstall (مثبّت Arch الرسمي)
-cat <<'EOF'
+# ═══════════════════════════════════════════════════════════════
+#  مثبّت زول (Zool OS) — واجهة رسومية عربية بسيطة
+#
+#  الفكرة: ينسخ نظام الحياة الحالي (بكل ثيماته وإعداداته) إلى القرص،
+#  ثم يضبط المستخدم والإقلاع. لا يحتاج إنترنت.
+#
+#  الاستعمال:
+#    zool-install                 (واجهة رسومية — من قائمة زول أو الطرفية)
+#    zool-install --run <ملف>     (المرحلة الثانية — يُستدعى تلقائياً بصلاحيات root)
+#    ZOOL_DRYRUN=1 zool-install --run <ملف>   (طباعة الأوامر دون تنفيذها)
+#
+#  تحذير: يمسح القرص المختار بالكامل.
+# ═══════════════════════════════════════════════════════════════
+set -u
+TARGET=/mnt/zool
+LOG=/tmp/zool-install.log
+SELF=$(readlink -f "$0")
 
-  ╭──────────────────────────────────────╮
-  │   تثبيت Zool OS  —  زول              │
-  ╰──────────────────────────────────────╯
+# ───────────────────────── المرحلة الأولى: الأسئلة (مستخدم عادي) ─────────────────────────
+live_disk() {
+    local src
+    src=$(findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null) || return 0
+    [ -n "$src" ] && lsblk -no PKNAME "$src" 2>/dev/null | head -1
+}
 
-  سيُشغَّل archinstall. للحصول على سطح المكتب نفسه اختر:
-    • Profile → Desktop → Hyprland
-    • Audio → pipewire
-    • Network → NetworkManager
-    • حزم إضافية:  kitty waybar wofi mako swaybg grim slurp wl-clipboard
-                    cliphist brightnessctl playerctl hyprlock hypridle
-                    hyprpolkitagent adw-gtk-theme papirus-icon-theme
-                    ttf-jetbrains-mono-nerd noto-fonts firefox thunar
+stage1() {
+    if ! command -v zenity >/dev/null 2>&1 || { [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${DISPLAY:-}" ]; }; then
+        echo "المثبّت الرسومي يحتاج جلسة سطح المكتب وبرنامج zenity."
+        echo "شغّله من قائمة زول (SUPER+Z) داخل الجلسة الرسومية."
+        exit 1
+    fi
+    local T="تثبيت زول"
 
-  ملاحظة: تخصيصات زول (الشريط، القوائم، الخلفيات) موجودة في /etc/skel
-  وفي /usr/share/zool — انسخها إلى النظام المثبّت بعد انتهاء التثبيت.
+    zenity --question --title="$T" --width=480 --ok-label="متابعة" --cancel-label="إلغاء" \
+        --text="مرحباً بك في <b>زول</b> 🌅\n\nسيُثبَّت النظام على القرص الذي تختاره.\n<b>سيُحذف كل ما على ذلك القرص.</b>\n\nتأكد من اتصال الحاسوب بالكهرباء قبل المتابعة." || exit 0
 
-EOF
-read -r -p "اضغط Enter للمتابعة أو Ctrl+C للإلغاء... " _
-exec sudo archinstall
+    # ── القرص ──
+    local skip rows=() name size model
+    skip=$(live_disk)
+    while read -r name size model; do
+        [ -z "$name" ] && continue
+        [ "$name" = "$skip" ] && continue
+        case "$name" in zram*|loop*|ram*) continue ;; esac
+        rows+=("/dev/$name" "$size" "${model:-—}")
+    done < <(lsblk -dnpo NAME,SIZE,MODEL -e 7,11,2 2>/dev/null | sed 's|/dev/||')
+    if [ ${#rows[@]} -eq 0 ]; then
+        zenity --error --title="$T" --text="لم أجد قرصاً صالحاً للتثبيت."; exit 1
+    fi
+    local DISK
+    DISK=$(zenity --list --title="$T" --width=560 --height=360 --text="اختر القرص الذي سيُثبَّت عليه زول:" \
+        --column="القرص" --column="الحجم" --column="الطراز" "${rows[@]}") || exit 0
+    [ -z "$DISK" ] && exit 0
+
+    # ── المستخدم ──
+    local USERNAME HOSTNAME PASSWORD PASSWORD2 out
+    while true; do
+        out=$(zenity --forms --title="$T" --width=460 --separator=$'\t' \
+            --text="بيانات حسابك" \
+            --add-entry="اسم المستخدم (إنجليزي صغير)" \
+            --add-entry="اسم الجهاز" \
+            --add-password="كلمة المرور" \
+            --add-password="تأكيد كلمة المرور") || exit 0
+        IFS=$'\t' read -r USERNAME HOSTNAME PASSWORD PASSWORD2 <<<"$out"
+        HOSTNAME=${HOSTNAME:-zoolos}
+        if ! [[ "$USERNAME" =~ ^[a-z_][a-z0-9_-]{0,30}$ ]]; then
+            zenity --error --title="$T" --text="اسم المستخدم غير صالح. استعمل حروفاً إنجليزية صغيرة وأرقاماً فقط."; continue
+        fi
+        if ! [[ "$HOSTNAME" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,62}$ ]]; then
+            zenity --error --title="$T" --text="اسم الجهاز غير صالح."; continue
+        fi
+        if [ ${#PASSWORD} -lt 4 ]; then
+            zenity --error --title="$T" --text="كلمة المرور قصيرة (٤ أحرف على الأقل)."; continue
+        fi
+        if [ "$PASSWORD" != "$PASSWORD2" ]; then
+            zenity --error --title="$T" --text="كلمتا المرور غير متطابقتين."; continue
+        fi
+        break
+    done
+
+    # ── المنطقة الزمنية ──
+    local TZ_DEF TZONE
+    TZ_DEF=$(readlink -f /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||')
+    TZ_DEF=${TZ_DEF:-Africa/Khartoum}
+    TZONE=$(zenity --entry --title="$T" --width=420 --text="المنطقة الزمنية (مثل Africa/Khartoum):" --entry-text="$TZ_DEF") || exit 0
+    [ -f "/usr/share/zoneinfo/$TZONE" ] || TZONE=Africa/Khartoum
+
+    # ── التأكيد النهائي ──
+    zenity --question --title="$T" --width=480 --ok-label="ابدأ التثبيت" --cancel-label="رجوع" \
+        --text="<b>سيُمسح القرص $DISK بالكامل</b> ثم يُثبَّت زول عليه.\n\nالمستخدم: $USERNAME\nالجهاز: $HOSTNAME\nالمنطقة: $TZONE\n\nهل تريد المتابعة؟" || exit 0
+
+    local CONF
+    CONF=$(mktemp /tmp/zool-install.XXXXXX)
+    chmod 600 "$CONF"
+    {
+        printf 'DISK=%q\n' "$DISK"
+        printf 'USERNAME=%q\n' "$USERNAME"
+        printf 'HOSTNAME=%q\n' "$HOSTNAME"
+        printf 'PASSWORD=%q\n' "$PASSWORD"
+        printf 'TZONE=%q\n' "$TZONE"
+    } >"$CONF"
+
+    rm -f /tmp/zool-install.status
+    if command -v kitty >/dev/null 2>&1; then
+        kitty --title "تثبيت زول" -e sudo "$SELF" --run "$CONF"
+    else
+        sudo "$SELF" --run "$CONF"
+    fi
+    rm -f "$CONF"
+
+    if [ "$(cat /tmp/zool-install.status 2>/dev/null)" = "ok" ]; then
+        if zenity --question --title="$T" --width=420 --ok-label="إعادة التشغيل الآن" --cancel-label="لاحقاً" \
+            --text="✅ تم تثبيت <b>زول</b> بنجاح.\n\nانزع وسيط التثبيت ثم أعد التشغيل."; then
+            systemctl reboot
+        fi
+    else
+        zenity --error --title="$T" --width=460 \
+            --text="لم يكتمل التثبيت.\nراجع السجل:  $LOG"
+    fi
+}
+
+# ───────────────────────── المرحلة الثانية: التنفيذ (root) ─────────────────────────
+DRY=${ZOOL_DRYRUN:-0}
+say() { printf '\n\033[1;33m══ %s\033[0m\n' "$*" | tee -a "$LOG"; }
+run() {
+    if [ "$DRY" = 1 ]; then printf '[dry] %s\n' "$*"; return 0; fi
+    "$@" >>"$LOG" 2>&1 || { echo "فشل: $*" | tee -a "$LOG"; return 1; }
+}
+die() {
+    echo "✗ $*" | tee -a "$LOG"
+    echo fail >/tmp/zool-install.status
+    read -r -p "اضغط Enter للإغلاق... " _
+    exit 1
+}
+part() {  # اسم القسم رقم $2 للقرص $1 (يعالج nvme/mmc)
+    case "$1" in *[0-9]) echo "${1}p$2" ;; *) echo "${1}$2" ;; esac
+}
+
+stage2() {
+    local CONF=$1
+    [ "$(id -u)" = 0 ] || die "يجب التشغيل بصلاحيات root"
+    # shellcheck disable=SC1090
+    source "$CONF" || die "ملف الإعداد غير صالح"
+    : >"$LOG"
+    echo run >/tmp/zool-install.status
+
+    [ "$DRY" = 1 ] || [ -b "$DISK" ] || die "القرص غير موجود: $DISK"
+    local skip; skip=$(live_disk)
+    [ -n "$skip" ] && [ "$DISK" = "/dev/$skip" ] && die "لا يمكن التثبيت على وسيط الإقلاع نفسه"
+
+    local UEFI=0
+    [ -d /sys/firmware/efi ] && UEFI=1
+    say "الوضع: $([ $UEFI = 1 ] && echo UEFI || echo BIOS)   —   القرص: $DISK"
+
+    # ── 1) التقسيم ──
+    say "[1/7] تقسيم القرص"
+    run umount -R "$TARGET" || true
+    run swapoff -a || true
+    run wipefs -af "$DISK" || die "تعذر مسح القرص"
+    run sgdisk --zap-all "$DISK" || die "تعذر تقسيم القرص"
+    local P_BOOT P_ROOT
+    P_BOOT=$(part "$DISK" 1); P_ROOT=$(part "$DISK" 2)
+    if [ $UEFI = 1 ]; then
+        run sgdisk -n1:0:+512M -t1:ef00 -c1:ESP "$DISK" || die "فشل إنشاء قسم ESP"
+    else
+        run sgdisk -n1:0:+1M -t1:ef02 -c1:BIOSBOOT "$DISK" || die "فشل إنشاء قسم الإقلاع"
+    fi
+    run sgdisk -n2:0:0 -t2:8300 -c2:ZoolOS "$DISK" || die "فشل إنشاء قسم النظام"
+    run partprobe "$DISK" || true
+    run udevadm settle || true
+    sleep 1
+
+    # ── 2) التهيئة والتركيب ──
+    say "[2/7] تهيئة الأقسام"
+    run mkfs.ext4 -F -L ZoolOS "$P_ROOT" || die "فشلت تهيئة قسم النظام"
+    run mkdir -p "$TARGET"
+    run mount "$P_ROOT" "$TARGET" || die "تعذر تركيب قسم النظام"
+    if [ $UEFI = 1 ]; then
+        run mkfs.fat -F32 -n ZOOLEFI "$P_BOOT" || die "فشلت تهيئة ESP"
+        run mkdir -p "$TARGET/boot/efi"
+        run mount "$P_BOOT" "$TARGET/boot/efi" || die "تعذر تركيب ESP"
+    fi
+
+    # ── 3) نسخ النظام ──
+    say "[3/7] نسخ ملفات النظام (قد يستغرق بضع دقائق)"
+    local EXC=(
+        --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/run/*'
+        --exclude='/tmp/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found'
+        --exclude='/home/zool' --exclude='/var/cache/pacman/pkg/*' --exclude='/var/log/*'
+        --exclude='/etc/pacman.d/gnupg/*' --exclude='/boot/*' --exclude='/swapfile'
+    )
+    if [ "$DRY" = 1 ]; then
+        echo "[dry] rsync -aAXH ${EXC[*]} / $TARGET/"
+    else
+        rsync -aAXH --info=progress2 "${EXC[@]}" / "$TARGET/" 2>&1 | tee -a "$LOG"
+        [ -f "$TARGET/etc/os-release" ] || die "فشل نسخ النظام"
+    fi
+    run mkdir -p "$TARGET"/{dev,proc,sys,run,tmp,mnt,media,boot,var/log}
+    run chmod 1777 "$TARGET/tmp"
+
+    # ── 4) ضبط النظام داخل chroot ──
+    say "[4/7] ضبط النظام"
+    run bash -c ": > '$TARGET/etc/fstab'; genfstab -U '$TARGET' >> '$TARGET/etc/fstab'" || die "فشل إنشاء fstab"
+
+    local ENVF="$TARGET/root/.zool-env" CH="$TARGET/root/.zool-chroot.sh"
+    if [ "$DRY" != 1 ]; then
+        {
+            printf 'DISK=%q\nUSERNAME=%q\nHOSTNAME=%q\nPASSWORD=%q\nTZONE=%q\nUEFI=%q\n' \
+                "$DISK" "$USERNAME" "$HOSTNAME" "$PASSWORD" "$TZONE" "$UEFI"
+        } >"$ENVF"
+        chmod 600 "$ENVF"
+        cat >"$CH" <<'CHROOT'
+#!/bin/bash
+set -u
+source /root/.zool-env
+log() { echo "  · $*"; }
+
+log "اسم الجهاز والمنطقة الزمنية"
+echo "$HOSTNAME" >/etc/hostname
+printf '127.0.0.1 localhost\n::1 localhost\n127.0.1.1 %s\n' "$HOSTNAME" >/etc/hosts
+ln -sf "/usr/share/zoneinfo/$TZONE" /etc/localtime
+hwclock --systohc 2>/dev/null || true
+locale-gen >/dev/null 2>&1 || true
+
+log "إزالة بقايا نظام الحياة"
+userdel -f zool 2>/dev/null || true
+rm -rf /home/zool
+rm -f /etc/sudoers.d/10-zool-wheel /etc/sddm.conf.d/10-zool-autologin.conf
+rm -f /etc/mkinitcpio.conf.d/archiso.conf
+for u in choose-mirror.service pacman-init.service zool-live-setup.service livecd-alsa-unmuter.service \
+         etc-pacman.d-gnupg.mount; do
+    rm -f "/etc/systemd/system/$u" \
+          "/etc/systemd/system/multi-user.target.wants/$u" \
+          "/etc/systemd/system/sound.target.wants/$u"
+done
+rm -f /usr/local/bin/choose-mirror /usr/local/bin/livecd-sound /usr/local/bin/zool-live-setup
+
+log "إنشاء المستخدم $USERNAME"
+useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/bash "$USERNAME"
+printf '%s:%s\n' "$USERNAME" "$PASSWORD" | chpasswd
+passwd -l root >/dev/null
+printf '%%wheel ALL=(ALL:ALL) ALL\n' >/etc/sudoers.d/10-zool-wheel
+chmod 440 /etc/sudoers.d/10-zool-wheel
+install -d -o "$USERNAME" -g "$USERNAME" "/home/$USERNAME/Pictures" "/home/$USERNAME/Downloads" "/home/$USERNAME/Documents"
+
+log "مفاتيح pacman"
+pacman-key --init >/dev/null 2>&1 && pacman-key --populate archlinux >/dev/null 2>&1 || true
+
+log "النواة وصورة الإقلاع (initramfs)"
+mkdir -p /boot
+for k in /usr/lib/modules/*/vmlinuz; do
+    if [ -f "$(dirname "$k")/pkgbase" ] && [ "$(cat "$(dirname "$k")/pkgbase")" = linux ]; then
+        install -Dm644 "$k" /boot/vmlinuz-linux
+    fi
+done
+[ -f /boot/vmlinuz-linux ] || install -Dm644 "$(ls /usr/lib/modules/*/vmlinuz | head -1)" /boot/vmlinuz-linux
+cat >/etc/mkinitcpio.conf.d/zool.conf <<'EOM'
+HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard keymap consolefont block filesystems fsck)
+EOM
+mkinitcpio -P || exit 11
+
+log "المُحمّل GRUB"
+cat >/etc/default/grub <<'EOM'
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="Zool OS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=3"
+GRUB_CMDLINE_LINUX=""
+GRUB_PRELOAD_MODULES="part_gpt part_msdos"
+GRUB_TERMINAL_OUTPUT=gfxterm
+GRUB_GFXMODE=auto
+GRUB_GFXPAYLOAD_LINUX=keep
+GRUB_DISABLE_OS_PROBER=true
+EOM
+if [ -d /boot/grub/themes/yorha ]; then
+    echo 'GRUB_THEME="/boot/grub/themes/yorha/theme.txt"' >>/etc/default/grub
+fi
+if [ "$UEFI" = 1 ]; then
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ZoolOS --recheck || exit 12
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable --recheck || true
+else
+    grub-install --target=i386-pc --recheck "$DISK" || exit 12
+fi
+grub-mkconfig -o /boot/grub/grub.cfg || exit 13
+
+log "تفعيل الخدمات"
+systemctl enable sddm NetworkManager bluetooth >/dev/null 2>&1 || true
+systemctl --global enable pipewire pipewire-pulse wireplumber >/dev/null 2>&1 || true
+CHROOT
+        chmod 755 "$CH"
+        # ثيم GRUB (YoRHa) يأتي من وسيط التثبيت، فهو ليس داخل ملفات النظام
+        if [ -d /run/archiso/bootmnt/boot/grub/themes ]; then
+            mkdir -p "$TARGET/boot/grub"
+            cp -r /run/archiso/bootmnt/boot/grub/themes "$TARGET/boot/grub/" 2>>"$LOG" || true
+        fi
+    else
+        echo "[dry] (سكربت chroot: مستخدم + initramfs + grub + خدمات)"
+    fi
+
+    say "[5/7] المستخدم + النواة + الإقلاع"
+    if [ "$DRY" = 1 ]; then
+        echo "[dry] arch-chroot $TARGET /root/.zool-chroot.sh"
+    else
+        arch-chroot "$TARGET" /root/.zool-chroot.sh 2>&1 | tee -a "$LOG"
+        rc=${PIPESTATUS[0]}
+        shred -u "$ENVF" 2>/dev/null || rm -f "$ENVF"
+        rm -f "$CH"
+        [ "$rc" = 0 ] || die "فشل ضبط النظام (رمز $rc). راجع $LOG"
+    fi
+
+    # ── 6) تنظيف ──
+    say "[6/7] إنهاء"
+    run sync
+    run umount -R "$TARGET" || true
+
+    say "[7/7] ✅ اكتمل التثبيت"
+    echo ok >/tmp/zool-install.status
+    [ "$DRY" = 1 ] || { read -r -p "اضغط Enter للإغلاق... " _; }
+}
+
+# ───────────────────────── نقطة الدخول ─────────────────────────
+case "${1:-}" in
+    --run) [ -n "${2:-}" ] || { echo "usage: $0 --run <conf>"; exit 2; }; stage2 "$2" ;;
+    *)     stage1 ;;
+esac

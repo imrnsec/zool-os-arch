@@ -93,6 +93,12 @@ noto-fonts
 noto-fonts-emoji
 ttf-dejavu
 
+# ── الوسائط والترميزات ──
+ffmpeg gst-libav gst-plugins-good gst-plugins-bad gst-plugins-ugly ffmpegthumbnailer loupe
+
+# ── أدوات زول (بايثون لأوقات الصلاة، zenity للمثبّت) ──
+python zenity
+
 # ── التطبيقات ──
 firefox
 firefox-i18n-ar

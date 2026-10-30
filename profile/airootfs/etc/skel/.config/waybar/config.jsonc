@@ -8,7 +8,7 @@
     "margin-right": 14,
 
     "modules-left": ["custom/logo", "hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
+    "modules-center": ["clock", "custom/hijri", "custom/prayer"],
     "modules-right": ["tray", "hyprland/language", "cpu", "memory", "temperature", "pulseaudio", "bluetooth", "network", "battery", "custom/power"],
 
     "custom/logo": {
@@ -50,6 +50,19 @@
                 "weekdays": "<span color='#b9a98a'>{}</span>"
             }
         }
+    },
+
+    "custom/hijri": {
+        "exec": "zool-prayer hijri",
+        "return-type": "json",
+        "interval": 600
+    },
+
+    "custom/prayer": {
+        "exec": "zool-prayer waybar",
+        "return-type": "json",
+        "interval": 30,
+        "on-click": "zool-prayer city"
     },
 
     "hyprland/language": {

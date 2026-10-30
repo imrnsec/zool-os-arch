@@ -1,0 +1,347 @@
+#!/usr/bin/env python3
+"""zool-prayer — أوقات الصلاة والتاريخ الهجري لزول (حساب محلي، لا يحتاج إنترنت).
+
+الاستعمال:
+  zool-prayer waybar    خرج JSON لوحدة waybar (الصلاة القادمة)
+  zool-prayer hijri     خرج JSON لوحدة waybar (التاريخ الهجري)
+  zool-prayer list      طباعة أوقات اليوم
+  zool-prayer daemon    إشعار عند دخول كل وقت (يُشغَّل مع الجلسة)
+  zool-prayer city      اختيار المدينة من قائمة (wofi)
+  zool-prayer config    فتح ملف الإعداد
+
+الإعداد: ~/.config/zool/prayer.conf  (خط العرض/الطول وطريقة الحساب)
+ملاحظة: الأوقات تقريبية (طريقة الهيئة المصرية افتراضياً)، تحقق منها من مصدر رسمي.
+"""
+import configparser
+import datetime as dt
+import json
+import math
+import os
+import subprocess
+import sys
+import time
+
+CONF_DIR = os.path.expanduser("~/.config/zool")
+CONF = os.path.join(CONF_DIR, "prayer.conf")
+LOGO = "/usr/share/zool/logo/zool-logo-128.png"
+
+# المدن: (الاسم, خط العرض, خط الطول)
+CITIES = {
+    "الخرطوم": (15.5007, 32.5599),
+    "أم درمان": (15.6445, 32.4777),
+    "بورتسودان": (19.6158, 37.2164),
+    "كسلا": (15.4500, 36.4000),
+    "الأبيض": (13.1833, 30.2167),
+    "نيالا": (12.0489, 24.8807),
+    "ود مدني": (14.4012, 33.5199),
+    "عطبرة": (17.7022, 33.9861),
+    "دنقلا": (19.1652, 30.4764),
+    "القاهرة": (30.0444, 31.2357),
+    "مكة المكرمة": (21.3891, 39.8579),
+    "المدينة المنورة": (24.4709, 39.6122),
+    "الرياض": (24.7136, 46.6753),
+    "دبي": (25.2048, 55.2708),
+}
+
+# طرق الحساب: (زاوية الفجر, زاوية العشاء)
+METHODS = {
+    "egypt": (19.5, 17.5),   # الهيئة المصرية (مناسبة للسودان)
+    "mwl": (18.0, 17.0),     # رابطة العالم الإسلامي
+    "karachi": (18.0, 18.0),
+    "isna": (15.0, 15.0),
+}
+
+NAMES = {
+    "fajr": "الفجر", "sunrise": "الشروق", "dhuhr": "الظهر",
+    "asr": "العصر", "maghrib": "المغرب", "isha": "العشاء",
+}
+ORDER = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"]
+NOTIFY = ["fajr", "dhuhr", "asr", "maghrib", "isha"]  # الشروق بلا أذان
+
+HIJRI_MONTHS = ["محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة",
+                "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"]
+WEEKDAYS = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
+GREG_MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+               "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+
+DEFAULT_CONF = """# إعداد أوقات الصلاة — زول
+# يمكنك تغيير المدينة بـ:  zool-prayer city   (أو من قائمة زول)
+[prayer]
+city = الخرطوم
+latitude = 15.5007
+longitude = 32.5599
+# egypt | mwl | karachi | isna
+method = egypt
+# العصر: 1 = جمهور (الظل مثله) ، 2 = حنفي (الظل مثلاه)
+asr_factor = 1
+# تعديل التاريخ الهجري بالأيام (-1 أو 0 أو 1)
+hijri_offset = 0
+# دقائق تُضاف لكل وقت للاحتياط (اختياري)
+fajr_adjust = 0
+dhuhr_adjust = 0
+asr_adjust = 0
+maghrib_adjust = 0
+isha_adjust = 0
+# أذان صوتي اختياري: ضع ملفاً هنا (ogg/wav/mp3) ليُشغَّل مع الإشعار
+adhan_file = ~/.config/zool/adhan.ogg
+"""
+
+
+def to_ar(s):
+    """أرقام عربية-هندية."""
+    return str(s).translate(str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩"))
+
+
+def load_conf():
+    os.makedirs(CONF_DIR, exist_ok=True)
+    if not os.path.exists(CONF):
+        with open(CONF, "w", encoding="utf-8") as f:
+            f.write(DEFAULT_CONF)
+    cp = configparser.ConfigParser()
+    cp.read(CONF, encoding="utf-8")
+    sec = cp["prayer"] if cp.has_section("prayer") else {}
+
+    def g(k, d):
+        try:
+            return sec.get(k, d)
+        except Exception:
+            return d
+
+    method = g("method", "egypt")
+    fa, ia = METHODS.get(method, METHODS["egypt"])
+    return {
+        "lat": float(g("latitude", "15.5007")),
+        "lng": float(g("longitude", "32.5599")),
+        "fajr_angle": fa, "isha_angle": ia,
+        "asr_factor": float(g("asr_factor", "1")),
+        "hijri_offset": int(float(g("hijri_offset", "0"))),
+        "adj": {k: float(g(k + "_adjust", "0")) for k in NOTIFY},
+        "adhan": os.path.expanduser(g("adhan_file", "")),
+        "city": g("city", ""),
+    }
+
+
+# ───────────── الفلك ─────────────
+def _sin(d): return math.sin(math.radians(d))
+def _cos(d): return math.cos(math.radians(d))
+def _tan(d): return math.tan(math.radians(d))
+def _asin(x): return math.degrees(math.asin(x))
+def _acos(x): return math.degrees(math.acos(max(-1.0, min(1.0, x))))
+def _fix(a, b): return a - b * math.floor(a / b)
+
+
+def sun_position(jd):
+    d = jd - 2451545.0
+    g = _fix(357.529 + 0.98560028 * d, 360)
+    q = _fix(280.459 + 0.98564736 * d, 360)
+    L = _fix(q + 1.915 * _sin(g) + 0.020 * _sin(2 * g), 360)
+    e = 23.439 - 0.00000036 * d
+    ra = math.degrees(math.atan2(_cos(e) * _sin(L), _cos(L))) / 15.0
+    eqt = q / 15.0 - _fix(ra, 24)
+    if eqt > 12:
+        eqt -= 24
+    if eqt < -12:
+        eqt += 24
+    decl = _asin(_sin(e) * _sin(L))
+    return decl, eqt
+
+
+def prayer_times(date, conf, tz_hours):
+    """يرجع قاموس {اسم: datetime محلي واعٍ بالمنطقة}."""
+    lat, lng = conf["lat"], conf["lng"]
+    jd = date.toordinal() + 1721424.5 - lng / (15 * 24)
+    decl, eqt = sun_position(jd + 0.5)
+    dhuhr = 12 + tz_hours - lng / 15.0 - eqt
+
+    def t_angle(angle):
+        v = (-_sin(angle) - _sin(decl) * _sin(lat)) / (_cos(decl) * _cos(lat))
+        return _acos(v) / 15.0
+
+    def t_asr(factor):
+        ang = -math.degrees(math.atan(1.0 / (factor + _tan(abs(lat - decl)))))
+        v = (-_sin(ang) - _sin(decl) * _sin(lat)) / (_cos(decl) * _cos(lat))
+        return _acos(v) / 15.0
+
+    hours = {
+        "fajr": dhuhr - t_angle(conf["fajr_angle"]),
+        "sunrise": dhuhr - t_angle(0.833),
+        "dhuhr": dhuhr + 2 / 60.0,   # احتياط دقيقتين بعد الزوال
+        "asr": dhuhr + t_asr(conf["asr_factor"]),
+        "maghrib": dhuhr + t_angle(0.833),
+        "isha": dhuhr + t_angle(conf["isha_angle"]),
+    }
+    tz = dt.timezone(dt.timedelta(hours=tz_hours))
+    base = dt.datetime(date.year, date.month, date.day, tzinfo=tz)
+    out = {}
+    for k, h in hours.items():
+        h += conf["adj"].get(k, 0) / 60.0
+        out[k] = base + dt.timedelta(seconds=round(h * 3600))
+    return out
+
+
+def local_tz_hours(now=None):
+    now = now or dt.datetime.now().astimezone()
+    return now.utcoffset().total_seconds() / 3600.0
+
+
+# ───────────── التاريخ الهجري (جدولي) ─────────────
+def to_hijri(date, offset=0):
+    date = date + dt.timedelta(days=offset)
+    jd = date.toordinal() + 1721425
+    l = jd - 1948440 + 10632
+    n = (l - 1) // 10631
+    l = l - 10631 * n + 354
+    j = ((10985 - l) // 5316) * ((50 * l) // 17719) + (l // 5670) * ((43 * l) // 15238)
+    l = l - ((30 - j) // 15) * ((17719 * j) // 50) - (j // 16) * ((15238 * j) // 43) + 29
+    m = (24 * l) // 709
+    d = l - (709 * m) // 24
+    y = 30 * n + j - 30
+    return y, m, d
+
+
+def hijri_str(date, offset=0):
+    y, m, d = to_hijri(date, offset)
+    return f"{to_ar(d)} {HIJRI_MONTHS[m - 1]} {to_ar(y)}هـ"
+
+
+def greg_str(now):
+    return f"{WEEKDAYS[now.weekday()]} {to_ar(now.day)} {GREG_MONTHS[now.month - 1]} {to_ar(now.year)}"
+
+
+def fmt_time(t):
+    h = t.hour % 12 or 12
+    suffix = "ص" if t.hour < 12 else "م"
+    return f"{to_ar(h)}:{to_ar('%02d' % t.minute)} {suffix}"
+
+
+def fmt_delta(sec):
+    sec = max(0, int(sec))
+    h, rem = divmod(sec, 3600)
+    m = rem // 60
+    if h:
+        return f"{to_ar(h)}:{to_ar('%02d' % m)} س"
+    return f"{to_ar(m)} د"
+
+
+def next_prayer(conf, now):
+    """يرجع (key, datetime) للصلاة القادمة (يتخطى إلى فجر الغد إن لزم)."""
+    tz = local_tz_hours(now)
+    for add in (0, 1):
+        day = now.date() + dt.timedelta(days=add)
+        times = prayer_times(day, conf, tz)
+        for k in ORDER:
+            if k == "sunrise":
+                continue
+            if times[k] > now:
+                return k, times[k], times
+    return None, None, None
+
+
+# ───────────── الأوامر ─────────────
+def cmd_waybar():
+    conf = load_conf()
+    now = dt.datetime.now().astimezone()
+    k, t, _ = next_prayer(conf, now)
+    today = prayer_times(now.date(), conf, local_tz_hours(now))
+    lines = [f"{hijri_str(now.date(), conf['hijri_offset'])}", greg_str(now), ""]
+    for key in ORDER:
+        mark = "◀ " if key == k else "   "
+        lines.append(f"{mark}{NAMES[key]}  {fmt_time(today[key])}")
+    if conf["city"]:
+        lines += ["", f"📍 {conf['city']}"]
+    text = f"  {NAMES[k]} {fmt_time(t)}  ·  بعد {fmt_delta((t - now).total_seconds())}"
+    cls = "soon" if (t - now).total_seconds() < 1800 else "normal"
+    print(json.dumps({"text": text, "tooltip": "\n".join(lines), "class": cls}, ensure_ascii=False))
+
+
+def cmd_hijri():
+    conf = load_conf()
+    now = dt.datetime.now().astimezone()
+    print(json.dumps({"text": hijri_str(now.date(), conf["hijri_offset"]),
+                      "tooltip": greg_str(now)}, ensure_ascii=False))
+
+
+def cmd_list():
+    conf = load_conf()
+    now = dt.datetime.now().astimezone()
+    today = prayer_times(now.date(), conf, local_tz_hours(now))
+    print(hijri_str(now.date(), conf["hijri_offset"]), "—", greg_str(now))
+    if conf["city"]:
+        print("المدينة:", conf["city"])
+    for key in ORDER:
+        print(f"{NAMES[key]:<8} {fmt_time(today[key])}")
+
+
+def notify(title, body, urgent=True):
+    args = ["notify-send", "-i", LOGO, "-a", "zool-prayer"]
+    if urgent:
+        args += ["-u", "critical"]
+    subprocess.run(args + [title, body], check=False)
+
+
+def play_adhan(path):
+    if path and os.path.isfile(path):
+        for player in (["pw-play"], ["paplay"], ["mpv", "--no-video", "--really-quiet"]):
+            try:
+                subprocess.Popen(player + [path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                return
+            except FileNotFoundError:
+                continue
+
+
+def cmd_daemon():
+    done = set()
+    while True:
+        conf = load_conf()
+        now = dt.datetime.now().astimezone()
+        today = prayer_times(now.date(), conf, local_tz_hours(now))
+        for k in NOTIFY:
+            key = (now.date(), k)
+            delta = (now - today[k]).total_seconds()
+            # ننبّه خلال دقيقتين من الموعد (يغطي السكون القصير)
+            if 0 <= delta < 120 and key not in done:
+                done.add(key)
+                notify(f"حان الآن موعد أذان {NAMES[k]}", f"{fmt_time(today[k])}  ·  {conf['city'] or ''}".strip(" ·"))
+                play_adhan(conf["adhan"])
+        done = {x for x in done if x[0] == now.date()}
+        time.sleep(20)
+
+
+def cmd_city():
+    items = "\n".join(CITIES.keys())
+    try:
+        out = subprocess.run(
+            ["wofi", "--dmenu", "--prompt", "اختر المدينة", "--width", "420", "--height", "460"],
+            input=items, capture_output=True, text=True, check=False).stdout.strip()
+    except FileNotFoundError:
+        print("wofi غير موجود"); return
+    if out not in CITIES:
+        return
+    lat, lng = CITIES[out]
+    load_conf()
+    cp = configparser.ConfigParser()
+    cp.read(CONF, encoding="utf-8")
+    cp["prayer"]["city"] = out
+    cp["prayer"]["latitude"] = str(lat)
+    cp["prayer"]["longitude"] = str(lng)
+    with open(CONF, "w", encoding="utf-8") as f:
+        cp.write(f)
+    notify("أوقات الصلاة", f"تم اختيار {out}", urgent=False)
+
+
+def cmd_config():
+    load_conf()
+    subprocess.run(["kitty", "-e", "nano", CONF], check=False)
+
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "list"
+    fn = {"waybar": cmd_waybar, "hijri": cmd_hijri, "list": cmd_list, "daemon": cmd_daemon,
+          "city": cmd_city, "config": cmd_config}.get(cmd)
+    if not fn:
+        print(__doc__); sys.exit(1)
+    fn()
+
+
+if __name__ == "__main__":
+    main()

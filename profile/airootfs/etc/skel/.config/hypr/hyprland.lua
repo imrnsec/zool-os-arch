@@ -50,6 +50,7 @@ hl.on("hyprland.start", function()
         "zool-wallpaper",
         "waybar",
         "mako",
+        "zool-prayer daemon",
         "nm-applet --indicator",
         "zool-blueman-launch",
         "systemctl --user start hyprpolkitagent",
