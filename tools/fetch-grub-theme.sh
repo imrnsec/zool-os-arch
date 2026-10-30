@@ -18,6 +18,9 @@ fi
 # تخصيص النصوص لتحمل اسم النظام (آمن عند التكرار)
 sed -i 's/text = "L O A D I N G"/text = "Z O O L   O S"/; s/text = "- BOOTING SYSTEM . . ."/text = "- STARTING ZOOL . . ."/; s/text = "@KEYMAP_SHORT@"/text = "ENTER  boot      E  edit      C  command line"/' "$DEST/theme.txt"
 
+# تصحيح أي نسب عشرية بقيت من نسخة سابقة (GRUB يرفض مثل 64.5%)
+sed -i -E 's/(left|top|width|height) = ([0-9]+)\.[0-9]+%/\1 = \2%/' "$DEST/theme.txt"
+
 # إزاحة النص الثاني حتى لا يتداخل مع العنوان
 sed -zi 's/left = 18%\n\([[:space:]]*top = 70\)/left = 30%\n\1/' "$DEST/theme.txt"
 
