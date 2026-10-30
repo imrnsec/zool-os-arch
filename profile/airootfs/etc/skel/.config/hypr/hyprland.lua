@@ -41,7 +41,7 @@ local inactive   = "rgba(213039aa)"
 
 -- ── الشاشة ──
 try("monitor", function()
-    hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
+    hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 end)
 
 -- ── البرامج التي تبدأ مع الجلسة (أولاً، حتى تعمل مهما حدث بعدها) ──
