@@ -18,14 +18,13 @@ fi
 # تخصيص النصوص لتحمل اسم النظام (آمن عند التكرار)
 sed -i 's/text = "L O A D I N G"/text = "Z O O L   O S"/; s/text = "- BOOTING SYSTEM . . ."/text = "- STARTING ZOOL . . ."/; s/text = "@KEYMAP_SHORT@"/text = "ENTER  boot      E  edit      C  command line"/' "$DEST/theme.txt"
 
-python3 - "$DEST/theme.txt" <<'EPY'
-import re, sys
-p = sys.argv[1]
-t = open(p).read()
-# النص الثاني: left 18% -> 30%
-t = re.sub(r'(\+ label \{\s*left = )18%(\s*top = 70)', r'\g<1>30%\2', t)
-if "zool-cover.png" not in t:
-    block = """+ image {
+# إزاحة النص الثاني حتى لا يتداخل مع العنوان
+sed -zi 's/left = 18%\n\([[:space:]]*top = 70\)/left = 30%\n\1/' "$DEST/theme.txt"
+
+# إضافة غطاء + شعار زول فوق علامة YoRHa المائية (مرة واحدة فقط)
+if ! grep -q zool-cover.png "$DEST/theme.txt"; then
+  cat > "$TMP/block.txt" <<'EOB'
++ image {
     left = 21%
     top = 28%
     width = 57%
@@ -47,10 +46,10 @@ if "zool-cover.png" not in t:
     file = "zool-wordmark.png"
 }
 
-"""
-    t = t.replace("+ boot_menu {", block + "+ boot_menu {", 1)
-open(p, "w").write(t)
-EPY
+EOB
+  sed -i "0,/^+ boot_menu {/{/^+ boot_menu {/e cat $TMP/block.txt
+}" "$DEST/theme.txt"
+fi
 cp profile/grub/zool-theme/cover.png "$DEST/zool-cover.png"
 cp profile/grub/zool-theme/zool-logo.png profile/grub/zool-theme/zool-wordmark.png "$DEST/"
 
