@@ -29,11 +29,15 @@ window#waybar {
 #clock,
 #tray,
 #language,
-#sys,
-#media,
+#cpu,
+#memory,
+#temperature,
+#pulseaudio,
+#bluetooth,
+#network,
 #battery,
 #custom-power,
-#image {
+#custom-logo {
     background: @surface;
     border: 1px solid rgba(232, 176, 74, 0.22);
     border-radius: 16px;
@@ -41,8 +45,11 @@ window#waybar {
     margin: 0;
 }
 
-#image {
-    padding: 0 10px;
+#custom-logo {
+    padding: 0 14px;
+    color: @gold;
+    font-weight: bold;
+    font-size: 15px;
 }
 
 #window {
@@ -88,15 +95,15 @@ window#waybar {
 
 #language { color: @sand; }
 
-#cpu { color: @teal; padding-right: 8px; }
-#memory { color: @acacia; padding: 0 8px; }
-#temperature { color: @sand_dim; padding-left: 8px; }
+#cpu { color: @teal; }
+#memory { color: @acacia; }
+#temperature { color: @sand_dim; }
 #temperature.critical { color: @terracotta; }
 
-#pulseaudio { color: @gold; padding-right: 8px; }
+#pulseaudio { color: @gold; }
 #pulseaudio.muted { color: @sand_dim; }
-#bluetooth { color: @blue; padding: 0 8px; }
-#network { color: @sand; padding-left: 8px; }
+#bluetooth { color: @blue; }
+#network { color: @sand; }
 #network.disconnected { color: @terracotta; }
 
 #battery { color: @acacia; }

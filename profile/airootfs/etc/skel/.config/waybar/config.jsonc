@@ -7,15 +7,14 @@
     "margin-left": 14,
     "margin-right": 14,
 
-    "modules-left": ["image#logo", "hyprland/workspaces", "hyprland/window"],
+    "modules-left": ["custom/logo", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["tray", "hyprland/language", "group/sys", "group/media", "battery", "custom/power"],
+    "modules-right": ["tray", "hyprland/language", "cpu", "memory", "temperature", "pulseaudio", "bluetooth", "network", "battery", "custom/power"],
 
-    "image#logo": {
-        "path": "/usr/share/zool/logo/zool-logo-64.png",
-        "size": 26,
-        "tooltip": false,
-        "on-click": "zool-menu"
+    "custom/logo": {
+        "format": "زول",
+        "on-click": "zool-menu",
+        "tooltip": false
     },
 
     "hyprland/workspaces": {
@@ -56,15 +55,6 @@
     "hyprland/language": {
         "format": "  {short}",
         "on-click": "hyprctl switchxkblayout all next"
-    },
-
-    "group/sys": {
-        "orientation": "inherit",
-        "modules": ["cpu", "memory", "temperature"]
-    },
-    "group/media": {
-        "orientation": "inherit",
-        "modules": ["pulseaudio", "bluetooth", "network"]
     },
 
     "cpu": { "format": " {usage}%", "interval": 3, "on-click": "kitty -e btop" },
