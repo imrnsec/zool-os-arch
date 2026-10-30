@@ -106,12 +106,11 @@ end)
 
 try("dwindle+misc", function()
     hl.config({
-        dwindle = { pseudotile = true, preserve_split = true },
+        dwindle = { preserve_split = true },
         misc = {
             disable_hyprland_logo = true,
             disable_splash_rendering = true,
             force_default_wallpaper = 0,
-            vfr = true,
         },
     })
 end)
