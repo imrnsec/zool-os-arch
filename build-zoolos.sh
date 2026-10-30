@@ -15,7 +15,7 @@ OUT="${ZOOL_OUT:-$PWD/out}"
 echo "═══ [0/4] فحص المتطلبات ═══"
 if [ ! -f /etc/arch-release ]; then
   echo "✗ هذا السكربت يعمل على Arch Linux فقط (أو حاوية archlinux)."
-  echo "  على غير Arch: docker run --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'"
+  echo "  على غير Arch: docker run --rm --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'"
   exit 1
 fi
 for cmd in mkarchiso git grub-mkstandalone mksquashfs xorriso mformat; do
@@ -26,7 +26,8 @@ for cmd in mkarchiso git grub-mkstandalone mksquashfs xorriso mformat; do
   }
 done
 free_gb=$(df -BG --output=avail "$(dirname "$WORK")" | tail -1 | tr -dc '0-9')
-[ "${free_gb:-0}" -ge 20 ] || { echo "✗ المساحة الحرة ${free_gb}GB في $(dirname "$WORK") — يلزم 20GB على الأقل."; exit 1; }
+MIN_GB="${ZOOL_MIN_GB:-12}"
+[ "${free_gb:-0}" -ge "$MIN_GB" ] || { echo "✗ المساحة الحرة ${free_gb}GB في $(dirname "$WORK") — يلزم ${MIN_GB}GB على الأقل."; echo "  (في Docker: أضف --rm، ونظّف بـ  docker system prune -a ، أو غيّر المسار بـ ZOOL_WORK)"; exit 1; }
 
 echo "═══ [1/4] تنزيل ثيم GRUB (YoRHa) ═══"
 bash tools/fetch-grub-theme.sh
