@@ -33,13 +33,13 @@ if ! grep -q zool-cover.png "$DEST/theme.txt"; then
 }
 
 + image {
-    left = 64.5%
+    left = 64%
     top = 33%
     file = "zool-logo.png"
 }
 
 + image {
-    left = 58.5%
+    left = 58%
     top = 55%
     width = 25%
     height = 9%
