@@ -10,3 +10,4 @@ ConfigFile=theme.conf
 Theme-Id=zool
 Theme-API=2.0
 QTVersion=6
+QtVersion=6
