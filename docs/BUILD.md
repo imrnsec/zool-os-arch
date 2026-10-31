@@ -14,8 +14,8 @@
 sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools qemu-desktop edk2-ovmf
 
 # 2) انسخ المشروع
-git clone -b zool-os-arch https://github.com/imrnsec/snlnos
-cd snlnos
+git clone -b zool-os-arch https://github.com/imrnsec/zool-os-arch
+cd zool-os-arch
 
 # 3) ابنِ (15–40 دقيقة؛ السجل في build.log)
 bash build-zoolos.sh

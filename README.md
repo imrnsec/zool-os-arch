@@ -6,7 +6,7 @@
 
 **توزيعة لينكس سودانية خفيفة، مبنية على Arch Linux بسطح مكتب Hyprland**
 
-[![Download](https://img.shields.io/badge/تحميل-ISO-e8b04a?style=for-the-badge)](https://github.com/imrnsec/snlnos/releases/latest)
+[![Download](https://img.shields.io/badge/تحميل-ISO-e8b04a?style=for-the-badge)](https://github.com/imrnsec/zool-os-arch/releases/latest)
 ![Arch](https://img.shields.io/badge/Arch-Linux-1793d1?style=for-the-badge&logo=archlinux&logoColor=white)
 ![Size](https://img.shields.io/badge/الحجم-1.9GB-d46a43?style=for-the-badge)
 
@@ -46,7 +46,7 @@
 
 ## 📥 التنزيل
 
-1. افتح صفحة **[Releases](https://github.com/imrnsec/snlnos/releases/latest)** ونزّل ملف `zoolos-….iso`.
+1. افتح صفحة **[Releases](https://github.com/imrnsec/zool-os-arch/releases/latest)** ونزّل ملف `zoolos-….iso`.
 2. نزّل معه ملف `.sha256` إن أردت التحقق من سلامة الملف:
    ```bash
    sha256sum -c zoolos-*.iso.sha256
@@ -105,14 +105,14 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ## 🛠️ ملاحظات معروفة
 
 - **شاشة سوداء بعد التثبيت على بعض الأجهزة** (جرّبناه على معالج Intel Atom/Celeron القديم): اختر **الدخول التلقائي** أثناء التثبيت.
-- المشروع ما زال في مرحلة مبكرة، وقد تجد أخطاء. أخبرنا عنها في [Issues](https://github.com/imrnsec/snlnos/issues) مع صورة للخطأ أو ملف السجل.
+- المشروع ما زال في مرحلة مبكرة، وقد تجد أخطاء. أخبرنا عنها في [Issues](https://github.com/imrnsec/zool-os-arch/issues) مع صورة للخطأ أو ملف السجل.
 
 ## 🏗️ البناء من المصدر
 
 ```bash
 sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools
-git clone -b zool-os-arch https://github.com/imrnsec/snlnos
-cd snlnos
+git clone -b zool-os-arch https://github.com/imrnsec/zool-os-arch
+cd zool-os-arch
 bash build-zoolos.sh
 ```
 
@@ -144,7 +144,7 @@ bash build-zoolos.sh
 
 **Features:** Arabic-first GUI installer, offline prayer times + Hijri date in Waybar with adhan notification, bundled Arabic fonts (Reem Kufi, Amiri, Noto), SDDM login theme, YoRHa GRUB theme with a Zool boot animation, media codecs, PDF/image viewers, and optional LibreOffice.
 
-**Download:** grab the ISO from [Releases](https://github.com/imrnsec/snlnos/releases/latest), write it with `dd` (Linux) or Rufus in DD mode (Windows), boot it in UEFI or BIOS mode, then press `SUPER + Z` → *Install Zool OS*. The installer erases the selected disk.
+**Download:** grab the ISO from [Releases](https://github.com/imrnsec/zool-os-arch/releases/latest), write it with `dd` (Linux) or Rufus in DD mode (Windows), boot it in UEFI or BIOS mode, then press `SUPER + Z` → *Install Zool OS*. The installer erases the selected disk.
 
 **Build:** see [`docs/BUILD.md`](docs/BUILD.md).
 
