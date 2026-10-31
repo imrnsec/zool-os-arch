@@ -126,6 +126,15 @@ bash build-zoolos.sh
 
 ثيم GRUB (YoRHa) من تأليف OliveThePuffin ويُنزَّل وقت البناء. الخطوط Amiri وReem Kufi تحت رخصة OFL ونصوصها مرفقة في مجلد الخطوط.
 
+## 📬 تواصل معي
+
+<div align="center">
+
+[![Instagram](https://img.shields.io/badge/Instagram-@imrn.sec-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/imrn.sec)
+[![X](https://img.shields.io/badge/X-@imrnsec-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/imrnsec)
+
+</div>
+
 ---
 
 <details>
@@ -138,5 +147,7 @@ bash build-zoolos.sh
 **Download:** grab the ISO from [Releases](https://github.com/imrnsec/snlnos/releases/latest), write it with `dd` (Linux) or Rufus in DD mode (Windows), boot it in UEFI or BIOS mode, then press `SUPER + Z` → *Install Zool OS*. The installer erases the selected disk.
 
 **Build:** see [`docs/BUILD.md`](docs/BUILD.md).
+
+**Follow:** [Instagram @imrn.sec](https://instagram.com/imrn.sec) · [X @imrnsec](https://x.com/imrnsec)
 
 </details>
