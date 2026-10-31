@@ -85,6 +85,13 @@ stage1() {
     TZONE=$(zenity --entry --title="$T" --width=420 --text="المنطقة الزمنية (مثل Africa/Khartoum):" --entry-text="$TZ_DEF") || exit 0
     [ -f "/usr/share/zoneinfo/$TZONE" ] || TZONE=Africa/Khartoum
 
+    # ── الدخول التلقائي ──
+    local AUTOLOGIN=0
+    if zenity --question --title="$T" --width=440 --ok-label="نعم، دخول تلقائي" --cancel-label="لا، اطلب كلمة المرور" \
+        --text="هل تريد الدخول تلقائياً دون كتابة كلمة المرور عند تشغيل الجهاز؟\n(أسهل، لكنه أقل أماناً)"; then
+        AUTOLOGIN=1
+    fi
+
     # ── التأكيد النهائي ──
     zenity --question --title="$T" --width=480 --ok-label="ابدأ التثبيت" --cancel-label="رجوع" \
         --text="<b>سيُمسح القرص $DISK بالكامل</b> ثم يُثبَّت زول عليه.\n\nالمستخدم: $USERNAME\nالجهاز: $HOSTNAME\nالمنطقة: $TZONE\n\nهل تريد المتابعة؟" || exit 0
@@ -98,6 +105,7 @@ stage1() {
         printf 'HOSTNAME=%q\n' "$HOSTNAME"
         printf 'PASSWORD=%q\n' "$PASSWORD"
         printf 'TZONE=%q\n' "$TZONE"
+        printf 'AUTOLOGIN=%q\n' "$AUTOLOGIN"
     } >"$CONF"
 
     rm -f /tmp/zool-install.status
@@ -205,8 +213,8 @@ stage2() {
     local ENVF="$TARGET/root/.zool-env" CH="$TARGET/root/.zool-chroot.sh"
     if [ "$DRY" != 1 ]; then
         {
-            printf 'DISK=%q\nUSERNAME=%q\nHOSTNAME=%q\nPASSWORD=%q\nTZONE=%q\nUEFI=%q\n' \
-                "$DISK" "$USERNAME" "$HOSTNAME" "$PASSWORD" "$TZONE" "$UEFI"
+            printf 'DISK=%q\nUSERNAME=%q\nHOSTNAME=%q\nPASSWORD=%q\nTZONE=%q\nUEFI=%q\nAUTOLOGIN=%q\n' \
+                "$DISK" "$USERNAME" "$HOSTNAME" "$PASSWORD" "$TZONE" "$UEFI" "${AUTOLOGIN:-0}"
         } >"$ENVF"
         chmod 600 "$ENVF"
         cat >"$CH" <<'CHROOT'
@@ -255,7 +263,7 @@ for k in /usr/lib/modules/*/vmlinuz; do
 done
 [ -f /boot/vmlinuz-linux ] || install -Dm644 "$(ls /usr/lib/modules/*/vmlinuz | head -1)" /boot/vmlinuz-linux
 cat >/etc/mkinitcpio.conf.d/zool.conf <<'EOM'
-HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard keymap consolefont block filesystems fsck)
+HOOKS=(base udev autodetect microcode modconf kms keyboard keymap block filesystems fsck)
 EOM
 mkinitcpio -P || exit 11
 
@@ -264,7 +272,7 @@ cat >/etc/default/grub <<'EOM'
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=5
 GRUB_DISTRIBUTOR="Zool OS"
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=3"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=4 plymouth.enable=0"
 GRUB_CMDLINE_LINUX=""
 GRUB_PRELOAD_MODULES="part_gpt part_msdos"
 GRUB_TERMINAL_OUTPUT=gfxterm
@@ -283,6 +291,11 @@ else
     grub-install --target=i386-pc --recheck "$DISK" || exit 12
 fi
 grub-mkconfig -o /boot/grub/grub.cfg || exit 13
+
+if [ "${AUTOLOGIN:-0}" = 1 ]; then
+    log "الدخول التلقائي للمستخدم $USERNAME"
+    printf '[Autologin]\nUser=%s\nSession=hyprland\n' "$USERNAME" >/etc/sddm.conf.d/10-zool-autologin.conf
+fi
 
 log "تفعيل الخدمات"
 systemctl enable sddm NetworkManager bluetooth >/dev/null 2>&1 || true
