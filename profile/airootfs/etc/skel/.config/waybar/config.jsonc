@@ -96,7 +96,7 @@
 
     "network": {
         "format-wifi": " {signalStrength}%",
-        "format-ethernet": " {ipaddr}",
+        "format-ethernet": "",
         "format-disconnected": " offline",
         "tooltip-format": "{ifname}: {ipaddr}\n{essid}",
         "on-click": "nm-connection-editor"
