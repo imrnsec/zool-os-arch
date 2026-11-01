@@ -43,7 +43,7 @@ window#waybar {
     background: @surface;
     border: 1px solid rgba(232, 176, 74, 0.22);
     border-radius: 16px;
-    padding: 0 14px;
+    padding: 0 10px;
     margin: 0;
 }
 
@@ -67,8 +67,8 @@ window#waybar {
 
 #workspaces button {
     font-family: "Reem Kufi", "JetBrainsMono Nerd Font", sans-serif;
-    padding: 0 10px;
-    margin: 4px 2px;
+    padding: 0 8px;
+    margin: 4px 1px;
     color: @sand_dim;
     background: transparent;
     border-radius: 12px;
@@ -94,7 +94,7 @@ window#waybar {
 #clock {
     color: @gold;
     font-weight: bold;
-    padding: 0 20px;
+    padding: 0 14px;
 }
 
 #language { color: @sand; }

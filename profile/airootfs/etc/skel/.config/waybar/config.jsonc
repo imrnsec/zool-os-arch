@@ -2,14 +2,14 @@
     "layer": "top",
     "position": "top",
     "height": 38,
-    "spacing": 10,
-    "margin-top": 8,
-    "margin-left": 14,
-    "margin-right": 14,
+    "spacing": 6,
+    "margin-top": 6,
+    "margin-left": 8,
+    "margin-right": 8,
 
-    "modules-left": ["custom/logo", "hyprland/workspaces", "hyprland/window"],
+    "modules-left": ["custom/logo", "hyprland/workspaces"],
     "modules-center": ["clock", "custom/hijri", "custom/prayer"],
-    "modules-right": ["tray", "hyprland/language", "cpu", "memory", "temperature", "pulseaudio", "bluetooth", "network", "battery", "custom/power"],
+    "modules-right": ["tray", "hyprland/language", "cpu", "memory", "pulseaudio", "network", "battery", "custom/power"],
 
     "custom/logo": {
         "format": "زول",
@@ -39,8 +39,8 @@
     },
 
     "clock": {
-        "format": "{:%H:%M  ·  %A %d %B}",
-        "format-alt": "{:%Y-%m-%d  %H:%M:%S}",
+        "format": "{:%H:%M}",
+        "format-alt": "{:%A %d %B}",
         "tooltip-format": "<tt>{calendar}</tt>",
         "calendar": {
             "mode": "month",
@@ -98,7 +98,7 @@
         "format-wifi": " {signalStrength}%",
         "format-ethernet": " {ipaddr}",
         "format-disconnected": " offline",
-        "tooltip-format": "{essid} {ifname}",
+        "tooltip-format": "{ifname}: {ipaddr}\n{essid}",
         "on-click": "nm-connection-editor"
     },
 
@@ -109,7 +109,7 @@
         "states": { "warning": 25, "critical": 12 }
     },
 
-    "tray": { "spacing": 10 },
+    "tray": { "spacing": 8 },
 
     "custom/power": {
         "format": "",
