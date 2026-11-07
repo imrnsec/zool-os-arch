@@ -8,8 +8,8 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-OUT = os.path.join(ROOT, "profile/grub/zool-theme")
-LOGO = os.path.join(ROOT, "profile/airootfs/usr/share/zool/logo")
+OUT = os.path.join(ROOT, "iso/grub/zool-theme")
+LOGO = os.path.join(ROOT, "share/zool/logo")
 os.makedirs(OUT, exist_ok=True)
 
 # غطاء بلون خلفية YoRHa (≈ 20,16,14) مع ضجيج خفيف وحواف ناعمة حتى لا يظهر كمستطيل
