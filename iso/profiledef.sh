@@ -4,7 +4,7 @@
 
 iso_name="zoolos"
 iso_label="ZOOLOS_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="Zool OS Project <https://github.com/imrnsec/snlnos>"
+iso_publisher="Zool OS Project <https://github.com/imrnsec/zool-os-arch>"
 iso_application="Zool OS Live/Install Medium"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"

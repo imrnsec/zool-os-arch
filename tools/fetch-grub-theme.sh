@@ -4,7 +4,7 @@
 # المصدر: https://github.com/OliveThePuffin/yorha-grub-theme
 set -euo pipefail
 cd "$(dirname "$0")/.."
-DEST="profile/grub/themes/yorha"
+DEST="iso/grub/themes/yorha"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -53,8 +53,8 @@ EOB
   sed -i "0,/^+ boot_menu {/{/^+ boot_menu {/e cat $TMP/block.txt
 }" "$DEST/theme.txt"
 fi
-cp profile/grub/zool-theme/cover.png "$DEST/zool-cover.png"
-cp profile/grub/zool-theme/zool-logo.png profile/grub/zool-theme/zool-wordmark.png "$DEST/"
+cp iso/grub/zool-theme/cover.png "$DEST/zool-cover.png"
+cp iso/grub/zool-theme/zool-logo.png iso/grub/zool-theme/zool-wordmark.png "$DEST/"
 
 cat > "$DEST/NOTICE.txt" <<'EON'
 YoRHa GRUB theme — https://github.com/OliveThePuffin/yorha-grub-theme
