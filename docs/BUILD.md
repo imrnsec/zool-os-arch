@@ -21,11 +21,11 @@ cd zool-os-arch
 bash build-zoolos.sh
 ```
 
-الناتج: `out/zoolos-YYYY.MM.DD-x86_64.iso` ومعه ملف `.sha256`.
+الناتج: `zoolos-YYYY.MM.DD-x86_64.iso` ومعه ملف `.sha256` في **المجلد الرئيسي** (ونسخة في `out/`).
 
 **اختبار بدون حرق USB** (Hyprland يحتاج تسريع رسوميات، لذلك `virtio-vga-gl`):
 ```bash
-qemu-system-x86_64 -enable-kvm -cpu host -m 4096 -smp 2 -cdrom out/zoolos-*.iso \
+qemu-system-x86_64 -enable-kvm -cpu host -m 4096 -smp 2 -cdrom zoolos-*.iso \
   -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.4m.fd \
   -device virtio-vga-gl -display gtk,gl=on
 ```
@@ -75,20 +75,24 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 ## 🗂️ خريطة المشروع
 
 ```
-├── build-zoolos.sh             ← زر البناء
-├── profile/                    ← ملف تعريف archiso
+├── bin/                        ← أوامر زول  → /usr/local/bin  (zool-menu · zool-install · zool-prayer · …)
+├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · kitty · gtk · fastfetch)
+├── etc/                        ← إعدادات النظام → /etc  (SDDM · systemd · mkinitcpio · plymouth · fonts)
+├── share/                      ← → /usr/share  (zool: الشعار والخلفيات · plymouth · sddm · fonts · applications)
+├── local-share/                ← → /usr/local/share
+├── iso/                        ← إعدادات الـ ISO نفسه
 │   ├── profiledef.sh · pacman.conf · packages.x86_64
 │   ├── grub/grub.cfg           ← قائمة GRUB (الثيم يُنزَّل إلى grub/themes/yorha)
-│   ├── syslinux/               ← قائمة BIOS بهوية زول
-│   └── airootfs/               ← ملفات النظام الحي
-│       ├── etc/skel/.config/   ← hypr · waybar · wofi · mako · kitty · gtk · fastfetch
-│       ├── etc/mkinitcpio.conf.d/archiso.conf   ← فيه hook الـ plymouth
-│       └── usr/
-│           ├── local/bin/      ← zool-menu · zool-power · zool-keys · zool-wallpaper · …
-│           └── share/{zool,plymouth/themes/zool}   ← الشعار والخلفيات وأنيميشن الإقلاع
+│   └── syslinux/               ← قائمة BIOS بهوية زول
+├── tools/
+│   ├── assemble-profile.sh     ← يجمّع المجلدات أعلاه في build/profile لـ archiso
+│   └── fetch-grub-theme.sh     ← ينزّل ثيم YoRHa
 ├── branding/                   ← مولّدات الهوية (الشعار، الخلفيات)
-└── tools/fetch-grub-theme.sh   ← ينزّل ثيم YoRHa
+├── build-zoolos.sh             ← زر البناء (ينتج zoolos-*.iso في المجلد الرئيسي)
+└── build/ · out/               ← مخرجات البناء (غير مرفوعة إلى git)
 ```
+
+ملفات النظام موزّعة في جذر المستودع بنفس بنية النظام المثبّت (على طريقة Omarchy)، ولا يحتاج التعديل إلى فتح مجلد `airootfs`. عند البناء يجمّعها `tools/assemble-profile.sh` تلقائياً في `build/profile/`.
 
 ### إعادة توليد الشعار والخلفيات
 ```bash
@@ -103,13 +107,13 @@ python3 make_wallpapers.py    # الخلفيات الثلاث
 
 ## 🛠️ حل المشاكل المتوقعة
 
-**فشل `mkarchiso` بسبب اسم حزمة:** افتح `build.log` وابحث عن `target not found`، ثم احذف الحزمة أو بدّلها في `profile/packages.x86_64`.
+**فشل `mkarchiso` بسبب اسم حزمة:** افتح `build.log` وابحث عن `target not found`، ثم احذف الحزمة أو بدّلها في `iso/packages.x86_64`.
 
 **الإقلاع يتجمد عند شاشة الشعار:** جرّب الخيار «safe graphics (nomodeset)» من قائمة GRUB. إن نجح فالمشكلة في تعريف الرسوميات داخل الـ VM.
 
 **شاشة سوداء بعد الشعار:** يعني أن Hyprland لم يبدأ (غالباً بلا تسريع رسوميات). اضغط `Ctrl+Alt+F2` وادخل بالمستخدم `zool` (بلا كلمة مرور)، ثم شغّل `Hyprland` لقراءة رسالة الخطأ.
 
-**لا يظهر ثيم GRUB:** تأكد أن `tools/fetch-grub-theme.sh` نجح (يحتاج إنترنت) وأن المجلد `profile/grub/themes/yorha` موجود قبل البناء.
+**لا يظهر ثيم GRUB:** تأكد أن `tools/fetch-grub-theme.sh` نجح (يحتاج إنترنت) وأن المجلد `iso/grub/themes/yorha` موجود قبل البناء.
 
 ---
 

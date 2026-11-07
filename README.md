@@ -107,6 +107,19 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 - **شاشة سوداء بعد التثبيت على بعض الأجهزة** (جرّبناه على معالج Intel Atom/Celeron القديم): اختر **الدخول التلقائي** أثناء التثبيت.
 - المشروع ما زال في مرحلة مبكرة، وقد تجد أخطاء. أخبرنا عنها في [Issues](https://github.com/imrnsec/zool-os-arch/issues) مع صورة للخطأ أو ملف السجل.
 
+## 🗂️ هيكل المستودع
+
+ملفات النظام في جذر المستودع بنفس بنية النظام المثبّت، لتعرف أين تعدّل أي شيء:
+
+| المجلد | يُنسخ إلى | المحتوى |
+|---|---|---|
+| `bin/` | `/usr/local/bin` | أوامر زول (`zool-install`، `zool-prayer`، `zool-menu`…) |
+| `config/` | `/etc/skel/.config` | إعدادات Hyprland وWaybar وWofi وMako وKitty |
+| `etc/` | `/etc` | إعدادات النظام (SDDM، systemd، mkinitcpio، Plymouth) |
+| `share/` | `/usr/share` | الشعار والخلفيات والخطوط وثيمات Plymouth وSDDM |
+| `iso/` | — | إعدادات الـ ISO: الحزم، GRUB، Syslinux |
+| `tools/` · `branding/` | — | أدوات البناء ومولّدات الهوية |
+
 ## 🏗️ البناء من المصدر
 
 ```bash
@@ -115,6 +128,8 @@ git clone -b zool-os-arch https://github.com/imrnsec/zool-os-arch
 cd zool-os-arch
 bash build-zoolos.sh
 ```
+
+ينتج الملف `zoolos-….iso` مع مجموعه `.sha256` في المجلد الرئيسي.
 
 يلزم 12GB مساحة حرة على الأقل. التفاصيل الكاملة (بما فيها البناء داخل Docker من أي توزيعة) في [`docs/BUILD.md`](docs/BUILD.md).
 
