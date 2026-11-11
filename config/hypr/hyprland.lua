@@ -34,10 +34,21 @@ local files    = "thunar"
 local browser  = "firefox"
 local menu     = "wofi --show drun"
 
--- ── ألوان زول ──
+-- ── ألوان الثيم الحالي (يكتبها zool-theme في ~/.config/zool/theme/hypr) ──
 local gold       = "rgba(e8b04aff)"
 local terracotta = "rgba(d46a43ff)"
 local inactive   = "rgba(213039aa)"
+pcall(function()
+    local f = io.open((os.getenv("HOME") or "") .. "/.config/zool/theme/hypr", "r")
+    if not f then return end
+    for line in f:lines() do
+        local k, v = line:match("^(%w+)=(%x%x%x%x%x%x)%s*$")
+        if k == "active1" then gold = "rgba(" .. v .. "ff)"
+        elseif k == "active2" then terracotta = "rgba(" .. v .. "ff)"
+        elseif k == "inactive" then inactive = "rgba(" .. v .. "aa)" end
+    end
+    f:close()
+end)
 
 -- ── الشاشة ──
 try("monitor", function()
@@ -52,6 +63,8 @@ hl.on("hyprland.start", function()
         "mako",
         "zool-prayer daemon",
         "hypridle",
+        "zool-welcome --auto",
+        "sh -c 'sleep 120; zool-update notify'",
         "nm-applet --indicator",
         "zool-blueman-launch",
         "systemctl --user start hyprpolkitagent",
@@ -173,6 +186,7 @@ B(mod .. " + W", function() return hl.dsp.window.close() end)
 B(mod .. " + Q", function() return hl.dsp.window.close() end)
 B("ALT + F4",    function() return hl.dsp.window.close() end)   -- المألوف من ويندوز
 B(mod .. " + SHIFT + E", X("zool-effects toggle"))
+B(mod .. " + T",         X("zool-theme"))
 B(mod .. " + F", function() return hl.dsp.window.fullscreen() end)
 B(mod .. " + V", function() return hl.dsp.window.float({ action = "toggle" }) end)
 B(mod .. " + P", function() return hl.dsp.window.pseudo() end)

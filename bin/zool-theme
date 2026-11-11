@@ -1,0 +1,147 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════
+#  zool-theme — يبدّل ثيم زول كاملاً: الألوان + الخلفية
+#  (Hyprland · Waybar · Wofi · Mako · Kitty · شاشة القفل)
+#
+#    zool-theme              قائمة اختيار
+#    zool-theme list         أسماء الثيمات
+#    zool-theme current      الثيم الحالي
+#    zool-theme set <اسم>    تطبيق ثيم
+#
+#  الثيمات في /usr/share/zool/themes/<اسم>/theme.conf
+#  وثيماتك الخاصة في ~/.config/zool/themes/<اسم>/theme.conf (بنفس الصيغة)
+# ═══════════════════════════════════════════════
+SYS=/usr/share/zool/themes
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+USR="$CFG/zool/themes"
+STATE="$CFG/zool/theme"
+KEYS="night surface surface2 sand sand_dim gold terracotta teal blue acacia red yellow magenta"
+
+theme_dir() { [ -f "$USR/$1/theme.conf" ] && echo "$USR/$1" || echo "$SYS/$1"; }
+list()      { { ls -1 "$SYS" 2>/dev/null; ls -1 "$USR" 2>/dev/null; } | sort -u; }
+current()   { cat "$STATE/name" 2>/dev/null || echo zool; }
+
+# يعيد كتابة أسطر @define-color في ملف CSS بألوان الثيم
+recolor_css() {
+    local f="$1" k; [ -f "$f" ] || return 0
+    for k in $KEYS; do
+        sed -i -E "s|^(@define-color[[:space:]]+$k[[:space:]]+)[^;]*;|\1#${!k};|" "$f"
+    done
+}
+
+apply() {
+    local id="$1" dir; dir=$(theme_dir "$id")
+    [ -f "$dir/theme.conf" ] || { echo "ثيم غير موجود: $id" >&2; return 1; }
+    local NAME CREDIT WALLPAPER $KEYS
+    # shellcheck disable=SC1091
+    . "$dir/theme.conf"
+    local k; for k in $KEYS; do
+        [[ "${!k}" =~ ^[0-9a-fA-F]{6}$ ]] || { echo "لون غير صالح في الثيم: $k" >&2; return 1; }
+    done
+    mkdir -p "$STATE" "$CFG/zool"
+
+    # ── Hyprland (يقرؤه hyprland.lua) ──
+    printf 'active1=%s\nactive2=%s\ninactive=%s\n' "$gold" "$terracotta" "$surface2" > "$STATE/hypr"
+
+    # ── Waybar و Wofi ──
+    recolor_css "$CFG/waybar/style.css"
+    recolor_css "$CFG/wofi/style.css"
+
+    # ── Kitty (مضمَّن من kitty.conf) ──
+    cat > "$STATE/kitty.conf" <<EOF
+foreground            #$sand
+background            #$night
+selection_foreground  #$night
+selection_background  #$gold
+cursor                #$gold
+url_color             #$teal
+active_tab_foreground   #$night
+active_tab_background   #$gold
+inactive_tab_foreground #$sand_dim
+inactive_tab_background #$surface
+color0  #$surface
+color8  #$sand_dim
+color1  #$red
+color9  #$red
+color2  #$acacia
+color10 #$acacia
+color3  #$yellow
+color11 #$yellow
+color4  #$blue
+color12 #$blue
+color5  #$magenta
+color13 #$magenta
+color6  #$teal
+color14 #$teal
+color7  #$sand
+color15 #ffffff
+EOF
+
+    # ── Mako (الإشعارات) ──
+    mkdir -p "$CFG/mako"
+    cat > "$CFG/mako/config" <<EOF
+font=Noto Sans 11
+background-color=#${surface}ee
+text-color=#$sand
+border-color=#$gold
+border-size=2
+border-radius=14
+padding=16
+margin=14
+width=380
+icons=1
+max-icon-size=48
+anchor=top-right
+default-timeout=6000
+progress-color=over #${gold}55
+
+# مؤشر الصوت والسطوع (zool-osd): صغير، في الوسط أسفل الشاشة
+[app-name=zool-osd]
+anchor=bottom-center
+width=260
+margin=60
+text-alignment=center
+border-size=1
+icons=0
+
+[urgency=high]
+border-color=#$red
+default-timeout=0
+EOF
+
+    # ── الخلفية وشاشة القفل ──
+    if [ -f "$WALLPAPER" ]; then
+        printf '%s\n' "$WALLPAPER" > "$CFG/zool/wallpaper"
+        [ -f "$CFG/hypr/hyprlock.conf" ] && \
+            sed -i -E "0,/^([[:space:]]*path[[:space:]]*=[[:space:]]*).*(jpg|jpeg|png|webp)[[:space:]]*$/s||\1$WALLPAPER|" "$CFG/hypr/hyprlock.conf"
+    fi
+    printf '%s\n' "$id" > "$STATE/name"
+
+    # ── إعادة التحميل (إن كانت الجلسة تعمل) ──
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        hyprctl reload >/dev/null 2>&1
+        command -v zool-wallpaper >/dev/null && zool-wallpaper
+        makoctl reload >/dev/null 2>&1
+        pkill -USR2 -x waybar 2>/dev/null || { pkill -x waybar; hyprctl dispatch exec waybar >/dev/null 2>&1; }
+        pkill -USR1 -x kitty 2>/dev/null
+        notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 3000 "الثيم: $NAME" "${CREDIT:-}" 2>/dev/null
+    fi
+    echo "✓ $id — $NAME"
+}
+
+case "${1:-pick}" in
+    list)    list ;;
+    current) current ;;
+    set)     [ -n "${2:-}" ] || { echo "الاستخدام: zool-theme set <اسم>" >&2; exit 2; }; apply "$2" ;;
+    pick)
+        cur=$(current)
+        menu=$(for id in $(list); do
+                   n=$(. "$(theme_dir "$id")/theme.conf" 2>/dev/null; echo "$NAME")
+                   [ "$id" = "$cur" ] && mark="●" || mark="○"
+                   printf '%s %s | %s\n' "$mark" "$id" "$n"
+               done)
+        pick=$(printf '%s\n' "$menu" | wofi --dmenu --prompt "الثيم" --width 520 --height 360 --columns 1) || exit 0
+        id=$(printf '%s' "$pick" | awk '{print $2}')
+        [ -n "$id" ] && apply "$id" ;;
+    *) echo "الاستخدام: zool-theme [list|current|set <اسم>]" >&2; exit 2 ;;
+esac

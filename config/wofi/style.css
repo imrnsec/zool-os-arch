@@ -6,6 +6,12 @@
 @define-color sand_dim #b9a98a;
 @define-color gold     #e8b04a;
 @define-color terracotta #d46a43;
+@define-color teal     #3ba5a0;
+@define-color blue     #2d86b4;
+@define-color acacia   #8fb35f;
+@define-color red      #d46a43;
+@define-color yellow   #e8b04a;
+@define-color magenta  #c58bb0;
 
 * {
     font-family: "Noto Sans Arabic", "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
@@ -14,8 +20,8 @@
 
 window {
     margin: 0;
-    background-color: rgba(16, 24, 28, 0.92);
-    border: 2px solid rgba(232, 176, 74, 0.55);
+    background-color: alpha(@night, 0.92);
+    border: 2px solid alpha(@gold, 0.55);
     border-radius: 22px;
 }
 
@@ -27,7 +33,7 @@ window {
 #input {
     background-color: @surface2;
     color: @sand;
-    border: 1px solid rgba(232, 176, 74, 0.25);
+    border: 1px solid alpha(@gold, 0.25);
     border-radius: 999px;
     padding: 12px 22px;
     margin-bottom: 18px;
@@ -61,12 +67,12 @@ window {
 }
 
 #entry:hover {
-    background-color: rgba(232, 176, 74, 0.10);
+    background-color: alpha(@gold, 0.10);
 }
 
 #entry:selected {
-    background-color: rgba(232, 176, 74, 0.20);
-    border: 1px solid rgba(232, 176, 74, 0.6);
+    background-color: alpha(@gold, 0.20);
+    border: 1px solid alpha(@gold, 0.6);
     outline: none;
 }
 

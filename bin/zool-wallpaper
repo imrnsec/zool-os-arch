@@ -9,9 +9,9 @@ apply() {
 }
 
 if [ "$1" = "pick" ]; then
-    list=$(ls -1 /usr/share/zool/wallpapers/*.jpg "$HOME"/Pictures/Wallpapers/* 2>/dev/null)
+    list=$(ls -1 /usr/share/zool/wallpapers/*.jpg /usr/share/zool/themes/*/wallpapers/* "$HOME"/Pictures/Wallpapers/* 2>/dev/null)
     names=$(printf '%s\n' "$list" | while read -r p; do [ -n "$p" ] && basename "$p"; done)
-    pick=$(printf '%s\n' "$names" | wofi --dmenu --prompt "الخلفية" --width 460 --height 320 --columns 1)
+    pick=$(printf '%s\n' "$names" | wofi --dmenu --prompt "الخلفية" --width 460 --height 420 --columns 1)
     [ -n "$pick" ] || exit 0
     path=$(printf '%s\n' "$list" | grep -F "/$pick" | head -1)
     [ -f "$path" ] || exit 1
