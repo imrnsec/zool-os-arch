@@ -13,14 +13,10 @@ mkinitcpio
 mkinitcpio-archiso
 grub
 efibootmgr
-edk2-shell
-memtest86+
-memtest86+-efi
 syslinux
 plymouth
 
 # ── التثبيت والأقراص ──
-archinstall
 arch-install-scripts
 parted
 gptfdisk
@@ -58,7 +54,6 @@ xorg-server
 waybar
 wofi
 mako
-foot
 kitty
 swaybg
 grim
@@ -73,6 +68,15 @@ polkit
 sddm
 qt6-svg
 qt6-declarative
+
+# ── تعريفات الرسوميات وفك ترميز الفيديو بالعتاد (Intel) ──
+mesa
+vulkan-intel
+intel-media-driver
+libva-intel-driver
+
+# ── الذاكرة: swap مضغوط في الرام للأجهزة الضعيفة ──
+zram-generator
 
 # ── الصوت والبلوتوث ──
 pipewire
@@ -117,17 +121,14 @@ file-roller
 tumbler
 gvfs
 mousepad
-imv
 evince
 mpv
 btop
-htop
 fastfetch
 
 # ── أدوات عامة ──
 sudo
 nano
-vim
 git
 less
 man-db
