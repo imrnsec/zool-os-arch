@@ -51,6 +51,7 @@ hl.on("hyprland.start", function()
         "waybar",
         "mako",
         "zool-prayer daemon",
+        "hypridle",
         "nm-applet --indicator",
         "zool-blueman-launch",
         "systemctl --user start hyprpolkitagent",
@@ -70,12 +71,26 @@ try("env", function()
     hl.env("XDG_SESSION_TYPE", "wayland")
 end)
 
+-- ── وضع المؤثرات: light (الافتراضي، للأجهزة الضعيفة) أو full ──
+--    يُبدَّل من قائمة زول أو بالأمر:  zool-effects toggle
+local effects = "light"
+pcall(function()
+    local home = os.getenv("HOME") or ""
+    local f = io.open(home .. "/.config/zool/effects", "r")
+    if f then
+        local v = (f:read("*l") or ""):gsub("%s+", "")
+        f:close()
+        if v == "full" or v == "light" then effects = v end
+    end
+end)
+local full = (effects == "full")
+
 -- ── المظهر الناعم ──
 try("general+decoration", function()
     hl.config({
         general = {
-            gaps_in = 6,
-            gaps_out = 14,
+            gaps_in = full and 6 or 4,
+            gaps_out = full and 14 or 8,
             border_size = 2,
             layout = "dwindle",
             resize_on_border = true,
@@ -85,11 +100,11 @@ try("general+decoration", function()
             },
         },
         decoration = {
-            rounding = 14,
+            rounding = full and 14 or 10,
             active_opacity = 1.0,
-            inactive_opacity = 0.93,
-            blur = { enabled = true, size = 8, passes = 3, noise = 0.02, brightness = 1.0 },
-            shadow = { enabled = true, range = 18, render_power = 3, color = "rgba(00000099)" },
+            inactive_opacity = full and 0.93 or 1.0,
+            blur = { enabled = full, size = 8, passes = 3, noise = 0.02, brightness = 1.0 },
+            shadow = { enabled = full, range = 18, render_power = 3, color = "rgba(00000099)" },
         },
         animations = { enabled = true },
     })
@@ -98,11 +113,20 @@ end)
 try("animations", function()
     hl.curve("soft",     { type = "bezier", points = { { 0.22, 1 },   { 0.36, 1 } } })
     hl.curve("overshot", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
-    hl.animation({ leaf = "windows",    enabled = true, speed = 6,  bezier = "overshot", style = "slide" })
-    hl.animation({ leaf = "windowsOut", enabled = true, speed = 5,  bezier = "soft",     style = "slide" })
-    hl.animation({ leaf = "border",     enabled = true, speed = 10, bezier = "default" })
-    hl.animation({ leaf = "fade",       enabled = true, speed = 6,  bezier = "soft" })
-    hl.animation({ leaf = "workspaces", enabled = true, speed = 6,  bezier = "soft",     style = "slidefade" })
+    if full then
+        hl.animation({ leaf = "windows",    enabled = true, speed = 6,  bezier = "overshot", style = "slide" })
+        hl.animation({ leaf = "windowsOut", enabled = true, speed = 5,  bezier = "soft",     style = "slide" })
+        hl.animation({ leaf = "border",     enabled = true, speed = 10, bezier = "default" })
+        hl.animation({ leaf = "fade",       enabled = true, speed = 6,  bezier = "soft" })
+        hl.animation({ leaf = "workspaces", enabled = true, speed = 6,  bezier = "soft",     style = "slidefade" })
+    else
+        -- حركات قصيرة وبسيطة: تبقى الواجهة حيّة دون إجهاد كرت الشاشة
+        hl.animation({ leaf = "windows",    enabled = true, speed = 3,  bezier = "soft", style = "popin" })
+        hl.animation({ leaf = "windowsOut", enabled = true, speed = 3,  bezier = "soft", style = "popin" })
+        hl.animation({ leaf = "border",     enabled = false })
+        hl.animation({ leaf = "fade",       enabled = true, speed = 3,  bezier = "soft" })
+        hl.animation({ leaf = "workspaces", enabled = true, speed = 4,  bezier = "soft", style = "slide" })
+    end
 end)
 
 try("dwindle+misc", function()
@@ -146,6 +170,9 @@ B("Print",            X("zool-screenshot region"))
 B("SHIFT + Print",    X("zool-screenshot full"))
 
 B(mod .. " + W", function() return hl.dsp.window.close() end)
+B(mod .. " + Q", function() return hl.dsp.window.close() end)
+B("ALT + F4",    function() return hl.dsp.window.close() end)   -- المألوف من ويندوز
+B(mod .. " + SHIFT + E", X("zool-effects toggle"))
 B(mod .. " + F", function() return hl.dsp.window.fullscreen() end)
 B(mod .. " + V", function() return hl.dsp.window.float({ action = "toggle" }) end)
 B(mod .. " + P", function() return hl.dsp.window.pseudo() end)
@@ -170,12 +197,13 @@ B(mod .. " + mouse_up",   function() return hl.dsp.focus({ workspace = "e-1" }) 
 B(mod .. " + mouse:272", function() return hl.dsp.window.drag() end,   { mouse = true })
 B(mod .. " + mouse:273", function() return hl.dsp.window.resize() end, { mouse = true })
 
--- الصوت والسطوع والوسائط
-B("XF86AudioRaiseVolume", X("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-B("XF86AudioLowerVolume", X("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-B("XF86AudioMute",        X("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true })
-B("XF86MonBrightnessUp",  X("brightnessctl set 5%+"),                          { locked = true, repeating = true })
-B("XF86MonBrightnessDown",X("brightnessctl set 5%-"),                          { locked = true, repeating = true })
+-- الصوت والسطوع (مع مؤشر على الشاشة عبر zool-osd) والوسائط
+B("XF86AudioRaiseVolume", X("zool-osd volume up"),     { locked = true, repeating = true })
+B("XF86AudioLowerVolume", X("zool-osd volume down"),   { locked = true, repeating = true })
+B("XF86AudioMute",        X("zool-osd volume mute"),   { locked = true })
+B("XF86AudioMicMute",     X("zool-osd mic mute"),      { locked = true })
+B("XF86MonBrightnessUp",  X("zool-osd brightness up"),   { locked = true, repeating = true })
+B("XF86MonBrightnessDown",X("zool-osd brightness down"), { locked = true, repeating = true })
 B("XF86AudioPlay",        X("playerctl play-pause"),                           { locked = true })
 B("XF86AudioNext",        X("playerctl next"),                                 { locked = true })
 B("XF86AudioPrev",        X("playerctl previous"),                             { locked = true })

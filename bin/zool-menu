@@ -8,6 +8,7 @@ choice=$(printf '%s\n' \
   "Bluetooth | البلوتوث" \
   "Sound | الصوت" \
   "Wallpaper | الخلفية" \
+  "Effects | المؤثرات (خفيف/كامل)" \
   "Prayer city | مدينة الصلاة" \
   "Extras | برامج إضافية" \
   "Install Zool OS | تثبيت زول" \
@@ -24,6 +25,7 @@ case "$choice" in
     Bluetooth*)     blueman-manager ;;
     Sound*)         pavucontrol ;;
     Wallpaper*)     zool-wallpaper pick ;;
+    Effects*)       zool-effects toggle ;;
     Prayer*)        zool-prayer city ;;
     Extras*)        kitty -e zool-extras ;;
     Install*)       zool-install ;;
