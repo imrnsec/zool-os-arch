@@ -7,7 +7,7 @@
     "margin-left": 8,
     "margin-right": 8,
 
-    "modules-left": ["custom/logo", "hyprland/workspaces"],
+    "modules-left": ["custom/logo", "hyprland/workspaces", "wlr/taskbar", "custom/close"],
     "modules-center": ["clock", "custom/hijri", "custom/prayer"],
     "modules-right": ["tray", "hyprland/language", "cpu", "memory", "pulseaudio", "network", "battery", "custom/power"],
 
@@ -25,6 +25,24 @@
         },
         "on-click": "activate",
         "persistent-workspaces": { "*": 5 }
+    },
+
+    // شريط المهام: أيقونات النوافذ المفتوحة — نقرة للانتقال، نقرة وسطى أو يمنى للإغلاق
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "icon-size": 18,
+        "icon-theme": "Papirus-Dark",
+        "tooltip-format": "{title}\nنقرة: انتقال  ·  نقرة يمنى: إغلاق",
+        "on-click": "activate",
+        "on-click-middle": "close",
+        "on-click-right": "close"
+    },
+
+    // زر إغلاق النافذة النشطة (لمن يفضّل الفأرة)
+    "custom/close": {
+        "format": "✕",
+        "tooltip-format": "إغلاق النافذة الحالية (ALT+F4)",
+        "on-click": "hyprctl dispatch 'hl.dsp.window.close()'"
     },
 
     "hyprland/window": {

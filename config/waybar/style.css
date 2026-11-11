@@ -25,6 +25,8 @@ window#waybar {
 
 /* كل مجموعة = "جزيرة" ناعمة */
 #workspaces,
+#taskbar,
+#custom-close,
 #window,
 #clock,
 #custom-hijri,
@@ -146,4 +148,38 @@ tooltip label {
 #custom-prayer.soon {
     color: @night;
     background: linear-gradient(135deg, @gold, @terracotta);
+}
+
+/* ── شريط المهام وزر الإغلاق ── */
+#taskbar {
+    padding: 0 4px;
+}
+#taskbar button {
+    padding: 0 6px;
+    margin: 4px 1px;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+#taskbar button:hover {
+    background: rgba(232, 176, 74, 0.18);
+}
+#taskbar button.active {
+    background: rgba(232, 176, 74, 0.30);
+}
+#taskbar.empty {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+}
+#custom-close {
+    padding: 0 10px;
+    color: #d46a43;
+    font-weight: bold;
+}
+#custom-close:hover {
+    background: rgba(212, 106, 67, 0.30);
+    color: #f3e6cc;
 }
