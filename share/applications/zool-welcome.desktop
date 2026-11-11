@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Zool Welcome
+Name[ar]=مرحباً بك في زول
+Comment=البداية السريعة
+Exec=zool-welcome
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;Settings;

@@ -29,6 +29,11 @@ cp -a bin "$DEST/airootfs/usr/local/bin"
 [ -d local-share ] && cp -a local-share "$DEST/airootfs/usr/local/share"
 [ -d root ]        && cp -a root "$DEST/airootfs/root"
 
+# نسخة زول (لأمر zool-update) + اعتبار الترحيلات الحالية منفَّذة على هذا الـ ISO
+mkdir -p "$DEST/airootfs/var/lib/zool/migrations"
+git -c safe.directory='*' rev-parse HEAD > "$DEST/airootfs/var/lib/zool/version" 2>/dev/null || echo unknown > "$DEST/airootfs/var/lib/zool/version"
+for m in migrations/*.sh; do [ -f "$m" ] && touch "$DEST/airootfs/var/lib/zool/migrations/$(basename "$m")"; done
+
 # لا ننقل ملفات بايثون المؤقتة إلى النظام
 find "$DEST" -name __pycache__ -type d -prune -exec rm -rf {} +
 

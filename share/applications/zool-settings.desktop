@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Zool Settings
+Name[ar]=إعدادات زول
+Comment=الشبكة والصوت والثيم والوقت
+Exec=zool-settings
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;Settings;

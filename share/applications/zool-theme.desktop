@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Zool Themes
+Name[ar]=ثيمات زول
+Comment=تغيير الألوان والخلفية
+Exec=zool-theme
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;Settings;

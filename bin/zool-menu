@@ -1,35 +1,34 @@
 #!/bin/sh
-# قائمة زول — SUPER+Z : اختصار لكل الإعدادات والأدوات
+# قائمة زول — SUPER+Z : كل شيء من مكان واحد
+LIVE=""; [ -d /run/archiso ] && LIVE="تثبيت زول على القرص"
 choice=$(printf '%s\n' \
-  "Applications | التطبيقات" \
-  "Files | الملفات" \
-  "Browser | المتصفح" \
-  "Network | الشبكة" \
-  "Bluetooth | البلوتوث" \
-  "Sound | الصوت" \
-  "Wallpaper | الخلفية" \
-  "Effects | المؤثرات (خفيف/كامل)" \
-  "Prayer city | مدينة الصلاة" \
-  "Extras | برامج إضافية" \
-  "Install Zool OS | تثبيت زول" \
-  "Keybindings | الاختصارات" \
-  "System monitor | مراقب النظام" \
-  "Power | الطاقة" \
-  | wofi --dmenu --prompt "زول" --width 520 --height 600 --columns 1)
+  "التطبيقات" \
+  "الملفات" \
+  "المتصفح" \
+  "الإعدادات" \
+  "الثيم والألوان" \
+  "الخلفية" \
+  "متجر البرامج" \
+  "تحديث النظام" \
+  ${LIVE:+"$LIVE"} \
+  "الاختصارات" \
+  "مراقب النظام" \
+  "شاشة الترحيب" \
+  "الطاقة" \
+  | wofi --dmenu --prompt "زول" --width 460 --height 560 --columns 1) || exit 0
 
 case "$choice" in
-    Applications*)  wofi --show drun ;;
-    Files*)         thunar ;;
-    Browser*)       firefox ;;
-    Network*)       nm-connection-editor ;;
-    Bluetooth*)     blueman-manager ;;
-    Sound*)         pavucontrol ;;
-    Wallpaper*)     zool-wallpaper pick ;;
-    Effects*)       zool-effects toggle ;;
-    Prayer*)        zool-prayer city ;;
-    Extras*)        kitty -e zool-extras ;;
-    Install*)       zool-install ;;
-    Keybindings*)   zool-keys ;;
-    "System monitor"*) kitty -e btop ;;
-    Power*)         zool-power ;;
+    التطبيقات)  wofi --show drun ;;
+    الملفات)    thunar ;;
+    المتصفح)    firefox ;;
+    الإعدادات)  zool-settings ;;
+    الثيم*)     zool-theme ;;
+    الخلفية)    zool-wallpaper pick ;;
+    متجر*)      zool-store ;;
+    تحديث*)     kitty --title "تحديث زول" -e zool-update ;;
+    تثبيت*)     zool-install ;;
+    الاختصارات) zool-keys ;;
+    مراقب*)     kitty -e btop ;;
+    شاشة*)      zool-welcome ;;
+    الطاقة)     zool-power ;;
 esac

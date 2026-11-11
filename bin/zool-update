@@ -1,0 +1,142 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════
+#  zool-update — يحدّث النظام وملفات زول من GitHub دون إعادة تثبيت
+#
+#    zool-update            تحديث كامل (حزم Arch + ملفات زول)
+#    zool-update --zool     ملفات زول فقط (بلا pacman -Syu)
+#    zool-update check      هل يوجد تحديث؟ (رمز الخروج 10 = نعم)
+#    zool-update notify     إشعار إن وُجد تحديث (يُستدعى عند الدخول)
+#    zool-update version    النسخة المثبّتة
+#
+#  ما يُحدَّث: أوامر زول (/usr/local/bin) · الثيمات والخطوط (/usr/share) ·
+#  إعداداتك في ~/.config (الملفات التي لم تعدّلها أنت فقط) · ثم الترحيلات (migrations/)
+# ═══════════════════════════════════════════════
+set -uo pipefail
+CONF=/etc/zool/update.conf
+STATE=/var/lib/zool
+CACHE=/var/cache/zool
+SRC=$CACHE/src
+REPO="https://github.com/imrnsec/zool-os-arch"; BRANCH=""
+# shellcheck disable=SC1090
+[ -f "$CONF" ] && . "$CONF"
+LOGO=/usr/share/zool/logo/zool-logo-128.png
+# ملفات يعيد zool-theme تلوينها: تُستبدل دائماً ثم يُعاد تطبيق الثيم
+MANAGED="waybar/style.css wofi/style.css mako/config hypr/hyprlock.conf"
+
+say()  { printf '\n\033[1;33m▶ %s\033[0m\n' "$*"; }
+die()  { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
+installed() { cat "$STATE/version" 2>/dev/null || echo unknown; }
+
+remote() {   # يطبع: <الفرع> <sha>
+    local out b sha
+    if [ -n "$BRANCH" ]; then
+        sha=$(git ls-remote "$REPO" "refs/heads/$BRANCH" 2>/dev/null | cut -f1)
+        b="$BRANCH"
+    else
+        out=$(git ls-remote --symref "$REPO" HEAD 2>/dev/null) || return 1
+        b=$(printf '%s\n' "$out" | sed -n 's#^ref: refs/heads/\([^[:space:]]*\)[[:space:]]*HEAD#\1#p')
+        sha=$(printf '%s\n' "$out" | awk '$2=="HEAD" && $1!="ref:" {print $1}')
+    fi
+    [ -n "$b" ] && [ -n "$sha" ] || return 1
+    echo "$b $sha"
+}
+
+cmd_check() {
+    local r; r=$(remote) || { echo "تعذر الاتصال بـ GitHub"; return 2; }
+    if [ "${r#* }" = "$(installed)" ]; then echo "النظام محدَّث"; return 0; fi
+    echo "يوجد تحديث لزول"; return 10
+}
+
+# ── الجزء الذي يعمل بصلاحيات root ──
+system_apply() {
+    local with_pacman="$1" r branch sha
+    [ "$(id -u)" = 0 ] || die "هذا الجزء يحتاج root"
+    if [ "$with_pacman" = 1 ]; then
+        say "[1/4] تحديث حزم النظام (pacman)"
+        pacman -Syu --noconfirm || die "فشل تحديث الحزم — راجع الرسائل أعلاه"
+    fi
+    say "[2/4] جلب آخر نسخة من زول"
+    r=$(remote) || die "تعذر الاتصال بـ GitHub — تأكد من الإنترنت"
+    branch=${r% *}; sha=${r#* }
+    rm -rf "$SRC"; mkdir -p "$CACHE" "$STATE/migrations"
+    git clone -q --depth 1 -b "$branch" "$REPO" "$SRC" || die "فشل تنزيل المستودع"
+    for d in bin config share; do
+        [ -d "$SRC/$d" ] || die "الفرع «$branch» لا يحتوي الهيكل المتوقع ($d/) — لم يُغيَّر شيء"
+    done
+    for f in "$SRC"/bin/*; do bash -n "$f" 2>/dev/null || head -1 "$f" | grep -q python || die "ملف تالف في التحديث: $f — لم يُغيَّر شيء"; done
+
+    say "[3/4] تثبيت ملفات زول"
+    install -m 755 -t /usr/local/bin "$SRC"/bin/*
+    cp -a "$SRC"/share/. /usr/share/
+    [ -d "$SRC/local-share" ] && cp -a "$SRC"/local-share/. /usr/local/share/
+    for f in fonts/conf.d/60-zool-arabic.conf systemd/zram-generator.conf sysctl.d/99-zool-zram.conf; do
+        [ -f "$SRC/etc/$f" ] && install -D -m 644 "$SRC/etc/$f" "/etc/$f"
+    done
+    # نحتفظ بالإعدادات الافتراضية القديمة لنعرف ما الذي عدّله المستخدم بنفسه
+    rm -rf "$CACHE/skel-old"; cp -a /etc/skel/.config "$CACHE/skel-old" 2>/dev/null || mkdir -p "$CACHE/skel-old"
+    rm -rf /etc/skel/.config; cp -a "$SRC/config" /etc/skel/.config
+    fc-cache -f >/dev/null 2>&1 || true
+
+    say "[4/4] الترحيلات"
+    local m n ran=0
+    for m in "$SRC"/migrations/*.sh; do
+        [ -f "$m" ] || continue
+        n=$(basename "$m")
+        [ -e "$STATE/migrations/$n" ] && continue
+        echo "  • $n"
+        if bash "$m"; then touch "$STATE/migrations/$n"; ran=$((ran+1)); else echo "  ✗ فشل $n (سيُعاد في التحديث القادم)"; fi
+    done
+    [ "$ran" = 0 ] && echo "  لا ترحيلات جديدة"
+    echo "$sha" > "$STATE/version"
+    chmod -R a+rX "$CACHE"
+}
+
+# ── الجزء الخاص بالمستخدم: تحديث ~/.config دون مسّ ما عدّله ──
+user_apply() {
+    local new="$SRC/config" old="$CACHE/skel-old" cfg="${XDG_CONFIG_HOME:-$HOME/.config}" rel kept=()
+    [ -d "$new" ] || return 0
+    while IFS= read -r -d '' f; do
+        rel=${f#"$new"/}
+        local u="$cfg/$rel"
+        if [ ! -e "$u" ] || [[ " $MANAGED " == *" $rel "* ]]; then
+            install -D -m 644 "$f" "$u"
+        elif cmp -s "$u" "$f"; then
+            :
+        elif [ -f "$old/$rel" ] && cmp -s "$u" "$old/$rel"; then
+            install -D -m 644 "$f" "$u"
+        else
+            kept+=("$rel")
+        fi
+    done < <(find "$new" -type f -print0)
+    if command -v zool-theme >/dev/null; then zool-theme set "$(zool-theme current)" >/dev/null 2>&1 || true; fi
+    [ -n "${WAYLAND_DISPLAY:-}" ] && hyprctl reload >/dev/null 2>&1
+    if [ "${#kept[@]}" -gt 0 ]; then
+        echo; echo "ملفات عدّلتَها بنفسك فتركناها كما هي (النسخة الجديدة في /etc/skel/.config):"
+        printf '   • %s\n' "${kept[@]}"
+    fi
+}
+
+case "${1:-}" in
+    check)   cmd_check; exit $? ;;
+    version) installed; exit 0 ;;
+    notify)
+        [ -d /run/archiso ] && exit 0
+        cmd_check >/dev/null; [ $? = 10 ] && notify-send -i "$LOGO" -t 12000 "تحديث متوفر لزول" "افتح قائمة زول (SUPER+Z) ← «تحديث النظام»"
+        exit 0 ;;
+    --system-apply) system_apply "${2:-1}"; exit $? ;;
+    ""|--zool) ;;
+    *) sed -n '2,14p' "$0"; exit 2 ;;
+esac
+
+if [ -d /run/archiso ]; then
+    echo "أنت على النظام الحي (الفلاشة). التحديث يعمل بعد تثبيت زول على القرص."; exit 0
+fi
+with_pacman=1; [ "${1:-}" = "--zool" ] && with_pacman=0
+echo "═══ تحديث زول ═══   (النسخة الحالية: $(installed | cut -c1-8))"
+sudo "$0" --system-apply "$with_pacman" || { echo; read -r -p "فشل التحديث. Enter للإغلاق " _; exit 1; }
+user_apply
+echo
+printf '\033[1;32m✓ اكتمل التحديث\033[0m  (النسخة: %s)\n' "$(installed | cut -c1-8)"
+notify-send -i "$LOGO" "زول" "اكتمل التحديث ✓" 2>/dev/null
+[ -t 0 ] && read -r -p "Enter للإغلاق " _
+exit 0
