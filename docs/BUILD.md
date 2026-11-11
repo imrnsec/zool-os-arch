@@ -41,7 +41,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 
 ## 🎬 ما سيظهر عند الإقلاع
 
-1. **GRUB** بثيم **YoRHa** (يُنزَّل وقت البناء، النصوص معدّلة إلى «Z O O L  O S»).
+1. **GRUB** بثيم **زول** (المصدر في `iso/grub/zool-theme/`، والخطوط تُولَّد وقت البناء بـ `grub-mkfont`).
 2. **شعار زول المتحرك** (Plymouth): يظهر الشعار، تشرق الشمس خلف الأهرامات، تدور الأشعة ببطء، يظهر الاسم مع نقاط تحميل نابضة.
 3. **دخول تلقائي** إلى Hyprland (مستخدم `zool` بلا كلمة مرور في نظام الحياة).
 
@@ -75,6 +75,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 ## 🗂️ خريطة المشروع
 
 ```
+├── migrations/                 ← ترحيلات تُنفَّذ مرة واحدة عند zool-update
 ├── bin/                        ← أوامر زول  → /usr/local/bin  (zool-menu · zool-install · zool-prayer · …)
 ├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · kitty · gtk · fastfetch)
 ├── etc/                        ← إعدادات النظام → /etc  (SDDM · systemd · mkinitcpio · plymouth · fonts)
@@ -86,7 +87,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 │   └── syslinux/               ← قائمة BIOS بهوية زول
 ├── tools/
 │   ├── assemble-profile.sh     ← يجمّع المجلدات أعلاه في build/profile لـ archiso
-│   └── fetch-grub-theme.sh     ← ينزّل ثيم YoRHa
+│   └── make-grub-theme.sh      ← يجهّز ثيم GRUB (زول) ويولّد خطوطه
 ├── branding/                   ← مولّدات الهوية (الشعار، الخلفيات)
 ├── build-zoolos.sh             ← زر البناء (ينتج zoolos-*.iso في المجلد الرئيسي)
 └── build/ · out/               ← مخرجات البناء (غير مرفوعة إلى git)
@@ -113,13 +114,12 @@ python3 make_wallpapers.py    # الخلفيات الثلاث
 
 **شاشة سوداء بعد الشعار:** يعني أن Hyprland لم يبدأ (غالباً بلا تسريع رسوميات). اضغط `Ctrl+Alt+F2` وادخل بالمستخدم `zool` (بلا كلمة مرور)، ثم شغّل `Hyprland` لقراءة رسالة الخطأ.
 
-**لا يظهر ثيم GRUB:** تأكد أن `tools/fetch-grub-theme.sh` نجح (يحتاج إنترنت) وأن المجلد `iso/grub/themes/yorha` موجود قبل البناء.
+**لا يظهر ثيم GRUB:** تأكد أن `tools/make-grub-theme.sh` نجح وأن `grub-mkfont` موجود (حزمة `grub`).
 
 ---
 
 ## ⚠️ ملاحظات
 
-- **ترخيص ثيم YoRHa:** مستودعه الأصلي بلا ملف ترخيص صريح، لذلك لا يُضمَّن في هذا المستودع ويُنزَّل وقت البناء. قبل أي إصدار عام راسل المؤلف أو استبدله.
 - **المثبّت:** يستخدم `archinstall` الرسمي (`zool-install`). تخصيصات زول لا تنتقل تلقائياً للنظام المثبّت بعد؛ هذه مهمة قادمة (Calamares أو سكربت ما بعد التثبيت).
 - **الدخول التلقائي** خاص بنظام الحياة ويجب ألا يبقى في النظام المثبّت.
 
@@ -141,6 +141,6 @@ python3 make_wallpapers.py    # الخلفيات الثلاث
 ### 0.5 — Zool OS على Arch
 - تحويل المشروع إلى Arch (archiso) وتغيير الاسم من snlnOS إلى **Zool OS (زول)**
 - شعار جديد (أهرامات مروي + شمس + النيلان) وأنيميشن إقلاع Plymouth
-- ثيم GRUB: YoRHa
+- ثيم GRUB: من تصميم زول (`branding/make_grub_assets.py`)
 - ثيم سطح مكتب سوداني ناعم، وإعادة تصميم Waybar وWofi وقائمة زول
 - ثلاث خلفيات سودانية مولّدة

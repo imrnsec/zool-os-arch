@@ -26,7 +26,8 @@
 ## المميزات
 
 - 🪶 **خفيف:** ملف الـ ISO نحو **1.9GB** فقط.
-- 🎨 **هوية سودانية متكاملة:** ثيم GRUB (YoRHa) ثم شعار زول المتحرك، وثلاث خلفيات سودانية (غروب النيل · ليل مروي · فجر الكثبان).
+- 🎨 **هوية سودانية متكاملة:** ثيم GRUB خاص بزول ثم شعار زول المتحرك، وشريط علوي عائم يتلوّن مع الثيم.
+- 🌈 **خمسة ثيمات جاهزة** تغيّر الألوان والخلفية معاً بضغطة (`SUPER + T`): زول، الفقاعة الزرقاء، أعماق البحر، أفق الدوائر، ديونيسوس — بخلفيات من السودان. ويمكنك إضافة ثيمك في `~/.config/zool/themes/`.
 - 🕌 **أوقات الصلاة والتاريخ الهجري** في الشريط العلوي مع إشعار الأذان، وتُحسب محلياً دون إنترنت (`zool-prayer`).
 - 🔤 **خطوط عربية مضمّنة:** Reem Kufi للعناوين وAmiri للنصوص إلى جانب Noto.
 - 💿 **مثبّت رسومي بالعربية** (`zool-install`) ينقل النظام بثيماته إلى القرص بخطوات بسيطة.
@@ -36,7 +37,9 @@
 - 🪟 **Hyprland** مع شريط Waybar وقائمة Wofi وإشعارات Mako بألوان رمل السودان ونيله.
 - ⌨️ **مساحات عمل بأرقام عربية**، وتبديل لوحة المفاتيح بين الإنجليزية والعربية بـ `Alt+Shift`.
 - 🎬 **وسائط جاهزة:** ترميزات الفيديو والصوت، وقارئ PDF (evince)، وعارض صور (loupe)، ومشغّل (mpv).
-- 📦 **برامج اختيارية:** LibreOffice وغيره بضغطة من قائمة `zool-extras`.
+- 🛍️ **متجر برامج رسومي** (`zool-store`): برامج مختارة، بحث في مستودعات Arch، و**AUR** عبر `paru`.
+- 🔄 **تحديث بلا إعادة تثبيت** (`zool-update`): يجلب آخر مميزات زول من GitHub ويحدّث حزم النظام، مع إشعار عند توفر تحديث.
+- 👋 **شاشة ترحيب ومركز إعدادات** للمبتدئ: الشبكة والصوت والوقت وكلمة المرور من مكان واحد.
 
 <div align="center">
 <img src="docs/img/nile-sunset.jpg" width="31%" alt="غروب النيل">
@@ -95,6 +98,7 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 | `SUPER + B` / `SUPER + E` | المتصفح / مدير الملفات |
 | `SUPER + W` / `ALT + F4` | إغلاق النافذة |
 | `SUPER + SHIFT + E` | المؤثرات: خفيف ↔ كامل |
+| `SUPER + T` | تغيير الثيم |
 | `SUPER + L` | قفل الشاشة |
 | `SUPER + Escape` | قائمة الطاقة |
 | `Alt + Shift` | تبديل اللغة (EN ↔ عربي) |
@@ -124,6 +128,18 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 | `iso/` | — | إعدادات الـ ISO: الحزم، GRUB، Syslinux |
 | `tools/` · `branding/` | — | أدوات البناء ومولّدات الهوية |
 
+## 🔄 التحديث
+
+بعد التثبيت لا تحتاج ISO جديداً للحصول على المميزات الجديدة:
+
+```bash
+zool-update          # حزم النظام + آخر ملفات زول من GitHub
+zool-update --zool   # ملفات زول فقط
+zool-update check    # هل يوجد تحديث؟
+```
+
+أو من قائمة زول (`SUPER + Z`) ← «تحديث النظام». إعداداتك التي عدّلتها بنفسك لا تُمسّ.
+
 ## 🏗️ البناء من المصدر
 
 ```bash
@@ -143,7 +159,7 @@ bash build-zoolos.sh
 
 ## 📜 الترخيص
 
-ثيم GRUB (YoRHa) من تأليف OliveThePuffin ويُنزَّل وقت البناء. الخطوط Amiri وReem Kufi تحت رخصة OFL ونصوصها مرفقة في مجلد الخطوط.
+ألوان الثيمات الإضافية مقتبسة من ثيمات Omarchy: [Blue Bubble](https://github.com/biggsjm/omarchy-blue-bubble-theme) (Josh Biggs، MIT)، [Cthulhu Deep One](https://github.com/sonderbydk/omarchy-cthulhu-deep-one-theme) (sonderbydk، MIT)، [Circuit Horizon](https://github.com/jennabrinning/omarchy-circuit-horizon-theme) (Jenna Brinning، MIT)، [Dionysus](https://github.com/joeyvigil/omarchy-dionysus-theme) (joeyvigil). الخطوط Amiri وReem Kufi تحت رخصة OFL ونصوصها مرفقة في مجلد الخطوط.
 
 ## 📬 تواصل معي
 
@@ -161,7 +177,7 @@ bash build-zoolos.sh
 
 **Zool OS** is a lightweight (~1.9 GB ISO) Sudanese-themed Linux distribution based on Arch Linux with the Hyprland Wayland compositor. "Zool" (زول) is Sudanese Arabic for "person" and is the most recognisable word of the Sudanese dialect.
 
-**Features:** Arabic-first GUI installer, offline prayer times + Hijri date in Waybar with adhan notification, bundled Arabic fonts (Reem Kufi, Amiri, Noto), SDDM login theme, YoRHa GRUB theme with a Zool boot animation, media codecs, PDF/image viewers, and optional LibreOffice.
+**Features:** Arabic-first GUI installer, offline prayer times + Hijri date in Waybar with adhan notification, bundled Arabic fonts (Reem Kufi, Amiri, Noto), SDDM login theme, a custom Zool GRUB theme and boot animation, five switchable colour themes, a graphical app store with AUR (paru), and in-place updates from GitHub (`zool-update`), media codecs, PDF/image viewers, and optional LibreOffice.
 
 **Download:** grab the ISO from [Releases](https://github.com/imrnsec/zool-os-arch/releases/latest), write it with `dd` (Linux) or Rufus in DD mode (Windows), boot it in UEFI or BIOS mode, then press `SUPER + Z` → *Install Zool OS*. The installer erases the selected disk.
 

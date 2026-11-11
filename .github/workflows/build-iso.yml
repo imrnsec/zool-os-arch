@@ -1,0 +1,47 @@
+name: بناء ISO
+
+# يدوياً من تبويب Actions، أو تلقائياً عند دفع وسم مثل v0.2 (فيُرفق الـ ISO بالإصدار)
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: تفريغ مساحة على المشغّل
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -af >/dev/null
+          df -h /
+
+      - name: بناء الـ ISO داخل حاوية Arch
+        run: |
+          docker run --rm --privileged -e ZOOL_MIN_GB=10 -v "$PWD":/zool -w /zool archlinux bash -c \
+            'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'
+          ls -lh out/
+
+      - name: رفع الـ ISO كملف مرفق بالتشغيل
+        uses: actions/upload-artifact@v4
+        with:
+          name: zoolos-iso
+          path: |
+            out/zoolos-*.iso
+            out/zoolos-*.iso.sha256
+          retention-days: 7
+          compression-level: 0
+
+      - name: إرفاق الـ ISO بالإصدار
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/zoolos-*.iso
+            out/zoolos-*.iso.sha256
