@@ -11,7 +11,7 @@
 
 ```bash
 # 1) المتطلبات
-sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools qemu-desktop edk2-ovmf
+sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2 qemu-desktop edk2-ovmf
 
 # 2) انسخ المشروع
 git clone -b zool-os-arch https://github.com/imrnsec/zool-os-arch
@@ -34,7 +34,7 @@ qemu-system-x86_64 -enable-kvm -cpu host -m 4096 -smp 2 -cdrom zoolos-*.iso \
 **على غير Arch** (Docker):
 ```bash
 docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
-  bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'
+  bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2 && bash build-zoolos.sh'
 ```
 
 ---

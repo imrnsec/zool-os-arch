@@ -18,13 +18,13 @@ PROFILE="${ZOOL_PROFILE:-$PWD/build/profile}"   # يُولَّد من المجل
 echo "═══ [0/5] فحص المتطلبات ═══"
 if [ ! -f /etc/arch-release ]; then
   echo "✗ هذا السكربت يعمل على Arch Linux فقط (أو حاوية archlinux)."
-  echo "  على غير Arch: docker run --rm --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'"
+  echo "  على غير Arch: docker run --rm --privileged -v \"\$PWD\":/zool -w /zool archlinux bash -c 'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2 && bash build-zoolos.sh'"
   exit 1
 fi
 for cmd in mkarchiso git grub-mkstandalone mksquashfs xorriso mformat; do
   command -v "$cmd" >/dev/null 2>&1 || {
     echo "✗ الأداة '$cmd' غير مثبتة. ثبّت المتطلبات:"
-    echo "  sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools qemu-desktop edk2-ovmf"
+    echo "  sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2 qemu-desktop edk2-ovmf"
     exit 1
   }
 done

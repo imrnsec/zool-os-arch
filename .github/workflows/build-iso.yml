@@ -25,7 +25,7 @@ jobs:
       - name: بناء الـ ISO داخل حاوية Arch
         run: |
           docker run --rm --privileged -e ZOOL_MIN_GB=10 -v "$PWD":/zool -w /zool archlinux bash -c \
-            'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools && bash build-zoolos.sh'
+            'pacman -Syu --noconfirm archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2 && bash build-zoolos.sh'
           ls -lh out/
 
       - name: رفع الـ ISO كملف مرفق بالتشغيل

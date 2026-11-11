@@ -143,7 +143,7 @@ zool-update check    # هل يوجد تحديث؟
 ## 🏗️ البناء من المصدر
 
 ```bash
-sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools
+sudo pacman -S --needed archiso git grub squashfs-tools libisoburn mtools dosfstools freetype2
 git clone -b zool-os-arch https://github.com/imrnsec/zool-os-arch
 cd zool-os-arch
 bash build-zoolos.sh
