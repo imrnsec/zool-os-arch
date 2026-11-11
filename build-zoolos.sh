@@ -32,8 +32,8 @@ free_gb=$(df -BG --output=avail "$(dirname "$WORK")" | tail -1 | tr -dc '0-9')
 MIN_GB="${ZOOL_MIN_GB:-12}"
 [ "${free_gb:-0}" -ge "$MIN_GB" ] || { echo "✗ المساحة الحرة ${free_gb}GB في $(dirname "$WORK") — يلزم ${MIN_GB}GB على الأقل."; echo "  (في Docker: أضف --rm، ونظّف بـ  docker system prune -a ، أو غيّر المسار بـ ZOOL_WORK)"; exit 1; }
 
-echo "═══ [1/5] تنزيل ثيم GRUB (YoRHa) ═══"
-bash tools/fetch-grub-theme.sh
+echo "═══ [1/5] تجهيز ثيم GRUB (زول) ═══"
+bash tools/make-grub-theme.sh
 
 echo "═══ [2/5] تجميع ملفات النظام (bin · config · etc · share · iso) ═══"
 bash tools/assemble-profile.sh "$PROFILE"

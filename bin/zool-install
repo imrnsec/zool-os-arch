@@ -82,7 +82,11 @@ stage1() {
     local TZ_DEF TZONE
     TZ_DEF=$(readlink -f /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||')
     TZ_DEF=${TZ_DEF:-Africa/Khartoum}
-    TZONE=$(zenity --entry --title="$T" --width=420 --text="المنطقة الزمنية (مثل Africa/Khartoum):" --entry-text="$TZ_DEF") || exit 0
+    while :; do
+        TZONE=$(zenity --entry --title="$T" --width=420 --text="المنطقة الزمنية (مثل Africa/Khartoum):" --entry-text="$TZ_DEF") || exit 0
+        [ -n "$TZONE" ] && [ -f "/usr/share/zoneinfo/$TZONE" ] && break
+        zenity --error --title="$T" --width=420 --text="منطقة زمنية غير معروفة: «$TZONE».\nأمثلة: Africa/Khartoum · Asia/Riyadh · Africa/Cairo"
+    done
     [ -f "/usr/share/zoneinfo/$TZONE" ] || TZONE=Africa/Khartoum
 
     # ── الدخول التلقائي ──
@@ -281,8 +285,8 @@ GRUB_DISABLE_OS_PROBER=true
 EOM
 # UEFI: نُبقي إطار الشاشة؛ BIOS: نعود للنص (النواة الحديثة بلا vesafb فتتجمد الشاشة)
 if [ "$UEFI" = 1 ]; then echo 'GRUB_GFXPAYLOAD_LINUX=keep' >>/etc/default/grub; else echo 'GRUB_GFXPAYLOAD_LINUX=text' >>/etc/default/grub; fi
-if [ -d /boot/grub/themes/yorha ]; then
-    echo 'GRUB_THEME="/boot/grub/themes/yorha/theme.txt"' >>/etc/default/grub
+if [ -d /boot/grub/themes/zool ]; then
+    echo 'GRUB_THEME="/boot/grub/themes/zool/theme.txt"' >>/etc/default/grub
 fi
 if [ "$UEFI" = 1 ]; then
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ZoolOS --recheck || exit 12
@@ -302,7 +306,7 @@ systemctl enable sddm NetworkManager bluetooth >/dev/null 2>&1 || true
 systemctl --global enable pipewire pipewire-pulse wireplumber >/dev/null 2>&1 || true
 CHROOT
         chmod 755 "$CH"
-        # ثيم GRUB (YoRHa) يأتي من وسيط التثبيت، فهو ليس داخل ملفات النظام
+        # ثيم GRUB (زول) يأتي من وسيط التثبيت، فهو ليس داخل ملفات النظام
         if [ -d /run/archiso/bootmnt/boot/grub/themes ]; then
             mkdir -p "$TARGET/boot/grub"
             cp -r /run/archiso/bootmnt/boot/grub/themes "$TARGET/boot/grub/" 2>>"$LOG" || true

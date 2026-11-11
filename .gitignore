@@ -10,7 +10,7 @@
 /zoolos-*.iso
 /zoolos-*.iso.sha256
 
-# ثيم YoRHa يُنزَّل وقت البناء (انظر tools/fetch-grub-theme.sh)
+# ثيم زول يُنزَّل وقت البناء (انظر tools/make-grub-theme.sh)
 /iso/grub/themes/
 
 # أدوات توليد الهوية
