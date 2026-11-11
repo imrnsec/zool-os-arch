@@ -249,7 +249,9 @@ def cmd_waybar():
         lines.append(f"{mark}{NAMES[key]}  {fmt_time(today[key])}")
     if conf["city"]:
         lines += ["", f"📍 {conf['city']}"]
-    text = f"  {NAMES[k]} {fmt_time(t)}  ·  بعد {fmt_delta((t - now).total_seconds())}"
+    text = f"  {NAMES[k]} {fmt_time(t)}"
+    lines.insert(0, f"{NAMES[k]} بعد {fmt_delta((t - now).total_seconds())}")
+    lines.insert(1, "")
     cls = "soon" if (t - now).total_seconds() < 1800 else "normal"
     print(json.dumps({"text": text, "tooltip": "\n".join(lines), "class": cls}, ensure_ascii=False))
 
@@ -257,8 +259,10 @@ def cmd_waybar():
 def cmd_hijri():
     conf = load_conf()
     now = dt.datetime.now().astimezone()
-    print(json.dumps({"text": hijri_str(now.date(), conf["hijri_offset"]),
-                      "tooltip": greg_str(now)}, ensure_ascii=False))
+    y, m, d = to_hijri(now.date(), conf["hijri_offset"])
+    short = f"{to_ar(d)} {HIJRI_MONTHS[m - 1]}"          # بلا السنة ليبقى الشريط قصيراً
+    full = hijri_str(now.date(), conf["hijri_offset"])
+    print(json.dumps({"text": short, "tooltip": f"{full}\n{greg_str(now)}"}, ensure_ascii=False))
 
 
 def cmd_list():
