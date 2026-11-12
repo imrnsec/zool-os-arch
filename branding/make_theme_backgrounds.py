@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """خلفيات الثيمات:
   1) لوحة «كثبان مروي» مرسومة بألوان كل ثيم (حادة على أي شاشة) → themes/<id>/backgrounds/1-meroe-dunes.jpg
-  2) صور فوتوغرافية (branding/photos/) تُركَّب على لوحة 16:9 كاملة دون قص:
-     الصورة كلها ظاهرة في الوسط وخلفها نسخة ضبابية منها تملأ الفراغ.
+  2) صور فوتوغرافية بنسبة 16:9 (branding/photos/) تُكبَّر وتوضَّح لتملأ الشاشة كاملة.
 الاستعمال:  python3 branding/make_theme_backgrounds.py     (يحتاج Pillow و numpy)
 """
 import os, re, glob
@@ -98,16 +97,11 @@ def photo(src, out):
     return im.size, fit.size
 
 # أي صورة تذهب لأي ثيم
+# الصور الفوتوغرافية: 16:9 فقط حتى تملأ الشاشة كاملة بلا قص ولا حواف ضبابية
 PHOTOS = {
-    "khartoum-golden.jpg":  ["zool"],
-    "nile-dusk.jpg":        ["blue-bubble", "tokyo-night", "catppuccin"],
-    "khartoum-mono.jpg":    ["deep-one", "matte-black", "nord"],
-    "evening-sky.jpg":      ["circuit-horizon", "kanagawa", "ristretto"],
-    "river-sunset.jpg":     ["dionysus", "gruvbox", "everforest", "zool"],
-    "sunset-trees.jpg":     ["zool", "gruvbox", "kanagawa", "blue-bubble"],
-    "sea-sunset.jpg":       ["zool", "ristretto", "dionysus", "circuit-horizon"],
-    "rose.jpg":             ["matte-black", "everforest", "deep-one"],
-    "sea-book.jpg":         ["nord", "catppuccin", "tokyo-night"],
+    "evening-sky.jpg":   ["circuit-horizon", "kanagawa", "ristretto", "catppuccin"],
+    "sunset-trees.jpg":  ["zool", "gruvbox", "kanagawa", "blue-bubble", "tokyo-night"],
+    "sea-sunset.jpg":    ["zool", "ristretto", "dionysus", "circuit-horizon", "matte-black", "everforest", "nord", "deep-one"],
 }
 
 if __name__ == "__main__":
@@ -120,5 +114,7 @@ if __name__ == "__main__":
             if os.path.exists(old): os.remove(old)
     for name, themes in PHOTOS.items():
         src = f"{ROOT}/branding/photos/{name}"
+        w0, h0 = Image.open(src).size
+        assert abs(w0 / h0 - 16 / 9) < 0.02, f"{name}: ليست 16:9"
         for tid in themes:
             print(name, "→", tid, photo(src, f"{ROOT}/themes/{tid}/backgrounds/photo-{name}"))

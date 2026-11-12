@@ -76,6 +76,8 @@ zram-generator
 
 # ── واجهات البحث في الطرفية (تثبيت/إزالة الحزم) ──
 fzf
+lxterminal
+firefox-i18n-ar
 
 # ── الطاقة والراحة والأمان ──
 power-profiles-daemon

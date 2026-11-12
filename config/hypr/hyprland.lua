@@ -29,7 +29,7 @@ local function X(cmd)
 end
 
 -- ── البرامج ──
-local terminal = "kitty"
+local terminal = "zool-terminal"
 local files    = "thunar"
 local browser  = "firefox"
 local menu     = "wofi --show drun"
@@ -75,6 +75,19 @@ hl.on("hyprland.start", function()
         "sh -c 'sleep 4; notify-send -i /usr/share/zool/logo/zool-logo-128.png \"مرحباً بك في زول\" \"اضغط SUPER + F1 لعرض الاختصارات\"'",
     }) do
         try("autostart " .. cmd, function() hl.exec_cmd(cmd) end)
+    end
+end)
+
+-- ── لغة الواجهة (zool-language): العربية تجعل البرامج كلها من اليمين لليسار ──
+pcall(function()
+    local f = io.open((os.getenv("HOME") or "") .. "/.config/zool/lang", "r")
+    if not f then return end
+    local v = (f:read("*l") or ""):gsub("%s+", "")
+    f:close()
+    if v == "ar" then
+        hl.env("LANG", "ar_SD.UTF-8"); hl.env("LANGUAGE", "ar")
+    elseif v == "en" then
+        hl.env("LANG", "en_US.UTF-8"); hl.env("LANGUAGE", "en")
     end
 end)
 

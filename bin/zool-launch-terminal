@@ -3,4 +3,4 @@
 #   مثل omarchy-launch-floating-terminal-with-presentation
 cmd="$*"
 script="printf '\e[33m  زول  ·  Zool OS\e[0m\n\n'; $cmd; code=\$?; if (( code != 130 )); then zool-show-done \$code; fi"
-exec setsid kitty --class zool.terminal --title "زول" -e bash -c "$script"
+exec setsid zool-terminal --title "زول" -e bash -c "$script"

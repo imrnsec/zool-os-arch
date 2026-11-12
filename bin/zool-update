@@ -124,6 +124,7 @@ case "${1:-}" in
     version) installed; exit 0 ;;
     notify)
         [ -d /run/archiso ] && exit 0
+        [ -e "${XDG_CONFIG_HOME:-$HOME/.config}/zool/datasaver" ] && exit 0   # وضع توفير البيانات
         cmd_check >/dev/null; [ $? = 10 ] && notify-send -i "$LOGO" -t 12000 "تحديث متوفر لزول" "افتح قائمة زول (SUPER+Z) ← «تحديث»"
         exit 0 ;;
     --system-apply) system_apply "${2:-1}"; exit $? ;;

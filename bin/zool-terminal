@@ -1,0 +1,17 @@
+#!/bin/bash
+# zool-terminal [--title عنوان] [-e أمر…] — يفتح الطرفية المناسبة للغة الواجهة
+#   العربية: lxterminal (يدعم اتجاه الكتابة من اليمين لليسار وتشكيل الحروف — BiDi)
+#   غيرها:   kitty (أسرع، لكنه لا يدعم RTL)
+title="زول"; cmd=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --title) title="$2"; shift 2 ;;
+        -e) shift; cmd=("$@"); break ;;
+        *) cmd=("$@"); break ;;
+    esac
+done
+lang=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/zool/lang" 2>/dev/null)
+if [[ $lang == ar ]] && command -v lxterminal >/dev/null; then
+    if [[ ${#cmd[@]} -gt 0 ]]; then exec lxterminal -t "$title" -e "$(printf '%q ' "${cmd[@]}")"; else exec lxterminal -t "$title"; fi
+fi
+if [[ ${#cmd[@]} -gt 0 ]]; then exec kitty --title "$title" -e "${cmd[@]}"; else exec kitty --title "$title"; fi

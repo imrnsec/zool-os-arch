@@ -253,6 +253,11 @@ def cmd_waybar():
     lines.insert(0, f"{NAMES[k]} بعد {fmt_delta((t - now).total_seconds())}")
     lines.insert(1, "")
     cls = "soon" if (t - now).total_seconds() < 1800 else "normal"
+    # اتجاه القبلة: زاوية الدائرة العظمى من موقعك إلى الكعبة (بالدرجات من الشمال مع عقارب الساعة)
+    la, lo, kla, klo = map(math.radians, (conf["lat"], conf["lng"], 21.4225, 39.8262))
+    q = math.degrees(math.atan2(math.sin(klo - lo), math.cos(la) * math.tan(kla) - math.sin(la) * math.cos(klo - lo))) % 360
+    dirs = ["الشمال", "الشمال الشرقي", "الشرق", "الجنوب الشرقي", "الجنوب", "الجنوب الغربي", "الغرب", "الشمال الغربي"]
+    lines += ["", f"القبلة: {to_ar(round(q))}° ({dirs[int((q + 22.5) // 45) % 8]})"]
     print(json.dumps({"text": text, "tooltip": "\n".join(lines), "class": cls}, ensure_ascii=False))
 
 
@@ -335,7 +340,7 @@ def cmd_city():
 
 def cmd_config():
     load_conf()
-    subprocess.run(["kitty", "-e", "nano", CONF], check=False)
+    subprocess.run(["zool-terminal", "-e", "nano", CONF], check=False)
 
 
 def main():

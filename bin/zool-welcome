@@ -1,52 +1,41 @@
 #!/bin/bash
-# zool-welcome — شاشة الترحيب (تظهر تلقائياً أول مرة، ثم من قائمة زول ← تعلّم)
+# zool-welcome — شاشة الترحيب بألوان الثيم وأيقوناته (تظهر تلقائياً أول مرة، ثم من قائمة زول ← تعلّم)
 #   zool-welcome --auto   لا تظهر إن سبق عرضها
-FLAG="${XDG_CONFIG_HOME:-$HOME/.config}/zool/welcome-done"
-LOGO=/usr/share/zool/logo/zool-logo-128.png
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}/zool"
+FLAG="$CFG/welcome-done"
 [ "${1:-}" = "--auto" ] && [ -e "$FLAG" ] && exit 0
-mkdir -p "$(dirname "$FLAG")"; touch "$FLAG"
-
+mkdir -p "$CFG"; touch "$FLAG"
+i() { zool-icon "$1" 2>/dev/null; }
 LIVE=0; [ -d /run/archiso ] && LIVE=1
 while :; do
-    L=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/zool/lang" 2>/dev/null)
-    items=()
+    L=$(cat "$CFG/lang" 2>/dev/null); rows=()
     if [ "$L" = en ]; then
-        TITLE="Welcome to Zool"; OPEN="Open"; CLOSE="Close"
-        TEXT="<big><b>Welcome to Zool</b></big>\n\n<b>SUPER</b> is the Windows key. Press <b>SUPER+Z</b> any time to open the Zool menu.\nWhere would you like to start?"
-        [ $LIVE = 1 ] && items+=("install" "Install Zool on this computer" "Copies the system to your disk in a few steps")
-        items+=("lang" "اللغة / Language" "العربية · English"
-                "net" "Connect to the internet" "Wi-Fi or cable"
-                "theme" "Choose a theme" "Colours and backgrounds (SUPER+T)"
-                "prayer" "Prayer times city" "Sets the times shown in the top bar"
-                "apps" "Install apps" "Arch packages, AUR and popular apps"
-                "keys" "Keybindings" "The most useful shortcuts (SUPER+F1)"
-                "menu" "Full Zool menu" "Everything in one place (SUPER+Z)")
-        [ $LIVE = 0 ] && items+=("update" "Update the system" "Latest packages and Zool features")
+        P="Welcome to Zool — SUPER+Z opens the menu"
+        [ $LIVE = 1 ] && rows+=("$(i f0a0)   Install Zool on this computer")
+        rows+=("$(i f1ab)   Language / اللغة" "$(i f1eb)   Connect to the internet" "$(i f043)   Choose a theme" "$(i f017)   Prayer times city"
+               "$(i f019)   Install apps" "$(i f11c)   Keybindings" "$(i f0c9)   Full Zool menu")
+        [ $LIVE = 0 ] && rows+=("$(i f021)   Update the system")
+        rows+=("$(i f00d)   Close")
     else
-        TITLE="مرحباً بك في زول"; OPEN="فتح"; CLOSE="إغلاق"
-        TEXT="<big><b>مرحباً بك في زول</b></big>\n\nمفتاح <b>SUPER</b> هو مفتاح ويندوز. اضغط <b>SUPER+Z</b> في أي وقت لفتح قائمة زول.\nاختر من أين تبدأ:"
-        [ $LIVE = 1 ] && items+=("install" "تثبيت زول على هذا الجهاز" "ينسخ النظام إلى القرص بخطوات بسيطة")
-        items+=("lang" "اللغة / Language" "العربية · English"
-                "net" "الاتصال بالإنترنت" "واي فاي أو كيبل"
-                "theme" "اختيار الثيم" "ألوان وخلفيات جاهزة (SUPER+T)"
-                "prayer" "مدينة أوقات الصلاة" "لضبط المواقيت في الشريط العلوي"
-                "apps" "تثبيت برامج" "حزم Arch و AUR وبرامج شائعة"
-                "keys" "الاختصارات" "أهم مفاتيح لوحة المفاتيح (SUPER+F1)"
-                "menu" "قائمة زول كاملة" "كل شيء من مكان واحد (SUPER+Z)")
-        [ $LIVE = 0 ] && items+=("update" "تحديث النظام" "آخر الحزم وآخر مميزات زول")
+        P="مرحباً بك في زول — SUPER+Z يفتح القائمة"
+        [ $LIVE = 1 ] && rows+=("$(i f0a0)   تثبيت زول على هذا الجهاز")
+        rows+=("$(i f1ab)   اللغة / Language" "$(i f1eb)   الاتصال بالإنترنت" "$(i f043)   اختيار الثيم" "$(i f017)   مدينة أوقات الصلاة"
+               "$(i f019)   تثبيت برامج" "$(i f11c)   الاختصارات" "$(i f0c9)   قائمة زول كاملة")
+        [ $LIVE = 0 ] && rows+=("$(i f021)   تحديث النظام")
+        rows+=("$(i f00d)   إغلاق")
     fi
-    c=$(zenity --list --title="$TITLE" --window-icon="$LOGO" --width=620 --height=500 --text="$TEXT" \
-          --column="id" --column="" --column="" --hide-column=1 --print-column=1 --hide-header \
-          --ok-label="$OPEN" --cancel-label="$CLOSE" "${items[@]}" 2>/dev/null) || exit 0
+    n=${#rows[@]}
+    c=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --allow-markup --prompt "$P" --width 520 --height $(( n * 44 + 90 )) --columns 1 --cache-file /dev/null) || exit 0
     case "$c" in
-        install) zool-install ;;
-        lang)    zool-language ;;
-        net)     kitty --title "Network" -e nmtui ;;
-        theme)   zool-theme ;;
-        prayer)  zool-prayer city ;;
-        apps)    zool-menu install ;;
-        keys)    zool-keys ;;
-        menu)    zool-menu ;;
-        update)  zool-launch-terminal zool-update ;;
+        *"Install Zool"*|*"تثبيت زول"*)   zool-install ;;
+        *Language*)                       zool-language ;;
+        *internet*|*الإنترنت*)            zool-terminal --title nmtui -e nmtui ;;
+        *theme*|*الثيم*)                  zool-theme ;;
+        *Prayer*|*الصلاة*)                zool-prayer city ;;
+        *"Install apps"*|*"تثبيت برامج"*) zool-menu install; exit 0 ;;
+        *Keybindings*|*الاختصارات*)       zool-keys ;;
+        *"Full Zool"*|*"قائمة زول"*)      zool-menu; exit 0 ;;
+        *Update*|*تحديث*)                 zool-launch-terminal zool-update; exit 0 ;;
+        *) exit 0 ;;
     esac
 done

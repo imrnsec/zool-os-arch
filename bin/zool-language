@@ -9,6 +9,7 @@ case "${1:-}" in
     *) echo "usage: zool-language [ar|en|get]" >&2; exit 2 ;;
 esac
 mkdir -p "$(dirname "$conf")"; echo "$lang" > "$conf"
-if [ "$lang" = en ]; then msg="Interface language: English"; else msg="لغة الواجهة: العربية"; fi
-notify-send -t 2500 -i /usr/share/zool/logo/zool-logo-128.png "Zool" "$msg" 2>/dev/null
+if [ "$lang" = en ]; then msg="Interface language: English — log out and back in to apply it to every app."
+else msg="لغة الواجهة: العربية — سجّل الخروج ثم الدخول ليصير النظام كله من اليمين لليسار (والطرفية أيضاً)."; fi
+notify-send -t 9000 -i /usr/share/zool/logo/zool-logo-128.png "Zool" "$msg" 2>/dev/null
 exit 0

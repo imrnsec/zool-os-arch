@@ -100,10 +100,70 @@ color7  #$sand
 color15 #ffffff
 EOF
 
+    # ── تطبيقات GTK (النوافذ الحوارية، مدير الملفات…) فوق adw-gtk3 ──
+    local g
+    for g in gtk-3.0 gtk-4.0; do
+        mkdir -p "$CFG/$g"
+        cat > "$CFG/$g/gtk.css" <<EOF
+/* ألوان الثيم الحالي فوق adw-gtk3 — يكتبها zool-theme */
+@define-color accent_bg_color #$gold;
+@define-color accent_fg_color #$night;
+@define-color accent_color #$gold;
+@define-color destructive_bg_color #$red;
+@define-color success_bg_color #$acacia;
+@define-color window_bg_color #$surface;
+@define-color window_fg_color #$sand;
+@define-color view_bg_color #$night;
+@define-color view_fg_color #$sand;
+@define-color headerbar_bg_color #$surface2;
+@define-color headerbar_fg_color #$sand;
+@define-color card_bg_color #$surface2;
+@define-color card_fg_color #$sand;
+@define-color popover_bg_color #$surface2;
+@define-color popover_fg_color #$sand;
+@define-color dialog_bg_color #$surface;
+@define-color dialog_fg_color #$sand;
+@define-color sidebar_bg_color #$surface;
+@define-color sidebar_fg_color #$sand;
+EOF
+    done
+
+    # ── الطرفية العربية (lxterminal — تدعم RTL) ──
+    mkdir -p "$CFG/lxterminal"
+    cat > "$CFG/lxterminal/lxterminal.conf" <<EOF
+[general]
+fontname=JetBrainsMono Nerd Font 11
+fgcolor=#$sand
+bgcolor=#$night
+palette_color_0=#$surface
+palette_color_1=#$red
+palette_color_2=#$acacia
+palette_color_3=#$yellow
+palette_color_4=#$blue
+palette_color_5=#$magenta
+palette_color_6=#$teal
+palette_color_7=#$sand
+palette_color_8=#$sand_dim
+palette_color_9=#$red
+palette_color_10=#$acacia
+palette_color_11=#$yellow
+palette_color_12=#$blue
+palette_color_13=#$magenta
+palette_color_14=#$teal
+palette_color_15=#ffffff
+color_preset=Custom
+hidemenubar=true
+hidescrollbar=true
+hideclosebutton=true
+hidepointer=false
+cursorblinks=true
+scrollback=5000
+EOF
+
     # ── Mako (الإشعارات) ──
     mkdir -p "$CFG/mako"
     cat > "$CFG/mako/config" <<EOF
-font=Noto Sans 11
+font=IBM Plex Sans Arabic 11
 background-color=#${surface}ee
 text-color=#$sand
 border-color=#$gold
@@ -163,10 +223,10 @@ case "${1:-pick}" in
         cur=$(current)
         menu=$(for id in $(list); do
                    [ "$id" = "$cur" ] && mark="●" || mark="○"
-                   printf '%s %s   ·   %s\n' "$mark" "$id" "$(title "$id")"
+                   printf '%s   %s   ·   %s\n' "$(zool-icon f043 "#$(toml "$(theme_dir "$id")/colors.toml" accent blue foreground)")" "$id" "$(title "$id")$( [ "$id" = "$cur" ] && echo "  ✓")"
                done)
-        pick=$(printf '%s\n' "$menu" | wofi --dmenu --prompt "الثيم" --width 520 --height 520 --columns 1) || exit 0
-        id=$(printf '%s' "$pick" | awk '{print $2}')
+        pick=$(printf '%s\n' "$menu" | wofi --dmenu --allow-markup --prompt "الثيم" --width 520 --height 560 --columns 1) || exit 0
+        id=$(printf '%s' "$pick" | sed -E 's/<[^>]*>//g' | awk -F'   ' '{print $2}' | awk '{print $1}')
         [ -n "$id" ] && apply "$id" ;;
     *) echo "الاستخدام: zool-theme [list|current|dir|set <اسم>]" >&2; exit 2 ;;
 esac

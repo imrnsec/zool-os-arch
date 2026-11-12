@@ -1,0 +1,17 @@
+#!/bin/sh
+# zool-datasaver [toggle|on|off|status] — وضع توفير البيانات (لباقات الإنترنت المحدودة)
+#   يعلّم الاتصال الحالي «محدود» فتتوقف البرامج عن التنزيل في الخلفية، ويوقف فحص تحديثات زول التلقائي.
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/zool/datasaver"
+LOGO=/usr/share/zool/logo/zool-logo-128.png
+con=$(nmcli -t -f NAME connection show --active 2>/dev/null | head -1)
+state() { [ -e "$conf" ] && echo on || echo off; }
+set_metered() { [ -n "$con" ] && nmcli connection modify "$con" connection.metered "$1" >/dev/null 2>&1; }
+case "${1:-toggle}" in
+    status) state ;;
+    on)  mkdir -p "$(dirname "$conf")"; touch "$conf"; set_metered yes
+         notify-send -t 4000 -i "$LOGO" "توفير البيانات: يعمل" "الاتصال «${con:-الحالي}» محدود — لا تنزيلات في الخلفية ولا فحص تحديثات تلقائي." ;;
+    off) rm -f "$conf"; set_metered unknown
+         notify-send -t 3000 -i "$LOGO" "توفير البيانات: متوقف" "عاد الاتصال إلى وضعه العادي." ;;
+    toggle) [ "$(state)" = on ] && exec "$0" off || exec "$0" on ;;
+    *) echo "الاستخدام: zool-datasaver [toggle|on|off|status]" >&2; exit 2 ;;
+esac
