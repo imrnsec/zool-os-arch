@@ -50,7 +50,6 @@ hyprpolkitagent
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 xorg-xwayland
-xorg-server
 waybar
 wofi
 mako
@@ -65,9 +64,6 @@ playerctl
 jq
 libnotify
 polkit
-sddm
-qt6-svg
-qt6-declarative
 
 # ── تعريفات الرسوميات وفك ترميز الفيديو بالعتاد (Intel) ──
 mesa
@@ -80,6 +76,11 @@ zram-generator
 
 # ── واجهات البحث في الطرفية (تثبيت/إزالة الحزم) ──
 fzf
+
+# ── الطاقة والراحة والأمان ──
+power-profiles-daemon
+hyprsunset
+ufw
 
 # ── الصوت والبلوتوث ──
 pipewire

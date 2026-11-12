@@ -1,0 +1,22 @@
+#!/bin/sh
+# zool-battery-monitor — ينبّه عند انخفاض البطارية (يعمل في الخلفية مع الجلسة)
+LOGO=/usr/share/zool/logo/zool-logo-128.png
+LOW=15; CRIT=7; state=ok
+bat=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -1)
+[ -n "$bat" ] || exit 0                      # جهاز بلا بطارية
+while :; do
+    cap=$(cat "$bat/capacity" 2>/dev/null || echo 100)
+    st=$(cat "$bat/status" 2>/dev/null)
+    if [ "$st" = Discharging ]; then
+        if [ "$cap" -le "$CRIT" ] && [ "$state" != crit ]; then
+            notify-send -u critical -i "$LOGO" "البطارية على وشك النفاد ($cap%)" "صِل الشاحن الآن أو احفظ عملك."
+            state=crit
+        elif [ "$cap" -le "$LOW" ] && [ "$state" = ok ]; then
+            notify-send -u normal -t 15000 -i "$LOGO" "البطارية منخفضة ($cap%)" "صِل الشاحن. لتوفير الطاقة: قائمة زول ← الإعداد ← الطاقة."
+            state=low
+        fi
+    else
+        state=ok
+    fi
+    sleep 60
+done

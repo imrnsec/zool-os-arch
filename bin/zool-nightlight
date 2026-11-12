@@ -1,0 +1,15 @@
+#!/bin/sh
+# zool-nightlight [toggle|on|off|restore] — الضوء الليلي: تدفئة ألوان الشاشة لراحة العين (hyprsunset)
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/zool/nightlight"
+TEMP=4200
+LOGO=/usr/share/zool/logo/zool-logo-128.png
+on()  { pkill -x hyprsunset 2>/dev/null; setsid hyprsunset -t "$TEMP" >/dev/null 2>&1 & mkdir -p "$(dirname "$conf")"; echo on > "$conf"; }
+off() { pkill -x hyprsunset 2>/dev/null; mkdir -p "$(dirname "$conf")"; echo off > "$conf"; }
+case "${1:-toggle}" in
+    on)      on;  notify-send -t 2000 -i "$LOGO" "زول" "الضوء الليلي: يعمل" ;;
+    off)     off; notify-send -t 2000 -i "$LOGO" "زول" "الضوء الليلي: متوقف" ;;
+    toggle)  if pgrep -x hyprsunset >/dev/null; then "$0" off; else "$0" on; fi ;;
+    restore) [ "$(cat "$conf" 2>/dev/null)" = on ] && on ;;
+    *) echo "الاستخدام: zool-nightlight [toggle|on|off|restore]" >&2; exit 2 ;;
+esac
+exit 0

@@ -80,7 +80,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 ├── migrations/                 ← ترحيلات تُنفَّذ مرة واحدة عند zool-update
 ├── bin/                        ← أوامر زول  → /usr/local/bin  (zool-menu · zool-install · zool-prayer · …)
 ├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · kitty · gtk · fastfetch)
-├── etc/                        ← إعدادات النظام → /etc  (SDDM · systemd · mkinitcpio · plymouth · fonts)
+├── etc/                        ← إعدادات النظام → /etc  (الجلسة · systemd · mkinitcpio · plymouth · fonts)
 ├── share/                      ← → /usr/share  (zool: الشعار والخلفيات · plymouth · sddm · fonts · applications)
 ├── local-share/                ← → /usr/local/share
 ├── iso/                        ← إعدادات الـ ISO نفسه
@@ -131,7 +131,6 @@ python3 make_wallpapers.py    # الخلفيات الثلاث
 
 - [ ] أول بناء ناجح واختباره في QEMU
 - [ ] التأكد من: GRUB ← شعار زول ← الدخول التلقائي ← Waybar ← Wofi
-- [ ] ثيم SDDM بهوية زول (للنظام المثبّت)
 - [ ] مثبّت يحمل تخصيصات زول (Calamares أو post-install)
 - [ ] مستودع حزم لمحتوى زول التعليمي وأدوات الأمن (على نمط ما خطّطنا له)
 - [ ] إصدار تجريبي v0.1 مع SHA256

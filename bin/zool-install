@@ -91,8 +91,8 @@ stage1() {
 
     # ── الدخول التلقائي ──
     local AUTOLOGIN=0
-    if zenity --question --title="$T" --width=440 --ok-label="نعم، دخول تلقائي" --cancel-label="لا، اطلب كلمة المرور" \
-        --text="هل تريد الدخول تلقائياً دون كتابة كلمة المرور عند تشغيل الجهاز؟\n(أسهل، لكنه أقل أماناً)"; then
+    if zenity --question --title="$T" --width=460 --ok-label="بلا كلمة مرور" --cancel-label="اطلب كلمة المرور (موصى به)" \
+        --text="عند تشغيل الجهاز: هل تُفتح شاشة القفل وتطلب كلمة المرور، أم يُفتح سطح المكتب مباشرة؟\n(بلا كلمة مرور أسهل، لكنه أقل أماناً)"; then
         AUTOLOGIN=1
     fi
 
@@ -237,7 +237,7 @@ locale-gen >/dev/null 2>&1 || true
 log "إزالة بقايا نظام الحياة"
 userdel -f zool 2>/dev/null || true
 rm -rf /home/zool
-rm -f /etc/sudoers.d/10-zool-wheel /etc/sddm.conf.d/10-zool-autologin.conf
+rm -f /etc/sudoers.d/10-zool-wheel
 rm -f /etc/mkinitcpio.conf.d/archiso.conf
 for u in choose-mirror.service pacman-init.service zool-live-setup.service livecd-alsa-unmuter.service \
          etc-pacman.d-gnupg.mount; do
@@ -296,13 +296,21 @@ else
 fi
 grub-mkconfig -o /boot/grub/grub.cfg || exit 13
 
-if [ "${AUTOLOGIN:-0}" = 1 ]; then
-    log "الدخول التلقائي للمستخدم $USERNAME"
-    printf '[Autologin]\nUser=%s\nSession=hyprland\n' "$USERNAME" >/etc/sddm.conf.d/10-zool-autologin.conf
+log "جلسة سطح المكتب للمستخدم $USERNAME"
+# الجلسة تبدأ تلقائياً على tty1 (بلا مدير دخول ثقيل)، وشاشة القفل هي التي تطلب كلمة المرور
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+printf '[Service]\nExecStart=\nExecStart=-/sbin/agetty -o %s --noclear --autologin %s %%I $TERM\n' "'-p -f -- \\\\u'" "$USERNAME" \
+    >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+if [ "${AUTOLOGIN:-0}" != 1 ]; then
+    install -d -o "$USERNAME" -g "$USERNAME" "/home/$USERNAME/.config" "/home/$USERNAME/.config/zool"
+    install -o "$USERNAME" -g "$USERNAME" -m 644 /dev/null "/home/$USERNAME/.config/zool/lock-on-start"
 fi
 
+log "الجدار الناري"
+sed -i 's/^ENABLED=no/ENABLED=yes/' /etc/ufw/ufw.conf 2>/dev/null || true
+
 log "تفعيل الخدمات"
-systemctl enable sddm NetworkManager bluetooth >/dev/null 2>&1 || true
+systemctl enable NetworkManager bluetooth power-profiles-daemon ufw >/dev/null 2>&1 || true
 systemctl --global enable pipewire pipewire-pulse wireplumber >/dev/null 2>&1 || true
 CHROOT
         chmod 755 "$CH"

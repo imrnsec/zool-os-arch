@@ -1,0 +1,9 @@
+#!/bin/bash
+# zool-webapp-remove — يحذف تطبيق ويب أضفته بـ zool-webapp-install
+APPS="$HOME/.local/share/applications"
+list=$(grep -l '^Exec=zool-launch-webapp' "$APPS"/zool-webapp-*.desktop 2>/dev/null)
+[[ -n $list ]] || { echo "لا توجد تطبيقات ويب مضافة."; exit 0; }
+pick=$(for f in $list; do printf '%s\t%s\n' "$(sed -n 's/^Name=//p' "$f" | head -1)" "$f"; done | fzf --prompt="احذف> " --with-nth=1 --delimiter='\t' --height=40% --border) || exit 130
+f=$(printf '%s' "$pick" | cut -f2)
+id=$(basename "$f" .desktop); id=${id#zool-webapp-}
+rm -f "$f" "$APPS/icons/$id.png" && echo "✓ حُذف: $(printf '%s' "$pick" | cut -f1)"

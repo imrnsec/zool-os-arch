@@ -5,7 +5,7 @@
 #
 #    bin/          →  /usr/local/bin          أوامر زول (zool-*)
 #    config/       →  /etc/skel/.config       إعدادات المستخدم (Hyprland، Waybar…)
-#    etc/          →  /etc                    إعدادات النظام (SDDM، systemd، …)
+#    etc/          →  /etc                    إعدادات النظام (الجلسة، systemd، …)
 #    share/        →  /usr/share              الخطوط والشعارات وثيمات Plymouth/SDDM
 #    themes/       →  /usr/share/zool/themes   الثيمات (صيغة Omarchy: colors.toml + backgrounds/)
 #    default/      →  /usr/share/zool/default  الافتراضيات (ملف القائمة menu.conf)

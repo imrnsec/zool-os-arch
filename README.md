@@ -31,7 +31,10 @@
 - 🕌 **أوقات الصلاة والتاريخ الهجري** في الشريط العلوي مع إشعار الأذان، وتُحسب محلياً دون إنترنت (`zool-prayer`).
 - 🔤 **خطوط عربية مضمّنة:** Reem Kufi للعناوين وAmiri للنصوص إلى جانب Noto.
 - 💿 **مثبّت رسومي بالعربية** (`zool-install`) ينقل النظام بثيماته إلى القرص بخطوات بسيطة.
-- 🔐 **شاشة دخول SDDM** بهوية زول.
+- 🔐 **إقلاع مباشر بلا مدير دخول ثقيل:** يفتح سطح المكتب مباشرة، وشاشة القفل تطلب كلمة المرور (اختيارياً).
+- 🔋 **للابتوب:** تنبيه البطارية المنخفضة، أوضاع الطاقة، الضوء الليلي (`SUPER + N`)، وإيماءات لوحة اللمس بثلاث أصابع.
+- 🌐 **تطبيقات الويب:** أضف أي موقع (واتساب، يوتيوب…) كتطبيق في القائمة — خفيف على الأجهزة الضعيفة.
+- 🛡️ **جدار ناري مفعّل** بعد التثبيت، ودعم الطابعات بضغطة، وواجهة بالعربية أو الإنجليزية.
 - ⚡ **مهيّأ للأجهزة الضعيفة:** وضع مؤثرات خفيف افتراضياً (يُبدَّل بـ `zool-effects`)، وذاكرة مضغوطة zram، وفك ترميز الفيديو بالعتاد على Intel.
 - 🖱️ **سهل بالفأرة:** شريط مهام للنوافذ المفتوحة وزر إغلاق، ومؤشر للصوت والسطوع، وقفل تلقائي عند الخمول.
 - 🪟 **Hyprland** مع شريط Waybar وقائمة Wofi وإشعارات Mako بألوان رمل السودان ونيله.
@@ -99,6 +102,7 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 | `SUPER + W` / `ALT + F4` | إغلاق النافذة |
 | `SUPER + SHIFT + E` | المؤثرات: خفيف ↔ كامل |
 | `SUPER + T` | تغيير الثيم |
+| `SUPER + N` | الضوء الليلي |
 | `SUPER + L` | قفل الشاشة |
 | `SUPER + Escape` | قائمة الطاقة |
 | `Alt + Shift` | تبديل اللغة (EN ↔ عربي) |
@@ -123,8 +127,8 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 |---|---|---|
 | `bin/` | `/usr/local/bin` | أوامر زول (`zool-install`، `zool-prayer`، `zool-menu`…) |
 | `config/` | `/etc/skel/.config` | إعدادات Hyprland وWaybar وWofi وMako وKitty |
-| `etc/` | `/etc` | إعدادات النظام (SDDM، systemd، mkinitcpio، Plymouth) |
-| `share/` | `/usr/share` | الشعار والخلفيات والخطوط وثيمات Plymouth وSDDM |
+| `etc/` | `/etc` | إعدادات النظام (الجلسة، systemd، mkinitcpio، Plymouth) |
+| `share/` | `/usr/share` | الشعار والخلفيات والخطوط وثيم Plymouth |
 | `themes/` | `/usr/share/zool/themes` | الثيمات (صيغة Omarchy: `colors.toml` + `backgrounds/`) |
 | `default/` | `/usr/share/zool/default` | الافتراضيات (ملف القائمة `menu.conf`) |
 | `migrations/` | — | ترحيلات تُنفَّذ مرة عند `zool-update` |
@@ -180,7 +184,7 @@ bash build-zoolos.sh
 
 **Zool OS** is a lightweight (~1.9 GB ISO) Sudanese-themed Linux distribution based on Arch Linux with the Hyprland Wayland compositor. "Zool" (زول) is Sudanese Arabic for "person" and is the most recognisable word of the Sudanese dialect.
 
-**Features:** Arabic-first GUI installer, offline prayer times + Hijri date in Waybar with adhan notification, bundled Arabic fonts (Reem Kufi, Amiri, Noto), SDDM login theme, a custom Zool GRUB theme and boot animation, 13 switchable themes in Omarchy's colors.toml format (any Omarchy theme installs with `zool-theme-install`), an Omarchy-style hierarchical menu and fzf package pickers for Arch repos and the AUR (yay), and in-place updates from GitHub (`zool-update`), media codecs, PDF/image viewers, and optional LibreOffice.
+**Features:** Arabic-first GUI installer, offline prayer times + Hijri date in Waybar with adhan notification, bundled Arabic fonts (Reem Kufi, Amiri, Noto), a custom Zool GRUB theme and boot animation, 13 switchable themes in Omarchy's colors.toml format (any Omarchy theme installs with `zool-theme-install`), an Omarchy-style hierarchical menu and fzf package pickers for Arch repos and the AUR (yay), and in-place updates from GitHub (`zool-update`), media codecs, PDF/image viewers, and optional LibreOffice.
 
 **Download:** grab the ISO from [Releases](https://github.com/imrnsec/zool-os-arch/releases/latest), write it with `dd` (Linux) or Rufus in DD mode (Windows), boot it in UEFI or BIOS mode, then press `SUPER + Z` → *Install Zool OS*. The installer erases the selected disk.
 

@@ -3,10 +3,15 @@
 #   zool-menu            القائمة الرئيسية
 #   zool-menu install    يفتح مباشرة على قائمة فرعية
 #   Esc يرجع خطوة للخلف
-CONF="${XDG_CONFIG_HOME:-$HOME/.config}/zool/menu.conf"
-[ -f "$CONF" ] || CONF=/usr/share/zool/default/menu.conf
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}/zool"
+LANG_UI=$(cat "$CFG/lang" 2>/dev/null); ROOT_TITLE="زول"
+CONF="$CFG/menu.conf"
+if [ ! -f "$CONF" ]; then
+    CONF=/usr/share/zool/default/menu.conf
+    [ "$LANG_UI" = en ] && [ -f /usr/share/zool/default/menu.en.conf ] && CONF=/usr/share/zool/default/menu.en.conf
+fi
 [ -f "$CONF" ] || { echo "ملف القائمة غير موجود: $CONF" >&2; exit 1; }
-BACK="‹ رجوع"
+BACK="‹ رجوع"; [ "$LANG_UI" = en ] && { BACK="‹ Back"; ROOT_TITLE="Zool"; }
 trim() { local s="$1"; s="${s#"${s%%[![:space:]]*}"}"; printf '%s' "${s%"${s##*[![:space:]]}"}"; }
 
 ids=(); labels=(); actions=(); conds=()
@@ -18,7 +23,7 @@ done < "$CONF"
 parent() { [[ $1 == *.* ]] && echo "${1%.*}" || echo root; }
 route="${1:-root}"
 while :; do
-    rows=(); map=(); title="زول"
+    rows=(); map=(); title="$ROOT_TITLE"
     for i in "${!ids[@]}"; do
         [[ ${ids[i]} == "$route" ]] && title="${labels[i]}"
         [[ $(parent "${ids[i]}") == "$route" ]] || continue

@@ -58,11 +58,14 @@ end)
 -- ── البرامج التي تبدأ مع الجلسة (أولاً، حتى تعمل مهما حدث بعدها) ──
 hl.on("hyprland.start", function()
     for _, cmd in ipairs({
+        "sh -c '[ -e \"$HOME/.config/zool/lock-on-start\" ] && hyprlock'",   -- كلمة المرور عند بدء التشغيل
         "zool-wallpaper",
         "waybar",
         "mako",
         "zool-prayer daemon",
         "hypridle",
+        "zool-battery-monitor",
+        "zool-nightlight restore",
         "zool-welcome --auto",
         "sh -c 'sleep 120; zool-update notify'",
         "nm-applet --indicator",
@@ -166,6 +169,13 @@ try("input", function()
     })
 end)
 
+-- ── إيماءات لوحة اللمس: ٣ أصابع يميناً/يساراً = مساحة العمل التالية/السابقة، وللأسفل = قائمة زول ──
+try("gestures", function()
+    hl.gesture({ fingers = 3, direction = "left",  action = function() hl.dispatch(hl.dsp.focus({ workspace = "r-1" })) end })
+    hl.gesture({ fingers = 3, direction = "right", action = function() hl.dispatch(hl.dsp.focus({ workspace = "r+1" })) end })
+    hl.gesture({ fingers = 3, direction = "down",  action = function() hl.dispatch(hl.dsp.exec_cmd("zool-menu")) end })
+end)
+
 -- ── الاختصارات ──
 local mod = "SUPER"
 
@@ -189,6 +199,7 @@ B(mod .. " + Q", function() return hl.dsp.window.close() end)
 B("ALT + F4",    function() return hl.dsp.window.close() end)   -- المألوف من ويندوز
 B(mod .. " + SHIFT + E", X("zool-effects toggle"))
 B(mod .. " + T",         X("zool-theme"))
+B(mod .. " + N",         X("zool-nightlight toggle"))
 B(mod .. " + F", function() return hl.dsp.window.fullscreen() end)
 B(mod .. " + V", function() return hl.dsp.window.float({ action = "toggle" }) end)
 B(mod .. " + P", function() return hl.dsp.window.pseudo() end)

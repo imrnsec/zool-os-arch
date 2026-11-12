@@ -1,27 +1,58 @@
 #!/bin/sh
-# عرض الاختصارات — SUPER+F1
+# عرض الاختصارات — SUPER+F1  (بلغة الواجهة: zool-language)
+lang=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/zool/lang" 2>/dev/null)
+if [ "$lang" = en ]; then
 printf '%s\n' \
-  "SUPER + Enter        الطرفية (kitty)" \
-  "SUPER + Space        قائمة التطبيقات" \
-  "SUPER + Z            قائمة زول (إعدادات وأدوات)" \
-  "SUPER + B            المتصفح" \
-  "SUPER + E            مدير الملفات" \
-  "SUPER + W  /  ALT + F4   إغلاق النافذة" \
-  "SUPER + F            ملء الشاشة" \
-  "SUPER + V            نافذة عائمة / مثبّتة" \
-  "SUPER + J            تبديل اتجاه التقسيم" \
-  "SUPER + 1..9         مساحة العمل" \
-  "SUPER+SHIFT + 1..9   نقل النافذة لمساحة عمل" \
-  "SUPER + الأسهم       التنقل بين النوافذ" \
-  "SUPER + C            سجل الحافظة" \
-  "SUPER+SHIFT + W      تغيير الخلفية" \
-  "SUPER+SHIFT + E      المؤثرات: خفيف / كامل" \
-  "SUPER + T            تغيير الثيم" \
-  "SUPER+CTRL + Space   الخلفية التالية" \
-  "SUPER + L            قفل الشاشة" \
-  "SUPER + Esc          قائمة الطاقة" \
-  "Print                لقطة لمنطقة (تُنسخ وتُحفظ)" \
-  "SHIFT + Print        لقطة للشاشة كاملة" \
-  "ALT + SHIFT          تبديل اللغة (EN / عربي)" \
-  "SUPER+SHIFT + M      الخروج من Hyprland" \
-  | wofi --dmenu --prompt "الاختصارات" --width 620 --height 620 --columns 1 >/dev/null
+  "SUPER + Enter          Terminal (kitty)" \
+  "SUPER + Space          App launcher" \
+  "SUPER + Z              Zool menu (install, setup, themes, update)" \
+  "SUPER + B              Browser" \
+  "SUPER + E              File manager" \
+  "SUPER + W  /  ALT + F4 Close window" \
+  "SUPER + F              Fullscreen" \
+  "SUPER + V              Float / tile window" \
+  "SUPER + J              Toggle split direction" \
+  "SUPER + arrows         Move focus between windows" \
+  "SUPER+SHIFT + arrows   Move the window" \
+  "SUPER + 1..9           Go to workspace" \
+  "SUPER+SHIFT + 1..9     Send window to workspace" \
+  "SUPER + T              Change theme" \
+  "SUPER+CTRL + Space     Next background" \
+  "SUPER + N              Night light on/off" \
+  "SUPER+SHIFT + E        Effects: light / full" \
+  "SUPER + C              Clipboard history" \
+  "SUPER + L              Lock screen" \
+  "SUPER + Esc            Power menu" \
+  "Print                  Screenshot a region" \
+  "SHIFT + Print          Screenshot the full screen" \
+  "ALT + SHIFT            Switch keyboard layout (EN / Arabic)" \
+  "3-finger swipe         Left/right: workspaces · down: Zool menu" \
+  | wofi --dmenu --prompt "Keybindings" --width 640 --height 640 --columns 1 >/dev/null
+else
+printf '%s\n' \
+  "SUPER + Enter          الطرفية (kitty)" \
+  "SUPER + Space          قائمة التطبيقات" \
+  "SUPER + Z              قائمة زول (تثبيت، إعداد، ثيمات، تحديث)" \
+  "SUPER + B              المتصفح" \
+  "SUPER + E              مدير الملفات" \
+  "SUPER + W  /  ALT + F4 إغلاق النافذة" \
+  "SUPER + F              ملء الشاشة" \
+  "SUPER + V              نافذة عائمة / مثبّتة" \
+  "SUPER + J              تبديل اتجاه التقسيم" \
+  "SUPER + الأسهم         التنقل بين النوافذ" \
+  "SUPER+SHIFT + الأسهم   تحريك النافذة" \
+  "SUPER + 1..9           الانتقال إلى مساحة عمل" \
+  "SUPER+SHIFT + 1..9     نقل النافذة إلى مساحة عمل" \
+  "SUPER + T              تغيير الثيم" \
+  "SUPER+CTRL + Space     الخلفية التالية" \
+  "SUPER + N              الضوء الليلي تشغيل/إيقاف" \
+  "SUPER+SHIFT + E        المؤثرات: خفيف / كامل" \
+  "SUPER + C              سجل الحافظة" \
+  "SUPER + L              قفل الشاشة" \
+  "SUPER + Esc            قائمة الطاقة" \
+  "Print                  لقطة لمنطقة (تُنسخ وتُحفظ)" \
+  "SHIFT + Print          لقطة للشاشة كاملة" \
+  "ALT + SHIFT            تبديل لغة لوحة المفاتيح (EN / عربي)" \
+  "سحب بثلاث أصابع        يمين/يسار: مساحات العمل · للأسفل: قائمة زول" \
+  | wofi --dmenu --prompt "الاختصارات" --width 640 --height 640 --columns 1 >/dev/null
+fi
