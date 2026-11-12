@@ -104,6 +104,10 @@ PHOTOS = {
     "khartoum-mono.jpg":    ["deep-one", "matte-black", "nord"],
     "evening-sky.jpg":      ["circuit-horizon", "kanagawa", "ristretto"],
     "river-sunset.jpg":     ["dionysus", "gruvbox", "everforest", "zool"],
+    "sunset-trees.jpg":     ["zool", "gruvbox", "kanagawa", "blue-bubble"],
+    "sea-sunset.jpg":       ["zool", "ristretto", "dionysus", "circuit-horizon"],
+    "rose.jpg":             ["matte-black", "everforest", "deep-one"],
+    "sea-book.jpg":         ["nord", "catppuccin", "tokyo-night"],
 }
 
 if __name__ == "__main__":
