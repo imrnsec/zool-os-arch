@@ -1,0 +1,34 @@
+mode = "dark"
+
+# iMessage dark mode: navy black field, send-blue accent.
+accent = "#0A84FF"
+selection = "#1A2740"
+muted = "#3D4A5C"
+
+background = "#0B1220"
+dark_background = "#080E18"
+darker_background = "#05080F"
+lighter_background = "#151D2C"
+
+foreground = "#E8EEF7"
+dark_foreground = "#6B7A90"
+light_foreground = "#C5D0E0"
+bright_foreground = "#F4F7FC"
+
+hyprland_active_border = "rgba(0a84ffee) rgba(5ac8facc) 45deg"
+
+red = "#FF453A"
+yellow = "#FFD60A"
+orange = "#FF9F0A"
+green = "#30D158"
+cyan = "#64D2FF"
+blue = "#0A84FF"
+magenta = "#BF5AF2"
+brown = "#AC8E68"
+
+bright_red = "#FF6961"
+bright_yellow = "#FFE14D"
+bright_green = "#63E17A"
+bright_cyan = "#7DDEFF"
+bright_blue = "#5AC8FA"
+bright_magenta = "#DA8FFF"

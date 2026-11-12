@@ -1,0 +1,34 @@
+#!/bin/bash
+# zool-theme-install — يثبّت ثيماً من مستودع git (بصيغة ثيمات Omarchy: colors.toml + backgrounds/)
+#   zool-theme-install https://github.com/user/omarchy-example-theme
+# ثيمات كثيرة في:  https://omarchy.org/themes/
+if [[ -z ${1:-} ]]; then
+    echo -e "\e[33mثيمات جاهزة: https://omarchy.org/themes/\e[0m\n"
+    read -r -p "رابط مستودع الثيم (git): " REPO_URL
+else
+    REPO_URL="$1"
+fi
+[[ -n $REPO_URL ]] || exit 1
+# نقبل روابط https فقط — لا خيارات git ولا بروتوكولات أخرى
+if ! [[ $REPO_URL =~ ^https://[A-Za-z0-9._~/-]+$ ]]; then
+    echo "رابط غير مقبول. المطلوب رابط https لمستودع، مثل: https://github.com/user/omarchy-x-theme" >&2; exit 1
+fi
+THEMES_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zool/themes"
+THEME_NAME=$(basename -- "$REPO_URL" .git | sed -E 's/^omarchy-//; s/-theme$//' | tr '[:upper:]' '[:lower:]')
+if ! (LC_ALL=C; [[ $THEME_NAME =~ ^[a-z0-9_][a-z0-9._+-]*$ ]]); then
+    echo "تعذر استخراج اسم صالح للثيم من الرابط." >&2; exit 1
+fi
+THEME_PATH="$THEMES_DIR/$THEME_NAME"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+echo "تنزيل $THEME_NAME …"
+git clone -q --depth 1 -- "$REPO_URL" "$TMP/t" || { echo "فشل تنزيل المستودع." >&2; exit 1; }
+if [[ ! -f $TMP/t/colors.toml ]]; then
+    echo "هذا الثيم بلا ملف colors.toml (صيغة قديمة) — غير مدعوم." >&2; exit 1
+fi
+# نأخذ الألوان والخلفيات فقط — لا ننفّذ ولا ننسخ أي شيء آخر من المستودع
+mkdir -p "$THEMES_DIR"; rm -rf "$THEME_PATH"; mkdir -p "$THEME_PATH/backgrounds"
+cp "$TMP/t/colors.toml" "$THEME_PATH/"
+find "$TMP/t/backgrounds" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -exec cp {} "$THEME_PATH/backgrounds/" \; 2>/dev/null
+for f in LICENSE LICENSE.md README.md; do [[ -f $TMP/t/$f ]] && cp "$TMP/t/$f" "$THEME_PATH/"; done
+zool-theme set "$THEME_NAME"

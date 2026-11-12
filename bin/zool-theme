@@ -7,9 +7,11 @@
 #    zool-theme list         أسماء الثيمات
 #    zool-theme current      الثيم الحالي
 #    zool-theme set <اسم>    تطبيق ثيم
+#    zool-theme dir [اسم]    مجلد الثيم
 #
-#  الثيمات في /usr/share/zool/themes/<اسم>/theme.conf
-#  وثيماتك الخاصة في ~/.config/zool/themes/<اسم>/theme.conf (بنفس الصيغة)
+#  صيغة الثيم هي صيغة Omarchy نفسها:  <اسم>/colors.toml  +  <اسم>/backgrounds/
+#  فأي ثيم Omarchy حديث يعمل هنا:  zool-theme-install <رابط git>
+#  الثيمات المرفقة في /usr/share/zool/themes ، وثيماتك في ~/.config/zool/themes
 # ═══════════════════════════════════════════════
 SYS=/usr/share/zool/themes
 CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -17,9 +19,20 @@ USR="$CFG/zool/themes"
 STATE="$CFG/zool/theme"
 KEYS="night surface surface2 sand sand_dim gold terracotta teal blue acacia red yellow magenta"
 
-theme_dir() { [ -f "$USR/$1/theme.conf" ] && echo "$USR/$1" || echo "$SYS/$1"; }
-list()      { { ls -1 "$SYS" 2>/dev/null; ls -1 "$USR" 2>/dev/null; } | sort -u; }
+theme_dir() { [ -f "$USR/$1/colors.toml" ] && echo "$USR/$1" || echo "$SYS/$1"; }
+list()      { for d in "$SYS"/*/ "$USR"/*/; do [ -f "$d/colors.toml" ] && basename "$d"; done | sort -u; }
 current()   { cat "$STATE/name" 2>/dev/null || echo zool; }
+title()     { local d; d=$(theme_dir "$1"); [ -f "$d/name" ] && head -1 "$d/name" || echo "$1" | sed 's/-/ /g'; }
+
+# يقرأ لوناً من colors.toml (أول مفتاح موجود من القائمة)، بلا #
+toml() {
+    local f="$1" k v; shift
+    for k in "$@"; do
+        v=$(sed -n "s/^[[:space:]]*$k[[:space:]]*=[[:space:]]*\"#\([0-9a-fA-F]\{6\}\)\".*/\1/p" "$f" | head -1)
+        [ -n "$v" ] && { echo "$v"; return 0; }
+    done
+    return 1
+}
 
 # يعيد كتابة أسطر @define-color في ملف CSS بألوان الثيم
 recolor_css() {
@@ -30,18 +43,28 @@ recolor_css() {
 }
 
 apply() {
-    local id="$1" dir; dir=$(theme_dir "$id")
-    [ -f "$dir/theme.conf" ] || { echo "ثيم غير موجود: $id" >&2; return 1; }
-    local NAME CREDIT WALLPAPER $KEYS
-    # shellcheck disable=SC1091
-    . "$dir/theme.conf"
+    local id="$1" dir f; dir=$(theme_dir "$id"); f="$dir/colors.toml"
+    [ -f "$f" ] || { echo "ثيم غير موجود (أو بلا colors.toml): $id" >&2; return 1; }
+    local NAME $KEYS
+    NAME=$(title "$id")
+    # من أسماء Omarchy إلى الأسماء الدلالية في ملفات زول
+    surface=$(toml "$f" background)                                   || { echo "الثيم بلا لون background" >&2; return 1; }
+    night=$(toml "$f" dark_background darker_background background)
+    surface2=$(toml "$f" lighter_background selection background)
+    sand=$(toml "$f" foreground)                                      || { echo "الثيم بلا لون foreground" >&2; return 1; }
+    sand_dim=$(toml "$f" dark_foreground muted foreground)
+    gold=$(toml "$f" accent blue foreground)
+    terracotta=$(toml "$f" orange magenta red accent)
+    teal=$(toml "$f" cyan blue accent);      blue=$(toml "$f" blue cyan accent)
+    acacia=$(toml "$f" green cyan accent);   red=$(toml "$f" red orange accent)
+    yellow=$(toml "$f" yellow orange accent); magenta=$(toml "$f" magenta red accent)
     local k; for k in $KEYS; do
-        [[ "${!k}" =~ ^[0-9a-fA-F]{6}$ ]] || { echo "لون غير صالح في الثيم: $k" >&2; return 1; }
+        [[ "${!k}" =~ ^[0-9a-fA-F]{6}$ ]] || { echo "لون ناقص في الثيم: $k" >&2; return 1; }
     done
     mkdir -p "$STATE" "$CFG/zool"
 
     # ── Hyprland (يقرؤه hyprland.lua) ──
-    printf 'active1=%s\nactive2=%s\ninactive=%s\n' "$gold" "$terracotta" "$surface2" > "$STATE/hypr"
+    printf 'active1=%s\nactive2=%s\ninactive=%s\nnight=%s\n' "$gold" "$terracotta" "$surface2" "$night" > "$STATE/hypr"
 
     # ── Waybar و Wofi ──
     recolor_css "$CFG/waybar/style.css"
@@ -109,11 +132,13 @@ border-color=#$red
 default-timeout=0
 EOF
 
-    # ── الخلفية وشاشة القفل ──
-    if [ -f "$WALLPAPER" ]; then
+    # ── الخلفية (أول ملف في backgrounds/) وشاشة القفل ──
+    local WALLPAPER
+    WALLPAPER=$(find "$dir/backgrounds" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | sort | head -1)
+    if [ -n "$WALLPAPER" ]; then
         printf '%s\n' "$WALLPAPER" > "$CFG/zool/wallpaper"
         [ -f "$CFG/hypr/hyprlock.conf" ] && \
-            sed -i -E "0,/^([[:space:]]*path[[:space:]]*=[[:space:]]*).*(jpg|jpeg|png|webp)[[:space:]]*$/s||\1$WALLPAPER|" "$CFG/hypr/hyprlock.conf"
+            sed -i -E "0,/^([[:space:]]*path[[:space:]]*=[[:space:]]*).*(jpg|jpeg|png|webp)[[:space:]]*$/s||\\1$WALLPAPER|" "$CFG/hypr/hyprlock.conf"
     fi
     printf '%s\n' "$id" > "$STATE/name"
 
@@ -124,7 +149,7 @@ EOF
         makoctl reload >/dev/null 2>&1
         pkill -USR2 -x waybar 2>/dev/null || { pkill -x waybar; hyprctl dispatch exec waybar >/dev/null 2>&1; }
         pkill -USR1 -x kitty 2>/dev/null
-        notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 3000 "الثيم: $NAME" "${CREDIT:-}" 2>/dev/null
+        notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 2500 "زول" "الثيم: $NAME" 2>/dev/null
     fi
     echo "✓ $id — $NAME"
 }
@@ -132,16 +157,16 @@ EOF
 case "${1:-pick}" in
     list)    list ;;
     current) current ;;
+    dir)     theme_dir "${2:-$(current)}" ;;
     set)     [ -n "${2:-}" ] || { echo "الاستخدام: zool-theme set <اسم>" >&2; exit 2; }; apply "$2" ;;
     pick)
         cur=$(current)
         menu=$(for id in $(list); do
-                   n=$(. "$(theme_dir "$id")/theme.conf" 2>/dev/null; echo "$NAME")
                    [ "$id" = "$cur" ] && mark="●" || mark="○"
-                   printf '%s %s | %s\n' "$mark" "$id" "$n"
+                   printf '%s %s   ·   %s\n' "$mark" "$id" "$(title "$id")"
                done)
-        pick=$(printf '%s\n' "$menu" | wofi --dmenu --prompt "الثيم" --width 520 --height 360 --columns 1) || exit 0
+        pick=$(printf '%s\n' "$menu" | wofi --dmenu --prompt "الثيم" --width 520 --height 520 --columns 1) || exit 0
         id=$(printf '%s' "$pick" | awk '{print $2}')
         [ -n "$id" ] && apply "$id" ;;
-    *) echo "الاستخدام: zool-theme [list|current|set <اسم>]" >&2; exit 2 ;;
+    *) echo "الاستخدام: zool-theme [list|current|dir|set <اسم>]" >&2; exit 2 ;;
 esac
