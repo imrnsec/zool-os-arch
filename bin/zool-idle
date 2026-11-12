@@ -1,0 +1,8 @@
+#!/bin/sh
+# ينفّذه hypridle عند الخمول:  zool-idle lock | suspend
+# في النظام الحي (من الفلاشة) لا نقفل ولا ننام: المستخدم بلا كلمة مرور، وقد يكون التثبيت جارياً.
+[ -d /run/archiso ] && exit 0
+case "$1" in
+    lock)    pidof hyprlock >/dev/null || hyprlock ;;
+    suspend) systemctl suspend ;;
+esac

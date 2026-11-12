@@ -1,0 +1,23 @@
+#!/bin/sh
+# وضع المؤثرات البصرية:  light = خفيف (بلا ضبابية وظلال) · full = كامل
+#   zool-effects            يعرض الوضع الحالي
+#   zool-effects light|full يحدد الوضع
+#   zool-effects toggle     يبدّل بينهما (SUPER+SHIFT+E)
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/zool/effects"
+cur=light
+[ -f "$conf" ] && [ "$(tr -d '[:space:]' < "$conf")" = full ] && cur=full
+
+case "${1:-}" in
+    "")      echo "$cur"; exit 0 ;;
+    light|full) new="$1" ;;
+    toggle)  [ "$cur" = full ] && new=light || new=full ;;
+    *)       echo "الاستخدام: zool-effects [light|full|toggle]" >&2; exit 2 ;;
+esac
+
+mkdir -p "$(dirname "$conf")"
+printf '%s\n' "$new" > "$conf"
+hyprctl reload >/dev/null 2>&1
+
+if [ "$new" = full ]; then msg="المؤثرات الكاملة (ضبابية وظلال)"; else msg="الوضع الخفيف (أسرع على الأجهزة الضعيفة)"; fi
+notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 2500 "زول" "$msg" 2>/dev/null
+exit 0

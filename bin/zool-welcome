@@ -1,0 +1,41 @@
+#!/bin/bash
+# zool-welcome — شاشة الترحيب بألوان الثيم وأيقوناته (تظهر تلقائياً أول مرة، ثم من قائمة زول ← تعلّم)
+#   zool-welcome --auto   لا تظهر إن سبق عرضها
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}/zool"
+FLAG="$CFG/welcome-done"
+[ "${1:-}" = "--auto" ] && [ -e "$FLAG" ] && exit 0
+mkdir -p "$CFG"; touch "$FLAG"
+i() { zool-icon "$1" 2>/dev/null; }
+LIVE=0; [ -d /run/archiso ] && LIVE=1
+while :; do
+    L=$(cat "$CFG/lang" 2>/dev/null); rows=()
+    if [ "$L" = en ]; then
+        P="Welcome to Zool — SUPER+Z opens the menu"
+        [ $LIVE = 1 ] && rows+=("$(i f0a0)   Install Zool on this computer")
+        rows+=("$(i f1ab)   Language / اللغة" "$(i f1eb)   Connect to the internet" "$(i f043)   Choose a theme" "$(i f017)   Prayer times city"
+               "$(i f019)   Install apps" "$(i f11c)   Keybindings" "$(i f0c9)   Full Zool menu")
+        [ $LIVE = 0 ] && rows+=("$(i f021)   Update the system")
+        rows+=("$(i f00d)   Close")
+    else
+        P="مرحباً بك في زول — SUPER+Z يفتح القائمة"
+        [ $LIVE = 1 ] && rows+=("$(i f0a0)   تثبيت زول على هذا الجهاز")
+        rows+=("$(i f1ab)   اللغة / Language" "$(i f1eb)   الاتصال بالإنترنت" "$(i f043)   اختيار الثيم" "$(i f017)   مدينة أوقات الصلاة"
+               "$(i f019)   تثبيت برامج" "$(i f11c)   الاختصارات" "$(i f0c9)   قائمة زول كاملة")
+        [ $LIVE = 0 ] && rows+=("$(i f021)   تحديث النظام")
+        rows+=("$(i f00d)   إغلاق")
+    fi
+    n=${#rows[@]}
+    c=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --allow-markup --prompt "$P" --width 520 --height $(( n * 44 + 90 )) --columns 1 --cache-file /dev/null) || exit 0
+    case "$c" in
+        *"Install Zool"*|*"تثبيت زول"*)   zool-install ;;
+        *Language*)                       zool-language ;;
+        *internet*|*الإنترنت*)            zool-terminal --title nmtui -e nmtui ;;
+        *theme*|*الثيم*)                  zool-theme ;;
+        *Prayer*|*الصلاة*)                zool-prayer city ;;
+        *"Install apps"*|*"تثبيت برامج"*) zool-menu install; exit 0 ;;
+        *Keybindings*|*الاختصارات*)       zool-keys ;;
+        *"Full Zool"*|*"قائمة زول"*)      zool-menu; exit 0 ;;
+        *Update*|*تحديث*)                 zool-launch-terminal zool-update; exit 0 ;;
+        *) exit 0 ;;
+    esac
+done

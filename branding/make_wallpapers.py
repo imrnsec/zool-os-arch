@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from zoolbrand import render_svg, HERE  # noqa: E402
 
 ROOT = os.path.dirname(HERE)
-OUT = os.path.join(ROOT, "profile/airootfs/usr/share/zool/wallpapers")
+OUT = os.path.join(ROOT, "themes/zool/backgrounds")
 os.makedirs(OUT, exist_ok=True)
 W, H = 2560, 1440
 

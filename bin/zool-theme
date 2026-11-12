@@ -1,0 +1,232 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════
+#  zool-theme — يبدّل ثيم زول كاملاً: الألوان + الخلفية
+#  (Hyprland · Waybar · Wofi · Mako · Kitty · شاشة القفل)
+#
+#    zool-theme              قائمة اختيار
+#    zool-theme list         أسماء الثيمات
+#    zool-theme current      الثيم الحالي
+#    zool-theme set <اسم>    تطبيق ثيم
+#    zool-theme dir [اسم]    مجلد الثيم
+#
+#  صيغة الثيم هي صيغة Omarchy نفسها:  <اسم>/colors.toml  +  <اسم>/backgrounds/
+#  فأي ثيم Omarchy حديث يعمل هنا:  zool-theme-install <رابط git>
+#  الثيمات المرفقة في /usr/share/zool/themes ، وثيماتك في ~/.config/zool/themes
+# ═══════════════════════════════════════════════
+SYS=/usr/share/zool/themes
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+USR="$CFG/zool/themes"
+STATE="$CFG/zool/theme"
+KEYS="night surface surface2 sand sand_dim gold terracotta teal blue acacia red yellow magenta"
+
+theme_dir() { [ -f "$USR/$1/colors.toml" ] && echo "$USR/$1" || echo "$SYS/$1"; }
+list()      { for d in "$SYS"/*/ "$USR"/*/; do [ -f "$d/colors.toml" ] && basename "$d"; done | sort -u; }
+current()   { cat "$STATE/name" 2>/dev/null || echo zool; }
+title()     { local d; d=$(theme_dir "$1"); [ -f "$d/name" ] && head -1 "$d/name" || echo "$1" | sed 's/-/ /g'; }
+
+# يقرأ لوناً من colors.toml (أول مفتاح موجود من القائمة)، بلا #
+toml() {
+    local f="$1" k v; shift
+    for k in "$@"; do
+        v=$(sed -n "s/^[[:space:]]*$k[[:space:]]*=[[:space:]]*\"#\([0-9a-fA-F]\{6\}\)\".*/\1/p" "$f" | head -1)
+        [ -n "$v" ] && { echo "$v"; return 0; }
+    done
+    return 1
+}
+
+# يعيد كتابة أسطر @define-color في ملف CSS بألوان الثيم
+recolor_css() {
+    local f="$1" k; [ -f "$f" ] || return 0
+    for k in $KEYS; do
+        sed -i -E "s|^(@define-color[[:space:]]+$k[[:space:]]+)[^;]*;|\1#${!k};|" "$f"
+    done
+}
+
+apply() {
+    local id="$1" dir f; dir=$(theme_dir "$id"); f="$dir/colors.toml"
+    [ -f "$f" ] || { echo "ثيم غير موجود (أو بلا colors.toml): $id" >&2; return 1; }
+    local NAME $KEYS
+    NAME=$(title "$id")
+    # من أسماء Omarchy إلى الأسماء الدلالية في ملفات زول
+    surface=$(toml "$f" background)                                   || { echo "الثيم بلا لون background" >&2; return 1; }
+    night=$(toml "$f" dark_background darker_background background)
+    surface2=$(toml "$f" lighter_background selection background)
+    sand=$(toml "$f" foreground)                                      || { echo "الثيم بلا لون foreground" >&2; return 1; }
+    sand_dim=$(toml "$f" dark_foreground muted foreground)
+    gold=$(toml "$f" accent blue foreground)
+    terracotta=$(toml "$f" orange magenta red accent)
+    teal=$(toml "$f" cyan blue accent);      blue=$(toml "$f" blue cyan accent)
+    acacia=$(toml "$f" green cyan accent);   red=$(toml "$f" red orange accent)
+    yellow=$(toml "$f" yellow orange accent); magenta=$(toml "$f" magenta red accent)
+    local k; for k in $KEYS; do
+        [[ "${!k}" =~ ^[0-9a-fA-F]{6}$ ]] || { echo "لون ناقص في الثيم: $k" >&2; return 1; }
+    done
+    mkdir -p "$STATE" "$CFG/zool"
+
+    # ── Hyprland (يقرؤه hyprland.lua) ──
+    printf 'active1=%s\nactive2=%s\ninactive=%s\nnight=%s\n' "$gold" "$terracotta" "$surface2" "$night" > "$STATE/hypr"
+
+    # ── Waybar و Wofi ──
+    recolor_css "$CFG/waybar/style.css"
+    recolor_css "$CFG/wofi/style.css"
+
+    # ── Kitty (مضمَّن من kitty.conf) ──
+    cat > "$STATE/kitty.conf" <<EOF
+foreground            #$sand
+background            #$night
+selection_foreground  #$night
+selection_background  #$gold
+cursor                #$gold
+url_color             #$teal
+active_tab_foreground   #$night
+active_tab_background   #$gold
+inactive_tab_foreground #$sand_dim
+inactive_tab_background #$surface
+color0  #$surface
+color8  #$sand_dim
+color1  #$red
+color9  #$red
+color2  #$acacia
+color10 #$acacia
+color3  #$yellow
+color11 #$yellow
+color4  #$blue
+color12 #$blue
+color5  #$magenta
+color13 #$magenta
+color6  #$teal
+color14 #$teal
+color7  #$sand
+color15 #ffffff
+EOF
+
+    # ── تطبيقات GTK (النوافذ الحوارية، مدير الملفات…) فوق adw-gtk3 ──
+    local g
+    for g in gtk-3.0 gtk-4.0; do
+        mkdir -p "$CFG/$g"
+        cat > "$CFG/$g/gtk.css" <<EOF
+/* ألوان الثيم الحالي فوق adw-gtk3 — يكتبها zool-theme */
+@define-color accent_bg_color #$gold;
+@define-color accent_fg_color #$night;
+@define-color accent_color #$gold;
+@define-color destructive_bg_color #$red;
+@define-color success_bg_color #$acacia;
+@define-color window_bg_color #$surface;
+@define-color window_fg_color #$sand;
+@define-color view_bg_color #$night;
+@define-color view_fg_color #$sand;
+@define-color headerbar_bg_color #$surface2;
+@define-color headerbar_fg_color #$sand;
+@define-color card_bg_color #$surface2;
+@define-color card_fg_color #$sand;
+@define-color popover_bg_color #$surface2;
+@define-color popover_fg_color #$sand;
+@define-color dialog_bg_color #$surface;
+@define-color dialog_fg_color #$sand;
+@define-color sidebar_bg_color #$surface;
+@define-color sidebar_fg_color #$sand;
+EOF
+    done
+
+    # ── الطرفية العربية (lxterminal — تدعم RTL) ──
+    mkdir -p "$CFG/lxterminal"
+    cat > "$CFG/lxterminal/lxterminal.conf" <<EOF
+[general]
+fontname=JetBrainsMono Nerd Font 11
+fgcolor=#$sand
+bgcolor=#$night
+palette_color_0=#$surface
+palette_color_1=#$red
+palette_color_2=#$acacia
+palette_color_3=#$yellow
+palette_color_4=#$blue
+palette_color_5=#$magenta
+palette_color_6=#$teal
+palette_color_7=#$sand
+palette_color_8=#$sand_dim
+palette_color_9=#$red
+palette_color_10=#$acacia
+palette_color_11=#$yellow
+palette_color_12=#$blue
+palette_color_13=#$magenta
+palette_color_14=#$teal
+palette_color_15=#ffffff
+color_preset=Custom
+hidemenubar=true
+hidescrollbar=true
+hideclosebutton=true
+hidepointer=false
+cursorblinks=true
+scrollback=5000
+EOF
+
+    # ── Mako (الإشعارات) ──
+    mkdir -p "$CFG/mako"
+    cat > "$CFG/mako/config" <<EOF
+font=IBM Plex Sans Arabic 11
+background-color=#${surface}ee
+text-color=#$sand
+border-color=#$gold
+border-size=2
+border-radius=14
+padding=16
+margin=14
+width=380
+icons=1
+max-icon-size=48
+anchor=top-right
+default-timeout=6000
+progress-color=over #${gold}55
+
+# مؤشر الصوت والسطوع (zool-osd): صغير، في الوسط أسفل الشاشة
+[app-name=zool-osd]
+anchor=bottom-center
+width=260
+margin=60
+text-alignment=center
+border-size=1
+icons=0
+
+[urgency=high]
+border-color=#$red
+default-timeout=0
+EOF
+
+    # ── الخلفية (أول ملف في backgrounds/) وشاشة القفل ──
+    local WALLPAPER
+    WALLPAPER=$(find "$dir/backgrounds" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | sort | head -1)
+    if [ -n "$WALLPAPER" ]; then
+        printf '%s\n' "$WALLPAPER" > "$CFG/zool/wallpaper"
+        [ -f "$CFG/hypr/hyprlock.conf" ] && \
+            sed -i -E "0,/^([[:space:]]*path[[:space:]]*=[[:space:]]*).*(jpg|jpeg|png|webp)[[:space:]]*$/s||\\1$WALLPAPER|" "$CFG/hypr/hyprlock.conf"
+    fi
+    printf '%s\n' "$id" > "$STATE/name"
+
+    # ── إعادة التحميل (إن كانت الجلسة تعمل) ──
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        hyprctl reload >/dev/null 2>&1
+        command -v zool-wallpaper >/dev/null && zool-wallpaper
+        makoctl reload >/dev/null 2>&1
+        pkill -USR2 -x waybar 2>/dev/null || { pkill -x waybar; hyprctl dispatch exec waybar >/dev/null 2>&1; }
+        pkill -USR1 -x kitty 2>/dev/null
+        notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 2500 "زول" "الثيم: $NAME" 2>/dev/null
+    fi
+    echo "✓ $id — $NAME"
+}
+
+case "${1:-pick}" in
+    list)    list ;;
+    current) current ;;
+    dir)     theme_dir "${2:-$(current)}" ;;
+    set)     [ -n "${2:-}" ] || { echo "الاستخدام: zool-theme set <اسم>" >&2; exit 2; }; apply "$2" ;;
+    pick)
+        cur=$(current)
+        menu=$(for id in $(list); do
+                   [ "$id" = "$cur" ] && mark="●" || mark="○"
+                   printf '%s   %s   ·   %s\n' "$(zool-icon f043 "#$(toml "$(theme_dir "$id")/colors.toml" accent blue foreground)")" "$id" "$(title "$id")$( [ "$id" = "$cur" ] && echo "  ✓")"
+               done)
+        pick=$(printf '%s\n' "$menu" | wofi --dmenu --allow-markup --prompt "الثيم" --width 520 --height 560 --columns 1) || exit 0
+        id=$(printf '%s' "$pick" | sed -E 's/<[^>]*>//g' | awk -F'   ' '{print $2}' | awk '{print $1}')
+        [ -n "$id" ] && apply "$id" ;;
+    *) echo "الاستخدام: zool-theme [list|current|dir|set <اسم>]" >&2; exit 2 ;;
+esac

@@ -1,0 +1,4 @@
+#!/bin/sh
+# zool-timezone — اختيار المنطقة الزمنية من قائمة
+tz=$(timedatectl list-timezones 2>/dev/null | wofi --dmenu --prompt "المنطقة الزمنية (مثل Africa/Khartoum)" --width 460 --height 520 --columns 1) || exit 0
+[ -n "$tz" ] && pkexec timedatectl set-timezone "$tz" && notify-send -i /usr/share/zool/logo/zool-logo-128.png "زول" "المنطقة الزمنية: $tz"

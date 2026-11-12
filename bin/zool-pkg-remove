@@ -1,0 +1,21 @@
+#!/bin/bash
+# zool-pkg-remove — واجهة بحث (fzf) لاختيار حزم مثبّتة وإزالتها
+fzf_args=(
+  --multi
+  --prompt='أزِل> '
+  --header='اكتب للبحث · Tab: اختيار متعدد · Enter: إزالة · Esc: خروج'
+  --preview 'pacman -Qi {1}'
+  --preview-label='alt-p: إظهار/إخفاء الوصف · alt-j/k: تمرير'
+  --preview-label-pos='bottom'
+  --preview-window 'down:65%:wrap'
+  --bind 'alt-p:toggle-preview'
+  --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+  --bind 'alt-k:preview-up,alt-j:preview-down'
+  --color 'pointer:red,marker:red'
+)
+pkg_names=$(pacman -Qqe | fzf "${fzf_args[@]}")
+if [[ -n $pkg_names ]]; then
+  echo "$pkg_names" | tr '\n' ' ' | xargs sudo pacman -Rns --noconfirm
+  exit $?
+fi
+exit 130

@@ -1,0 +1,24 @@
+# Zool OS — رمل ونيل (الثيم الافتراضي)
+mode = "dark"
+accent = "#e8b04a"
+selection = "#213039"
+muted = "#b9a98a"
+
+background = "#172229"
+dark_background = "#10181c"
+darker_background = "#0b1114"
+lighter_background = "#213039"
+
+foreground = "#f3e6cc"
+dark_foreground = "#b9a98a"
+light_foreground = "#f7eedb"
+bright_foreground = "#ffffff"
+
+red = "#d46a43"
+yellow = "#e8b04a"
+orange = "#d46a43"
+green = "#8fb35f"
+cyan = "#3ba5a0"
+blue = "#2d86b4"
+magenta = "#c58bb0"
+brown = "#8a5a3c"

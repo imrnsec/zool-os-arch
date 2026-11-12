@@ -1,0 +1,41 @@
+#!/bin/sh
+# الخلفية — تُعرض الصورة كاملة دائماً (بلا قص)؛ ما يزيد عن أبعادها يُملأ بلون الثيم.
+#   zool-wallpaper          استعادة الخلفية المحفوظة (عند بدء الجلسة)
+#   zool-wallpaper pick     اختيار من خلفيات الثيم الحالي + صورك في ~/Pictures/Wallpapers
+#   zool-wallpaper next     الخلفية التالية في الثيم الحالي
+#   zool-wallpaper set <ملف>
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+conf="$CFG/zool/wallpaper"
+default="/usr/share/zool/themes/zool/backgrounds/1-nile-sunset.jpg"
+
+apply() {
+    night=$(sed -n 's/^night=\([0-9a-fA-F]\{6\}\)$/\1/p' "$CFG/zool/theme/hypr" 2>/dev/null)
+    pkill -x swaybg 2>/dev/null
+    setsid swaybg -i "$1" -m fit -c "#${night:-10181c}" >/dev/null 2>&1 &
+}
+save() { mkdir -p "$(dirname "$conf")"; printf '%s\n' "$1" > "$conf"; apply "$1"; }
+images() {
+    tdir=$(zool-theme dir 2>/dev/null)
+    find "$tdir/backgrounds" "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f \
+        \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | sort
+}
+cur() { [ -f "$conf" ] && cat "$conf"; }
+
+case "${1:-}" in
+    pick)
+        list=$(images); [ -n "$list" ] || exit 0
+        names=$(printf '%s\n' "$list" | while read -r p; do basename "$p"; done)
+        pick=$(printf '%s\n' "$names" | wofi --dmenu --prompt "الخلفية" --width 480 --height 420 --columns 1) || exit 0
+        path=$(printf '%s\n' "$list" | grep -F "/$pick" | head -1)
+        [ -f "$path" ] && save "$path" ;;
+    next)
+        list=$(images); [ -n "$list" ] || exit 0
+        nxt=$(printf '%s\n' "$list" | grep -A1 -Fx "$(cur)" | sed -n 2p)
+        [ -n "$nxt" ] || nxt=$(printf '%s\n' "$list" | head -1)
+        save "$nxt" ;;
+    set) [ -f "${2:-}" ] && save "$2" || { echo "ملف غير موجود: ${2:-}" >&2; exit 1; } ;;
+    *)
+        path="$default"
+        [ -f "$conf" ] && [ -f "$(cat "$conf")" ] && path="$(cat "$conf")"
+        apply "$path" ;;
+esac

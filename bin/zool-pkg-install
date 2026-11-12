@@ -1,0 +1,24 @@
+#!/bin/bash
+# zool-pkg-install — واجهة بحث (fzf) لاختيار حزم من مستودعات Arch الرسمية وتثبيتها
+#   اكتب للبحث · Tab لاختيار أكثر من حزمة · Enter للتثبيت · Esc للخروج
+fzf_args=(
+  --multi
+  --prompt='ثبّت> '
+  --header='اكتب للبحث · Tab: اختيار متعدد · Enter: تثبيت · Esc: خروج'
+  --preview 'pacman -Sii {1}'
+  --preview-label='alt-p: إظهار/إخفاء الوصف · alt-j/k: تمرير'
+  --preview-label-pos='bottom'
+  --preview-window 'down:65%:wrap'
+  --bind 'alt-p:toggle-preview'
+  --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+  --bind 'alt-k:preview-up,alt-j:preview-down'
+  --color 'pointer:green,marker:green'
+)
+[[ -n $(pacman -Slq 2>/dev/null | head -1) ]] || sudo pacman -Sy    # قاعدة الحزم فارغة (نظام حي جديد)
+pkg_names=$(pacman -Slq | fzf "${fzf_args[@]}")
+if [[ -n $pkg_names ]]; then
+  # shellcheck disable=SC2086
+  echo "$pkg_names" | tr '\n' ' ' | xargs sudo pacman -Sy --needed --noconfirm
+  exit $?
+fi
+exit 130

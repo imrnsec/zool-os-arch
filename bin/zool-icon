@@ -1,0 +1,11 @@
+#!/bin/bash
+# zool-icon <رمز-سداسي> [لون] — يطبع أيقونة Nerd Font ملوّنة بلون الثيم (Pango markup) لقوائم wofi
+#   مثال: zool-icon f013        ← ترس بلون الثيم المميّز
+cp=$((16#${1:-f10c}))
+color="${2:-}"
+if [[ -z $color ]]; then
+    color=$(sed -n 's/^active1=\([0-9a-fA-F]\{6\}\)$/\1/p' "${XDG_CONFIG_HOME:-$HOME/.config}/zool/theme/hypr" 2>/dev/null)
+    color="#${color:-e8b04a}"
+fi
+# ترميز UTF-8 يدوياً (3 بايت) حتى لا نعتمد على لغة الجلسة
+printf "<span color='%s'>\\x$(printf %x $((0xE0 | cp >> 12)))\\x$(printf %x $((0x80 | (cp >> 6 & 0x3F))))\\x$(printf %x $((0x80 | (cp & 0x3F))))</span>" "$color"

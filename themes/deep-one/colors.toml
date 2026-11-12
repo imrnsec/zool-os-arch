@@ -1,0 +1,39 @@
+# Call of Cthulhu: Deep One
+# Black water off Innsmouth, eldritch green witch-light under the waves,
+# and a violet flicker of something older in the clouds.
+
+mode = "dark"
+
+accent = "#43d68c"
+selection = "#1d3328"
+muted = "#4a6657"
+
+background = "#0a1210"
+dark_background = "#060c0a"
+darker_background = "#030706"
+lighter_background = "#142019"
+
+foreground = "#b5c9b8"
+dark_foreground = "#6f8f80"
+light_foreground = "#cfdfd2"
+bright_foreground = "#e6f2e8"
+
+red = "#d94f5c"
+yellow = "#c9b458"
+orange = "#d98a4a"
+green = "#43d68c"
+cyan = "#3ec9c0"
+blue = "#4f9fd1"
+magenta = "#a06ee8"
+brown = "#6b5a3e"
+
+bright_red = "#f06a76"
+bright_yellow = "#e3cf6e"
+bright_green = "#6ee8a8"
+bright_cyan = "#66e0d8"
+bright_blue = "#74b8e6"
+bright_magenta = "#bd91f5"
+
+# Active window: eldritch green fading into deep-sea violet.
+hyprland_active_border = "rgb(43d68c) rgb(43d68c) rgb(a06ee8) 45deg"
+hyprland_inactive_border = "rgba(1d332899)"

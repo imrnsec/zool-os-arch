@@ -1,0 +1,149 @@
+# ═══════════════════════════════════════════════
+#  حزم Zool OS — كلها من المستودعات الرسمية (core + extra)
+# ═══════════════════════════════════════════════
+
+# ── النظام الأساسي والإقلاع ──
+base
+linux
+linux-firmware
+sof-firmware
+intel-ucode
+amd-ucode
+mkinitcpio
+mkinitcpio-archiso
+grub
+efibootmgr
+syslinux
+plymouth
+
+# ── التثبيت والأقراص ──
+arch-install-scripts
+parted
+gptfdisk
+gparted
+dosfstools
+e2fsprogs
+btrfs-progs
+xfsprogs
+ntfs-3g
+exfatprogs
+cryptsetup
+lvm2
+mtools
+squashfs-tools
+rsync
+reflector
+
+# ── الشبكة ──
+networkmanager
+network-manager-applet
+wpa_supplicant
+openssh
+curl
+wget
+
+# ── Hyprland وبيئة سطح المكتب ──
+hyprland
+hyprlock
+hypridle
+hyprpolkitagent
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xorg-xwayland
+waybar
+wofi
+mako
+kitty
+swaybg
+grim
+slurp
+wl-clipboard
+cliphist
+brightnessctl
+playerctl
+jq
+libnotify
+polkit
+
+# ── تعريفات الرسوميات وفك ترميز الفيديو بالعتاد (Intel) ──
+mesa
+vulkan-intel
+intel-media-driver
+libva-intel-driver
+
+# ── الذاكرة: swap مضغوط في الرام للأجهزة الضعيفة ──
+zram-generator
+
+# ── واجهات البحث في الطرفية (تثبيت/إزالة الحزم) ──
+fzf
+lxterminal
+firefox-i18n-ar
+
+# ── الطاقة والراحة والأمان ──
+power-profiles-daemon
+hyprsunset
+ufw
+
+# ── الصوت والبلوتوث ──
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+pavucontrol
+alsa-utils
+bluez
+bluez-utils
+blueman
+
+# ── الثيم والخطوط ──
+adw-gtk-theme
+papirus-icon-theme
+adwaita-icon-theme
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+ttf-dejavu
+
+# ── الوسائط والترميزات ──
+ffmpeg
+gst-libav
+gst-plugins-good
+gst-plugins-bad
+gst-plugins-ugly
+ffmpegthumbnailer
+loupe
+
+# ── أدوات زول (بايثون لأوقات الصلاة، zenity للمثبّت) ──
+python
+zenity
+
+# ── التطبيقات ──
+firefox
+firefox-i18n-ar
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+tumbler
+gvfs
+mousepad
+evince
+mpv
+btop
+fastfetch
+
+# ── أدوات عامة ──
+sudo
+nano
+git
+less
+man-db
+bash-completion
+xdg-user-dirs
+xdg-utils
+usbutils
+pciutils
+
+# ── الأجهزة الافتراضية ──
+qemu-guest-agent
+spice-vdagent

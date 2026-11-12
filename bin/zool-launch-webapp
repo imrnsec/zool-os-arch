@@ -1,0 +1,7 @@
+#!/bin/bash
+# zool-launch-webapp <رابط> — يفتح موقعاً كتطبيق مستقل (نافذة بلا شريط عناوين)
+url="$1"; shift
+for b in chromium brave google-chrome-stable vivaldi-stable microsoft-edge-stable; do
+    command -v "$b" >/dev/null && exec setsid "$b" --app="$url" "$@"
+done
+exec setsid firefox --new-window "$url"       # بلا متصفح كروميوم: نافذة فايرفوكس عادية

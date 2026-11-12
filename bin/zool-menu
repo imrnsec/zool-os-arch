@@ -1,0 +1,58 @@
+#!/bin/bash
+# zool-menu [مسار] — قائمة زول الهرمية (SUPER+Z)، تُعرَّف في ملف نصي على نمط قائمة Omarchy
+#   zool-menu            القائمة الرئيسية
+#   zool-menu install    يفتح مباشرة على قائمة فرعية
+#   Esc يرجع خطوة للخلف
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}/zool"
+LANG_UI=$(cat "$CFG/lang" 2>/dev/null); ROOT_TITLE="زول"
+CONF="$CFG/menu.conf"
+if [ ! -f "$CONF" ]; then
+    CONF=/usr/share/zool/default/menu.conf
+    [ "$LANG_UI" = en ] && [ -f /usr/share/zool/default/menu.en.conf ] && CONF=/usr/share/zool/default/menu.en.conf
+fi
+[ -f "$CONF" ] || { echo "ملف القائمة غير موجود: $CONF" >&2; exit 1; }
+BACK="‹ رجوع"; [ "$LANG_UI" = en ] && { BACK="‹ Back"; ROOT_TITLE="Zool"; }
+trim() { local s="$1"; s="${s#"${s%%[![:space:]]*}"}"; printf '%s' "${s%"${s##*[![:space:]]}"}"; }
+
+ids=(); icons=(); labels=(); actions=(); conds=()
+while IFS='|' read -r id icon label action cond; do
+    id=$(trim "$id"); [[ -z $id || $id == \#* ]] && continue
+    ids+=("$id"); icons+=("$(trim "$icon")"); labels+=("$(trim "$label")"); actions+=("$(trim "$action")"); conds+=("$(trim "$cond")")
+done < "$CONF"
+
+plain() {   # نص الصف بلا أيقونة ولا وسوم (سواء أعاد wofi الوسوم أم لا)
+    local s="$1"
+    if [[ $s == "<span"* ]]; then s="${s#*</span>}"; elif [[ $s == *"   "* ]]; then s="${s#*   }"; fi
+    trim "$s"
+}
+ACCENT="#$(sed -n 's/^active1=\([0-9a-fA-F]\{6\}\)$/\1/p' "$CFG/theme/hypr" 2>/dev/null)"; [[ $ACCENT == "#" ]] && ACCENT="#e8b04a"
+parent() { [[ $1 == *.* ]] && echo "${1%.*}" || echo root; }
+route="${1:-root}"
+while :; do
+    rows=(); map=(); title="$ROOT_TITLE"
+    for i in "${!ids[@]}"; do
+        [[ ${ids[i]} == "$route" ]] && title="${labels[i]}"
+        [[ $(parent "${ids[i]}") == "$route" ]] || continue
+        [[ -n ${conds[i]} ]] && ! sh -c "${conds[i]}" >/dev/null 2>&1 && continue
+        ic=$(zool-icon "${icons[i]:-f10c}" "$ACCENT" 2>/dev/null)
+        if [[ -z ${actions[i]} ]]; then rows+=("$ic   ${labels[i]}  ›"); else rows+=("$ic   ${labels[i]}"); fi
+        map+=("$i")
+    done
+    [[ ${#rows[@]} -gt 0 ]] || { route=$(parent "$route"); [[ $route == root && ${#ids[@]} -eq 0 ]] && exit 1; continue; }
+    [[ $route != root ]] && rows+=("$BACK")
+    n=${#rows[@]}; h=$(( n * 44 + 90 )); (( h > 620 )) && h=620
+    pick=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --allow-markup --prompt "$title" --width 440 --height "$h" --columns 1 --cache-file /dev/null)
+    if [[ $? -ne 0 || -z $pick || $(plain "$pick") == "$(plain "$BACK")" ]]; then
+        [[ $route == root ]] && exit 0
+        route=$(parent "$route"); continue
+    fi
+    for j in "${!map[@]}"; do
+        if [[ $(plain "${rows[j]}") == "$(plain "$pick")" ]]; then
+            i=${map[j]}
+            if [[ -z ${actions[i]} ]]; then route="${ids[i]}"; continue 2; fi
+            setsid sh -c "${actions[i]}" >/dev/null 2>&1 &
+            exit 0
+        fi
+    done
+    exit 0
+done

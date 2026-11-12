@@ -1,0 +1,62 @@
+# ثيم GRUB لـ Zool OS — الخلفية والشعار في background.png (يولّدها branding/make_grub_assets.py)
+# ملاحظة: GRUB يقبل النسب المئوية الصحيحة فقط (لا كسور).
+
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "#10181c"
+terminal-font: "Unifont Regular 16"
+terminal-left: "8%"
+terminal-top: "8%"
+terminal-width: "84%"
+terminal-height: "84%"
+terminal-border: "0"
+
++ label {
+    left = 10%
+    top = 33%
+    width = 38%
+    height = 40
+    font = "Amiri Bold 30"
+    color = "#f3e6cc"
+    align = "left"
+    text = "Z O O L   O S"
+}
+
++ boot_menu {
+    left = 8%
+    top = 41%
+    width = 40%
+    height = 34%
+    item_font = "Amiri Regular 20"
+    item_color = "#b9a98a"
+    selected_item_font = "Amiri Bold 20"
+    selected_item_color = "#10181c"
+    selected_item_pixmap_style = "select_*.png"
+    item_height = 46
+    item_padding = 16
+    item_spacing = 8
+    scrollbar = false
+}
+
++ progress_bar {
+    id = "__timeout__"
+    left = 8%
+    top = 77%
+    width = 40%
+    height = 6
+    show_text = false
+    bg_color = "#213039"
+    fg_color = "#e8b04a"
+    border_color = "#213039"
+}
+
++ label {
+    left = 8%
+    top = 79%
+    width = 40%
+    height = 24
+    font = "Amiri Regular 14"
+    color = "#b9a98a"
+    align = "left"
+    text = "ENTER  boot        E  edit        C  command line"
+}

@@ -1,0 +1,15 @@
+#!/bin/sh
+# zool-language [ar|en] — لغة واجهة زول (القائمة، الترحيب، الاختصارات)
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/zool/lang"
+case "${1:-}" in
+    ar|en) lang="$1" ;;
+    "") pick=$(printf '%s\n' "العربية" "English" | wofi --dmenu --prompt "اللغة / Language" --width 360 --height 180 --columns 1) || exit 0
+        case "$pick" in English) lang=en ;; *) lang=ar ;; esac ;;
+    get) cat "$conf" 2>/dev/null || echo ar; exit 0 ;;
+    *) echo "usage: zool-language [ar|en|get]" >&2; exit 2 ;;
+esac
+mkdir -p "$(dirname "$conf")"; echo "$lang" > "$conf"
+if [ "$lang" = en ]; then msg="Interface language: English — log out and back in to apply it to every app."
+else msg="لغة الواجهة: العربية — سجّل الخروج ثم الدخول ليصير النظام كله من اليمين لليسار (والطرفية أيضاً)."; fi
+notify-send -t 9000 -i /usr/share/zool/logo/zool-logo-128.png "Zool" "$msg" 2>/dev/null
+exit 0

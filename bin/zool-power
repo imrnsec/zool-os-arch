@@ -1,0 +1,18 @@
+#!/bin/sh
+# قائمة الطاقة — SUPER+Escape
+i() { zool-icon "$1" "$2" 2>/dev/null; }
+choice=$(printf '%s\n' \
+  "$(i f023)   قفل الشاشة" \
+  "$(i f08b)   تسجيل الخروج" \
+  "$(i f186)   سكون" \
+  "$(i f021)   إعادة التشغيل" \
+  "$(i f011 '#d46a43')   إيقاف التشغيل" \
+  | wofi --dmenu --allow-markup --prompt "الطاقة" --width 420 --height 330 --columns 1) || exit 0
+
+case "$choice" in
+    *قفل*)     hyprlock ;;
+    *الخروج*)  { command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown; } || hyprctl dispatch 'hl.dsp.exit()' ;;
+    *سكون*)    systemctl suspend ;;
+    *إعادة*)   systemctl reboot ;;
+    *إيقاف*)   systemctl poweroff ;;
+esac

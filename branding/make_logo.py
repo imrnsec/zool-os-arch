@@ -15,8 +15,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from zoolbrand import PALETTE as C, font_ttf, text_path, render_svg, HERE  # noqa: E402
 
 ROOT = os.path.dirname(HERE)
-LOGO_DIR = os.path.join(ROOT, "profile/airootfs/usr/share/zool/logo")
-PLY_DIR = os.path.join(ROOT, "profile/airootfs/usr/share/plymouth/themes/zool")
+LOGO_DIR = os.path.join(ROOT, "share/zool/logo")
+PLY_DIR = os.path.join(ROOT, "share/plymouth/themes/zool")
 SRC_DIR = os.path.join(HERE, "src")
 for d in (LOGO_DIR, PLY_DIR, SRC_DIR):
     os.makedirs(d, exist_ok=True)

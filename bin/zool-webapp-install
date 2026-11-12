@@ -1,0 +1,33 @@
+#!/bin/bash
+# zool-webapp-install [الاسم] [الرابط] [رابط-أيقونة] — يضيف موقعاً إلى قائمة التطبيقات كأنه تطبيق
+#   مثال: zool-webapp-install WhatsApp https://web.whatsapp.com
+name="${1:-}"; url="${2:-}"; icon_url="${3:-}"
+if [[ -z $name || -z $url ]]; then
+    echo -e "\e[33mأضف موقعاً كتطبيق\e[0m  (مثل: WhatsApp ← https://web.whatsapp.com)\n"
+    read -r -p "اسم التطبيق: " name
+    read -r -p "الرابط (https://…): " url
+    read -r -p "رابط أيقونة PNG (اختياري — Enter للتخطي): " icon_url
+fi
+[[ -n $name && $url =~ ^https?://[^[:space:]]+$ ]] || { echo "اسم أو رابط غير صالح." >&2; exit 1; }
+id=$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$//'); [[ -n $id ]] || id="webapp-$(date +%s)"
+APPS="$HOME/.local/share/applications"; ICONS="$APPS/icons"; mkdir -p "$ICONS"
+icon=applications-internet
+if [[ $icon_url =~ ^https://[^[:space:]]+$ ]] && curl -fsSL -m 20 -o "$ICONS/$id.png" -- "$icon_url"; then icon="$ICONS/$id.png"; fi
+if ! command -v chromium >/dev/null && ! command -v brave >/dev/null && ! command -v google-chrome-stable >/dev/null; then
+    echo; echo "تطبيقات الويب تظهر كنافذة مستقلة مع Chromium (نحو 300MB). بدونه تُفتح في فايرفوكس."
+    read -r -p "تثبيت Chromium الآن؟ [y/N] " a; [[ $a == [yY]* ]] && sudo pacman -Sy --needed --noconfirm chromium
+fi
+cat > "$APPS/zool-webapp-$id.desktop" <<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=$name
+Comment=تطبيق ويب — $url
+Exec=zool-launch-webapp $url
+Icon=$icon
+Terminal=false
+StartupNotify=true
+Categories=Network;
+EOF
+chmod +x "$APPS/zool-webapp-$id.desktop"
+echo; echo "✓ أُضيف «$name» إلى قائمة التطبيقات (SUPER+Space)."

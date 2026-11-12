@@ -1,0 +1,178 @@
+/* Zool OS — شريط واحد عائم بألوان الثيم الحالي
+   الأسطر التالية (@define-color) يكتبها الأمر zool-theme تلقائياً عند تغيير الثيم. */
+@define-color night      #10181c;
+@define-color surface    #172229;
+@define-color surface2   #213039;
+@define-color sand       #f3e6cc;
+@define-color sand_dim   #b9a98a;
+@define-color gold       #e8b04a;
+@define-color terracotta #d46a43;
+@define-color teal       #3ba5a0;
+@define-color blue       #2d86b4;
+@define-color acacia     #8fb35f;
+@define-color red        #d46a43;
+@define-color yellow     #e8b04a;
+@define-color magenta    #c58bb0;
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "IBM Plex Sans Arabic", "Noto Sans Arabic", "Noto Sans", sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+/* الشريط نفسه: لوح زجاجي واحد بحواف دائرية */
+window#waybar {
+    background: alpha(@surface, 0.90);
+    color: @sand;
+    border-radius: 18px;
+    border: 1px solid alpha(@gold, 0.30);
+}
+
+tooltip {
+    background: @night;
+    border: 1px solid alpha(@gold, 0.45);
+    border-radius: 12px;
+}
+tooltip label {
+    color: @sand;
+    padding: 4px;
+}
+
+/* ── اليسار: الشعار · مساحات العمل · النوافذ المفتوحة ── */
+#custom-logo {
+    color: @night;
+    background: linear-gradient(135deg, @gold, @terracotta);
+    border-radius: 12px;
+    margin: 5px 4px 5px 6px;
+    padding: 0 14px;
+    font-family: "Reem Kufi", "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+#workspaces {
+    background: alpha(@surface2, 0.75);
+    border-radius: 12px;
+    margin: 5px 3px;
+    padding: 0 3px;
+}
+#workspaces button {
+    font-family: "Reem Kufi", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 15px;
+    color: @sand_dim;
+    background: transparent;
+    border-radius: 10px;
+    padding: 0 9px;
+    margin: 2px 1px;
+}
+#workspaces button:hover {
+    background: alpha(@gold, 0.18);
+    color: @sand;
+}
+#workspaces button.active {
+    color: @night;
+    font-weight: bold;
+    background: @gold;
+}
+#workspaces button.urgent {
+    color: @night;
+    background: @red;
+}
+
+#taskbar {
+    margin: 5px 2px;
+    padding: 0 2px;
+}
+#taskbar button {
+    background: transparent;
+    border-radius: 10px;
+    padding: 0 7px;
+    margin: 2px 1px;
+}
+#taskbar button:hover {
+    background: alpha(@gold, 0.18);
+}
+#taskbar button.active {
+    background: alpha(@gold, 0.30);
+    border-bottom: 2px solid @gold;
+}
+#taskbar.empty {
+    margin: 0;
+    padding: 0;
+}
+
+#custom-close {
+    color: @red;
+    font-weight: bold;
+    border-radius: 10px;
+    margin: 7px 2px;
+    padding: 0 9px;
+}
+#custom-close:hover {
+    background: alpha(@red, 0.30);
+    color: @sand;
+}
+
+/* ── الوسط: الساعة · الهجري · الصلاة ── */
+#clock {
+    color: @sand;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 0 10px;
+}
+#custom-hijri {
+    color: @sand_dim;
+    font-family: "Reem Kufi", "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+    padding: 0 8px;
+}
+#custom-prayer {
+    color: @gold;
+    background: alpha(@gold, 0.13);
+    border-radius: 10px;
+    margin: 6px 4px;
+    padding: 0 12px;
+    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "JetBrainsMono Nerd Font", sans-serif;
+}
+#custom-prayer.soon {
+    color: @night;
+    font-weight: bold;
+    background: linear-gradient(135deg, @gold, @terracotta);
+}
+
+/* ── اليمين: الحالة ── */
+#tray,
+#language,
+#cpu,
+#memory,
+#pulseaudio,
+#network,
+#battery {
+    padding: 0 9px;
+}
+#tray { padding: 0 8px; }
+#tray > .needs-attention { background: alpha(@red, 0.35); border-radius: 8px; }
+#language   { color: @sand_dim; }
+#cpu        { color: @teal; }
+#memory     { color: @acacia; }
+#pulseaudio { color: @yellow; }
+#pulseaudio.muted { color: @sand_dim; }
+#network    { color: @blue; }
+#network.disconnected { color: @red; }
+#battery    { color: @acacia; }
+#battery.charging { color: @teal; }
+#battery.warning  { color: @yellow; }
+#battery.critical { color: @red; font-weight: bold; }
+
+#custom-power {
+    color: @red;
+    border-radius: 12px;
+    margin: 5px 6px 5px 2px;
+    padding: 0 12px;
+    background: alpha(@red, 0.14);
+}
+#custom-power:hover {
+    background: @red;
+    color: @night;
+}

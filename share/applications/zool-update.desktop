@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Zool Update
+Name[ar]=تحديث زول
+Comment=تحديث النظام ومميزات زول
+Exec=zool-launch-terminal zool-update
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;Settings;

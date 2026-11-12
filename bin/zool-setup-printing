@@ -1,0 +1,5 @@
+#!/bin/bash
+# zool-setup-printing — يثبّت دعم الطابعات (CUPS) ويشغّله
+sudo pacman -Sy --needed --noconfirm cups cups-pdf system-config-printer || exit 1
+sudo systemctl enable --now cups.service || exit 1
+echo; echo "✓ الطباعة جاهزة. أضف طابعتك من تطبيق «Print Settings» في قائمة التطبيقات."
