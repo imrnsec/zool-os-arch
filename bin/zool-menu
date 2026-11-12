@@ -20,9 +20,11 @@ while IFS='|' read -r id icon label action cond; do
     ids+=("$id"); icons+=("$(trim "$icon")"); labels+=("$(trim "$label")"); actions+=("$(trim "$action")"); conds+=("$(trim "$cond")")
 done < "$CONF"
 
+esc() { sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' <<< "$1"; }
 plain() {   # نص الصف بلا أيقونة ولا وسوم (سواء أعاد wofi الوسوم أم لا)
     local s="$1"
     if [[ $s == "<span"* ]]; then s="${s#*</span>}"; elif [[ $s == *"   "* ]]; then s="${s#*   }"; fi
+    s=$(sed 's/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' <<< "$s")
     trim "$s"
 }
 ACCENT="#$(sed -n 's/^active1=\([0-9a-fA-F]\{6\}\)$/\1/p' "$CFG/theme/hypr" 2>/dev/null)"; [[ $ACCENT == "#" ]] && ACCENT="#e8b04a"
@@ -35,7 +37,8 @@ while :; do
         [[ $(parent "${ids[i]}") == "$route" ]] || continue
         [[ -n ${conds[i]} ]] && ! sh -c "${conds[i]}" >/dev/null 2>&1 && continue
         ic=$(zool-icon "${icons[i]:-f10c}" "$ACCENT" 2>/dev/null)
-        if [[ -z ${actions[i]} ]]; then rows+=("$ic   ${labels[i]}  ›"); else rows+=("$ic   ${labels[i]}"); fi
+        lb=$(esc "${labels[i]}")                # الرموز & < > تكسر تنسيق wofi إن لم تُهرَّب
+        if [[ -z ${actions[i]} ]]; then rows+=("$ic   $lb  ›"); else rows+=("$ic   $lb"); fi
         map+=("$i")
     done
     [[ ${#rows[@]} -gt 0 ]] || { route=$(parent "$route"); [[ $route == root && ${#ids[@]} -eq 0 ]] && exit 1; continue; }
