@@ -113,7 +113,9 @@ stage1() {
     } >"$CONF"
 
     rm -f /tmp/zool-install.status
-    if command -v kitty >/dev/null 2>&1; then
+    if command -v zool-terminal >/dev/null 2>&1; then
+        zool-terminal --title "تثبيت زول" -e sudo "$SELF" --run "$CONF"
+    elif command -v kitty >/dev/null 2>&1; then
         kitty --title "تثبيت زول" -e sudo "$SELF" --run "$CONF"
     else
         sudo "$SELF" --run "$CONF"
@@ -250,7 +252,7 @@ rm -f /usr/local/bin/choose-mirror /usr/local/bin/livecd-sound /usr/local/bin/zo
 rm -f /etc/systemd/system/sysinit.target.wants/systemd-time-wait-sync.service
 
 log "إنشاء المستخدم $USERNAME"
-useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/bash "$USERNAME"
+useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/zsh "$USERNAME"
 printf '%s:%s\n' "$USERNAME" "$PASSWORD" | chpasswd
 passwd -l root >/dev/null
 printf '%%wheel ALL=(ALL:ALL) ALL\n' >/etc/sudoers.d/10-zool-wheel

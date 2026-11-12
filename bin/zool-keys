@@ -3,7 +3,7 @@
 lang=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/zool/lang" 2>/dev/null)
 if [ "$lang" = en ]; then
 printf '%s\n' \
-  "SUPER + Enter          Terminal" \
+  "SUPER + Enter          Zool Terminal (Ctrl+Shift+T new tab)" \
   "SUPER + Space          App launcher" \
   "SUPER + Z              Zool menu (install, setup, themes, update)" \
   "SUPER + B              Browser" \
@@ -30,7 +30,7 @@ printf '%s\n' \
   | wofi --dmenu --prompt "Keybindings" --width 640 --height 640 --columns 1 >/dev/null
 else
 printf '%s\n' \
-  "SUPER + Enter          الطرفية" \
+  "SUPER + Enter          طرفية زول (Ctrl+Shift+T لسان جديد)" \
   "SUPER + Space          قائمة التطبيقات" \
   "SUPER + Z              قائمة زول (تثبيت، إعداد، ثيمات، تحديث)" \
   "SUPER + B              المتصفح" \

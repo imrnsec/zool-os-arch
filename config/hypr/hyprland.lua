@@ -193,6 +193,7 @@ end)
 local mod = "SUPER"
 
 B(mod .. " + Return", X(terminal))
+B(mod .. " + ALT + Return", X("kitty"))      -- طرفية احتياطية
 B(mod .. " + B",      X(browser))
 B(mod .. " + E",      X(files))
 B(mod .. " + Space",  X(menu))

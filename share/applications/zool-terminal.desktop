@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Zool Terminal
+Name[ar]=طرفية زول
+Comment=طرفية تدعم العربية من اليمين لليسار
+Exec=zool-terminal
+Icon=/usr/share/zool/logo/zool-logo-128.png
+Terminal=false
+Categories=System;TerminalEmulator;
+StartupWMClass=zool-terminal

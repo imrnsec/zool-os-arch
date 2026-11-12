@@ -3,7 +3,7 @@
 set -e
 locale-gen >/dev/null 2>&1 || true
 if ! id zool >/dev/null 2>&1; then
-    useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/bash -c "Zool" zool
+    useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/zsh -c "Zool" zool
     passwd -d zool >/dev/null
 fi
 install -d -o zool -g zool /home/zool/Pictures /home/zool/Downloads /home/zool/Documents

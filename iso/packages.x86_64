@@ -76,7 +76,14 @@ zram-generator
 
 # ── واجهات البحث في الطرفية (تثبيت/إزالة الحزم) ──
 fzf
-lxterminal
+# طرفية زول (bin/zool-terminal): بايثون + GTK + محرّك VTE الذي يدعم العربية RTL
+vte3
+python-gobject
+# الصدفة الافتراضية
+zsh
+zsh-completions
+zsh-autosuggestions
+zsh-syntax-highlighting
 firefox-i18n-ar
 
 # ── الطاقة والراحة والأمان ──

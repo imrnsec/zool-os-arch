@@ -1,7 +1,7 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════
 #  zool-theme — يبدّل ثيم زول كاملاً: الألوان + الخلفية
-#  (Hyprland · Waybar · Wofi · Mako · Kitty · شاشة القفل)
+#  (Hyprland · Waybar · Wofi · Mako · الطرفية · GTK · شاشة القفل)
 #
 #    zool-theme              قائمة اختيار
 #    zool-theme list         أسماء الثيمات
@@ -70,7 +70,7 @@ apply() {
     recolor_css "$CFG/waybar/style.css"
     recolor_css "$CFG/wofi/style.css"
 
-    # ── Kitty (مضمَّن من kitty.conf) ──
+    # ── ألوان الطرفية: يقرؤها Zool Terminal مباشرة، ويضمّنها kitty.conf ──
     cat > "$STATE/kitty.conf" <<EOF
 foreground            #$sand
 background            #$night
@@ -127,38 +127,6 @@ EOF
 @define-color sidebar_fg_color #$sand;
 EOF
     done
-
-    # ── الطرفية العربية (lxterminal — تدعم RTL) ──
-    mkdir -p "$CFG/lxterminal"
-    cat > "$CFG/lxterminal/lxterminal.conf" <<EOF
-[general]
-fontname=JetBrainsMono Nerd Font 11
-fgcolor=#$sand
-bgcolor=#$night
-palette_color_0=#$surface
-palette_color_1=#$red
-palette_color_2=#$acacia
-palette_color_3=#$yellow
-palette_color_4=#$blue
-palette_color_5=#$magenta
-palette_color_6=#$teal
-palette_color_7=#$sand
-palette_color_8=#$sand_dim
-palette_color_9=#$red
-palette_color_10=#$acacia
-palette_color_11=#$yellow
-palette_color_12=#$blue
-palette_color_13=#$magenta
-palette_color_14=#$teal
-palette_color_15=#ffffff
-color_preset=Custom
-hidemenubar=true
-hidescrollbar=true
-hideclosebutton=true
-hidepointer=false
-cursorblinks=true
-scrollback=5000
-EOF
 
     # ── Mako (الإشعارات) ──
     mkdir -p "$CFG/mako"

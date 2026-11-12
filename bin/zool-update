@@ -76,7 +76,7 @@ system_apply() {
     cp -a "$SRC"/themes/. /usr/share/zool/themes/
     cp -a "$SRC"/default/. /usr/share/zool/default/
     [ -d "$SRC/local-share" ] && cp -a "$SRC"/local-share/. /usr/local/share/
-    for f in fonts/conf.d/60-zool-arabic.conf systemd/zram-generator.conf sysctl.d/99-zool-zram.conf; do
+    for f in fonts/conf.d/60-zool-arabic.conf systemd/zram-generator.conf sysctl.d/99-zool-zram.conf skel/.zshrc; do
         [ -f "$SRC/etc/$f" ] && install -D -m 644 "$SRC/etc/$f" "/etc/$f"
     done
     # نحتفظ بالإعدادات الافتراضية القديمة لنعرف ما الذي عدّله المستخدم بنفسه

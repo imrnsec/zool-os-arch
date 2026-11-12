@@ -1,4 +1,4 @@
 #!/bin/bash
-# طرفية تدعم العربية من اليمين لليسار + حزمة اللغة العربية لفايرفوكس
-pacman -S --needed --noconfirm lxterminal firefox-i18n-ar || exit 1
+# حزمة اللغة العربية لفايرفوكس (الطرفية العربية صارت Zool Terminal — انظر الترحيل التالي)
+pacman -S --needed --noconfirm firefox-i18n-ar || exit 1
 exit 0
