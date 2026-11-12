@@ -1,0 +1,4 @@
+#!/bin/bash
+# zool-pkg-add <حزمة…> — يثبّت حزماً بالاسم إن لم تكن مثبّتة (تستعمله عناصر قائمة «تثبيت»)
+[[ $# -gt 0 ]] || { echo "الاستخدام: zool-pkg-add <حزمة…>" >&2; exit 2; }
+sudo pacman -Sy --needed --noconfirm "$@"

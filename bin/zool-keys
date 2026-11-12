@@ -17,6 +17,7 @@ printf '%s\n' \
   "SUPER+SHIFT + W      تغيير الخلفية" \
   "SUPER+SHIFT + E      المؤثرات: خفيف / كامل" \
   "SUPER + T            تغيير الثيم" \
+  "SUPER+CTRL + Space   الخلفية التالية" \
   "SUPER + L            قفل الشاشة" \
   "SUPER + Esc          قائمة الطاقة" \
   "Print                لقطة لمنطقة (تُنسخ وتُحفظ)" \

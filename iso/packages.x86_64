@@ -78,6 +78,9 @@ libva-intel-driver
 # ── الذاكرة: swap مضغوط في الرام للأجهزة الضعيفة ──
 zram-generator
 
+# ── واجهات البحث في الطرفية (تثبيت/إزالة الحزم) ──
+fzf
+
 # ── الصوت والبلوتوث ──
 pipewire
 pipewire-alsa

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Install Packages
+Name[ar]=تثبيت الحزم
+Comment=بحث وتثبيت من مستودعات Arch
+Exec=zool-launch-terminal zool-pkg-install
+Icon=/usr/share/zool/logo/zool-logo-64.png
+Terminal=false
+Categories=System;PackageManager;

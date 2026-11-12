@@ -75,6 +75,8 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 ## 🗂️ خريطة المشروع
 
 ```
+├── themes/                     ← الثيمات → /usr/share/zool/themes (colors.toml + backgrounds/)
+├── default/                    ← الافتراضيات → /usr/share/zool/default (menu.conf)
 ├── migrations/                 ← ترحيلات تُنفَّذ مرة واحدة عند zool-update
 ├── bin/                        ← أوامر زول  → /usr/local/bin  (zool-menu · zool-install · zool-prayer · …)
 ├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · kitty · gtk · fastfetch)

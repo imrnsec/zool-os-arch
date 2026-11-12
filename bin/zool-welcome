@@ -1,5 +1,5 @@
 #!/bin/bash
-# zool-welcome — شاشة الترحيب (تظهر تلقائياً أول مرة، ثم من قائمة زول)
+# zool-welcome — شاشة الترحيب (تظهر تلقائياً أول مرة، ثم من قائمة زول ← تعلّم)
 #   zool-welcome --auto   لا تظهر إن سبق عرضها
 FLAG="${XDG_CONFIG_HOME:-$HOME/.config}/zool/welcome-done"
 LOGO=/usr/share/zool/logo/zool-logo-128.png
@@ -13,21 +13,21 @@ while :; do
     items+=("الاتصال بالإنترنت"   "واي فاي أو كيبل"
             "اختيار الثيم"        "ألوان وخلفيات جاهزة (SUPER+T)"
             "مدينة أوقات الصلاة"  "لضبط المواقيت في الشريط العلوي"
-            "متجر البرامج"        "برامج مختارة + مستودعات Arch + AUR"
+            "تثبيت برامج"         "حزم Arch و AUR وبرامج شائعة"
             "الاختصارات"          "أهم مفاتيح لوحة المفاتيح (SUPER+F1)"
-            "الإعدادات"           "الصوت، البلوتوث، الوقت، كلمة المرور…")
+            "قائمة زول كاملة"     "كل شيء من مكان واحد (SUPER+Z)")
     [ $LIVE = 0 ] && items+=("تحديث النظام" "آخر الحزم وآخر مميزات زول")
     c=$(zenity --list --title="مرحباً بك في زول" --window-icon="$LOGO" --width=600 --height=470 \
-          --text="<big><b>مرحباً بك في زول 🇸🇩</b></big>\n\nمفتاح <b>SUPER</b> هو مفتاح ويندوز. اضغط <b>SUPER+Z</b> في أي وقت لفتح قائمة زول.\nاختر من أين تبدأ:" \
+          --text="<big><b>مرحباً بك في زول</b></big>\n\nمفتاح <b>SUPER</b> هو مفتاح ويندوز. اضغط <b>SUPER+Z</b> في أي وقت لفتح قائمة زول.\nاختر من أين تبدأ:" \
           --column="" --column="" --hide-header --ok-label="فتح" --cancel-label="إغلاق" "${items[@]}" 2>/dev/null) || exit 0
     case "$c" in
-        تثبيت*)    zool-install ;;
-        الاتصال*)  kitty --title "الشبكة" -e nmtui ;;
-        اختيار*)   zool-theme ;;
-        مدينة*)    zool-prayer city ;;
-        متجر*)     zool-store ;;
-        الاختصارات*) zool-keys ;;
-        الإعدادات*) zool-settings ;;
-        تحديث*)    kitty --title "تحديث زول" -e zool-update ;;
+        تثبيت\ زول*) zool-install ;;
+        الاتصال*)    kitty --title "الشبكة" -e nmtui ;;
+        اختيار*)     zool-theme ;;
+        مدينة*)      zool-prayer city ;;
+        تثبيت\ برامج) zool-menu install ;;
+        الاختصارات)  zool-keys ;;
+        قائمة*)      zool-menu ;;
+        تحديث*)      zool-launch-terminal zool-update ;;
     esac
 done

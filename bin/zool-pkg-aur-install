@@ -1,0 +1,31 @@
+#!/bin/bash
+# zool-pkg-aur-install — واجهة بحث (fzf) لاختيار حزم من AUR وتثبيتها عبر yay
+#   alt-b يعرض ملف PKGBUILD للحزمة (راجِعه: حزم AUR يرفعها المستخدمون وليست مراجَعة من Arch)
+if ! command -v yay >/dev/null; then
+  echo -e "\e[33mAUR يحتاج المساعد yay — يُثبَّت الآن مرة واحدة.\e[0m"
+  echo "تنبيه: حزم AUR يرفعها المستخدمون وليست مراجَعة من Arch؛ ثبّت ما تثق بمصدره فقط."
+  read -r -p "متابعة؟ [y/N] " a; [[ $a == [yY]* ]] || exit 130
+  sudo pacman -Sy --needed --noconfirm base-devel git || exit 1
+  d=$(mktemp -d) && git clone -q --depth 1 https://aur.archlinux.org/yay-bin.git "$d/yay-bin" && (cd "$d/yay-bin" && makepkg -si --noconfirm) || { echo "فشل تثبيت yay"; exit 1; }
+fi
+fzf_args=(
+  --multi
+  --prompt='AUR> '
+  --header='اكتب للبحث · Tab: اختيار متعدد · Enter: تثبيت · alt-b: عرض PKGBUILD'
+  --preview 'yay -Siia {1}'
+  --preview-label='alt-p: الوصف · alt-b/B: PKGBUILD · alt-j/k: تمرير'
+  --preview-label-pos='bottom'
+  --preview-window 'down:65%:wrap'
+  --bind 'alt-p:toggle-preview'
+  --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+  --bind 'alt-k:preview-up,alt-j:preview-down'
+  --bind 'alt-b:change-preview:yay -Gpa {1} | tail -n +5'
+  --bind 'alt-B:change-preview:yay -Siia {1}'
+  --color 'pointer:green,marker:green'
+)
+pkg_names=$(yay -Slqa | fzf "${fzf_args[@]}")
+if [[ -n $pkg_names ]]; then
+  echo "$pkg_names" | sed 's/^/aur\//' | tr '\n' ' ' | xargs yay -S --noconfirm
+  exit $?
+fi
+exit 130

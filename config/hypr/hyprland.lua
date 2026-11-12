@@ -174,6 +174,8 @@ B(mod .. " + B",      X(browser))
 B(mod .. " + E",      X(files))
 B(mod .. " + Space",  X(menu))
 B(mod .. " + Z",      X("zool-menu"))
+B(mod .. " + ALT + Space",  X("zool-menu"))            -- كما في Omarchy
+B(mod .. " + CTRL + Space", X("zool-wallpaper next"))  -- الخلفية التالية
 B(mod .. " + L",      X("hyprlock"))
 B(mod .. " + Escape", X("zool-power"))
 B(mod .. " + F1",     X("zool-keys"))

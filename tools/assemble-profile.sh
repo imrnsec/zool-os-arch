@@ -6,7 +6,9 @@
 #    bin/          →  /usr/local/bin          أوامر زول (zool-*)
 #    config/       →  /etc/skel/.config       إعدادات المستخدم (Hyprland، Waybar…)
 #    etc/          →  /etc                    إعدادات النظام (SDDM، systemd، …)
-#    share/        →  /usr/share              الثيمات والخطوط والشعارات والخلفيات
+#    share/        →  /usr/share              الخطوط والشعارات وثيمات Plymouth/SDDM
+#    themes/       →  /usr/share/zool/themes   الثيمات (صيغة Omarchy: colors.toml + backgrounds/)
+#    default/      →  /usr/share/zool/default  الافتراضيات (ملف القائمة menu.conf)
 #    local-share/  →  /usr/local/share        ملفات مساندة
 #    root/         →  /root                   (اختياري)
 #    iso/          →  جذر ملف التعريف         packages.x86_64 · pacman.conf · profiledef.sh · grub/ · syslinux/
@@ -26,6 +28,9 @@ cp -a etc/. "$DEST/airootfs/etc/"
 cp -a config "$DEST/airootfs/etc/skel/.config"
 cp -a share "$DEST/airootfs/usr/share"
 cp -a bin "$DEST/airootfs/usr/local/bin"
+mkdir -p "$DEST/airootfs/usr/share/zool"
+cp -a themes  "$DEST/airootfs/usr/share/zool/themes"
+cp -a default "$DEST/airootfs/usr/share/zool/default"
 [ -d local-share ] && cp -a local-share "$DEST/airootfs/usr/local/share"
 [ -d root ]        && cp -a root "$DEST/airootfs/root"
 

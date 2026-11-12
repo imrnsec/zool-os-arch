@@ -1,34 +1,46 @@
-#!/bin/sh
-# قائمة زول — SUPER+Z : كل شيء من مكان واحد
-LIVE=""; [ -d /run/archiso ] && LIVE="تثبيت زول على القرص"
-choice=$(printf '%s\n' \
-  "التطبيقات" \
-  "الملفات" \
-  "المتصفح" \
-  "الإعدادات" \
-  "الثيم والألوان" \
-  "الخلفية" \
-  "متجر البرامج" \
-  "تحديث النظام" \
-  ${LIVE:+"$LIVE"} \
-  "الاختصارات" \
-  "مراقب النظام" \
-  "شاشة الترحيب" \
-  "الطاقة" \
-  | wofi --dmenu --prompt "زول" --width 460 --height 560 --columns 1) || exit 0
+#!/bin/bash
+# zool-menu [مسار] — قائمة زول الهرمية (SUPER+Z)، تُعرَّف في ملف نصي على نمط قائمة Omarchy
+#   zool-menu            القائمة الرئيسية
+#   zool-menu install    يفتح مباشرة على قائمة فرعية
+#   Esc يرجع خطوة للخلف
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/zool/menu.conf"
+[ -f "$CONF" ] || CONF=/usr/share/zool/default/menu.conf
+[ -f "$CONF" ] || { echo "ملف القائمة غير موجود: $CONF" >&2; exit 1; }
+BACK="‹ رجوع"
+trim() { local s="$1"; s="${s#"${s%%[![:space:]]*}"}"; printf '%s' "${s%"${s##*[![:space:]]}"}"; }
 
-case "$choice" in
-    التطبيقات)  wofi --show drun ;;
-    الملفات)    thunar ;;
-    المتصفح)    firefox ;;
-    الإعدادات)  zool-settings ;;
-    الثيم*)     zool-theme ;;
-    الخلفية)    zool-wallpaper pick ;;
-    متجر*)      zool-store ;;
-    تحديث*)     kitty --title "تحديث زول" -e zool-update ;;
-    تثبيت*)     zool-install ;;
-    الاختصارات) zool-keys ;;
-    مراقب*)     kitty -e btop ;;
-    شاشة*)      zool-welcome ;;
-    الطاقة)     zool-power ;;
-esac
+ids=(); labels=(); actions=(); conds=()
+while IFS='|' read -r id label action cond; do
+    id=$(trim "$id"); [[ -z $id || $id == \#* ]] && continue
+    ids+=("$id"); labels+=("$(trim "$label")"); actions+=("$(trim "$action")"); conds+=("$(trim "$cond")")
+done < "$CONF"
+
+parent() { [[ $1 == *.* ]] && echo "${1%.*}" || echo root; }
+route="${1:-root}"
+while :; do
+    rows=(); map=(); title="زول"
+    for i in "${!ids[@]}"; do
+        [[ ${ids[i]} == "$route" ]] && title="${labels[i]}"
+        [[ $(parent "${ids[i]}") == "$route" ]] || continue
+        [[ -n ${conds[i]} ]] && ! sh -c "${conds[i]}" >/dev/null 2>&1 && continue
+        if [[ -z ${actions[i]} ]]; then rows+=("${labels[i]}  ›"); else rows+=("${labels[i]}"); fi
+        map+=("$i")
+    done
+    [[ ${#rows[@]} -gt 0 ]] || { route=$(parent "$route"); [[ $route == root && ${#ids[@]} -eq 0 ]] && exit 1; continue; }
+    [[ $route != root ]] && rows+=("$BACK")
+    n=${#rows[@]}; h=$(( n * 44 + 90 )); (( h > 620 )) && h=620
+    pick=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --prompt "$title" --width 440 --height "$h" --columns 1 --cache-file /dev/null)
+    if [[ $? -ne 0 || -z $pick || $pick == "$BACK" ]]; then
+        [[ $route == root ]] && exit 0
+        route=$(parent "$route"); continue
+    fi
+    for j in "${!map[@]}"; do
+        if [[ ${rows[j]} == "$pick" ]]; then
+            i=${map[j]}
+            if [[ -z ${actions[i]} ]]; then route="${ids[i]}"; continue 2; fi
+            setsid sh -c "${actions[i]}" >/dev/null 2>&1 &
+            exit 0
+        fi
+    done
+    exit 0
+done
