@@ -246,6 +246,8 @@ for u in choose-mirror.service pacman-init.service zool-live-setup.service livec
           "/etc/systemd/system/sound.target.wants/$u"
 done
 rm -f /usr/local/bin/choose-mirror /usr/local/bin/livecd-sound /usr/local/bin/zool-live-setup
+# خدمة تخص الفلاشة: تؤخر الإقلاع حتى تُضبط الساعة من الإنترنت (دقائق إن لم توجد شبكة)
+rm -f /etc/systemd/system/sysinit.target.wants/systemd-time-wait-sync.service
 
 log "إنشاء المستخدم $USERNAME"
 useradd -m -G wheel,audio,video,input,storage,optical,network -s /bin/bash "$USERNAME"
