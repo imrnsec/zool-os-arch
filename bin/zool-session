@@ -1,0 +1,9 @@
+#!/bin/bash
+# جلسة سطح المكتب بعد الدخول من شاشة دخول زول (greetd)
+export ZOOL_GREETD=1 XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=Hyprland
+[ -r /etc/profile ] && . /etc/profile
+cd "$HOME" 2>/dev/null || true
+if command -v start-hyprland >/dev/null 2>&1; then
+    exec start-hyprland >/dev/null 2>&1
+fi
+exec Hyprland >/dev/null 2>&1

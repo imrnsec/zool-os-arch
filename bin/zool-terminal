@@ -20,6 +20,8 @@ HOME = os.path.expanduser("~")
 CFG = os.environ.get("XDG_CONFIG_HOME") or os.path.join(HOME, ".config")
 COLORS_FILE = os.path.join(CFG, "zool", "theme", "terminal.conf")      # يكتبه zool-theme
 LANG_FILE = os.path.join(CFG, "zool", "lang")
+OPACITY_FILE = os.path.join(CFG, "zool", "terminal-opacity")    # رقم بين 0.3 و 1 (اختياري)
+OPACITY = 0.85
 FONT = "JetBrainsMono Nerd Font 11"
 ICON = "/usr/share/zool/logo/zool-logo-128.png"
 
@@ -60,6 +62,13 @@ def read_colors():
     except OSError:
         pass
     return c
+
+
+def read_opacity():
+    try:
+        return max(0.3, min(1.0, float(open(OPACITY_FILE, encoding="utf-8").read().strip())))
+    except (OSError, ValueError):
+        return OPACITY
 
 
 def user_shell():
@@ -122,6 +131,13 @@ class ZoolTerminal(Gtk.Window):
                 self.set_icon_from_file(ICON)
             except GLib.Error:
                 pass
+        # شفافية الخلفية: نافذة بقناة ألفا، ولون خلفية الطرفية نفسه شبه شفاف
+        visual = self.get_screen().get_rgba_visual()
+        self.transparent = visual is not None and self.get_screen().is_composited()
+        if self.transparent:
+            self.set_visual(visual)
+            self.set_app_paintable(True)
+            self.get_style_context().add_class("zool-term")
         self.scale = 1.0
         self.dir_mode = 0                                      # 0 تلقائي · 1 يمين · 2 يسار
         self.nb = Gtk.Notebook()
@@ -130,7 +146,8 @@ class ZoolTerminal(Gtk.Window):
         self.connect("key-press-event", self.on_key)
         self.connect("destroy", Gtk.main_quit)
         css = Gtk.CssProvider()
-        css.load_from_data(b"vte-terminal { padding: 10px 12px; } notebook tab { padding: 4px 12px; }")
+        css.load_from_data(b"vte-terminal { padding: 10px 12px; } notebook tab { padding: 4px 12px; }"
+                           b" .zool-term, .zool-term notebook, .zool-term notebook stack { background-color: transparent; }")
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         # تغيّر الثيم ← نعيد تلوين كل الألسنة فوراً
         try:
@@ -209,7 +226,10 @@ class ZoolTerminal(Gtk.Window):
     # ── المظهر ──
     def apply_colors(self, t):
         c = read_colors()
-        t.set_colors(rgba(c["foreground"]), rgba(c["background"]), [rgba(c[f"color{i}"]) for i in range(16)])
+        bg = rgba(c["background"])
+        if self.transparent:
+            bg.alpha = read_opacity()
+        t.set_colors(rgba(c["foreground"]), bg, [rgba(c[f"color{i}"]) for i in range(16)])
         t.set_color_cursor(rgba(c["cursor"]))
         t.set_color_cursor_foreground(rgba(c["background"]))
 

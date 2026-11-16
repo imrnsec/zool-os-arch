@@ -1,6 +1,6 @@
 # Zool OS — يبدأ سطح المكتب (Hyprland) تلقائياً عند الدخول على tty1
 # للخروج إلى الطرفية النصية: سجّل الدخول على tty آخر (Ctrl+Alt+F3)
-if [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${DISPLAY:-}" ] && [ "$(id -u)" -ne 0 ] && [ "$(tty 2>/dev/null)" = /dev/tty1 ]; then
+if [ -z "${ZOOL_GREETD:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${DISPLAY:-}" ] && [ "$(id -u)" -ne 0 ] && [ "$(tty 2>/dev/null)" = /dev/tty1 ]; then
     _zool_t0=$(date +%s)
     if command -v start-hyprland >/dev/null 2>&1; then
         start-hyprland >/dev/null 2>&1

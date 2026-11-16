@@ -1,0 +1,8 @@
+#!/bin/sh
+# يشغّله greetd: شاشة دخول زول داخل cage. إن تعذّر ذلك لأي سبب نعود إلى دخول نصي (agreety) حتى لا يُقفل الجهاز.
+export XKB_DEFAULT_LAYOUT=us,ara XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
+export GDK_BACKEND=wayland XCURSOR_SIZE=24
+if command -v cage >/dev/null 2>&1; then
+    cage -s -d -- /usr/local/bin/zool-greeter && exit 0
+fi
+exec agreety --cmd /usr/local/bin/zool-session

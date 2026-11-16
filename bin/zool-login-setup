@@ -1,0 +1,25 @@
+#!/bin/bash
+# zool-login-setup screen|auto <user>   (root)
+#   screen : شاشة دخول زول عند الإقلاع (اسم المستخدم + كلمة المرور) عبر greetd
+#   auto   : فتح سطح المكتب مباشرة للمستخدم المذكور بلا كلمة مرور
+[ "$(id -u)" = 0 ] || { echo "يحتاج root: sudo zool-login-setup $*" >&2; exit 1; }
+DROPIN=/etc/systemd/system/getty@tty1.service.d/autologin.conf
+case "${1:-}" in
+    screen)
+        command -v greetd >/dev/null 2>&1 && command -v cage >/dev/null 2>&1 || { echo "ينقص greetd أو cage:  pacman -S greetd cage" >&2; exit 2; }
+        mkdir -p /etc/greetd
+        printf '[terminal]\nvt = 1\n\n[default_session]\ncommand = "/usr/local/bin/zool-greeter-launch"\nuser = "greeter"\n' > /etc/greetd/config.toml
+        install -d -o greeter -g greeter -m 755 /var/lib/zool-greeter 2>/dev/null || install -d -m 777 /var/lib/zool-greeter
+        rm -f "$DROPIN"
+        systemctl enable greetd.service >/dev/null 2>&1 || exit 3
+        # شاشة الدخول تغني عن قفل الشاشة عند بدء الجلسة
+        rm -f /home/*/.config/zool/lock-on-start
+        echo "✓ شاشة دخول زول ستظهر عند الإقلاع القادم" ;;
+    auto)
+        id "${2:-}" >/dev/null 2>&1 || { echo "مستخدم غير موجود: ${2:-}" >&2; exit 2; }
+        systemctl disable greetd.service >/dev/null 2>&1
+        mkdir -p "$(dirname "$DROPIN")"
+        printf '[Service]\nExecStart=\nExecStart=-/sbin/agetty -o %s --noclear --autologin %s %%I $TERM\n' "'-p -f -- \\\\u'" "$2" > "$DROPIN"
+        echo "✓ سيُفتح سطح المكتب مباشرة للمستخدم $2" ;;
+    *) sed -n '2,4p' "$0"; exit 1 ;;
+esac

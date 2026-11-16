@@ -45,6 +45,8 @@ wget
 # ── Hyprland وبيئة سطح المكتب ──
 hyprland
 hyprlock
+greetd
+cage
 hypridle
 hyprpolkitagent
 xdg-desktop-portal-hyprland
