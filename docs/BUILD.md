@@ -62,7 +62,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 - **قائمة التطبيقات (Wofi):** بطاقة شفافة بثلاثة أعمدة، شريط بحث على شكل حبة، تحديد ذهبي. `SUPER+Space`.
 - **قائمة زول (`SUPER+Z`):** اختصارات للشبكة والبلوتوث والصوت والخلفية والتثبيت.
 - **ثلاث خلفيات:** `nile-sunset` (الافتراضية) · `meroe-night` · `dune-dawn`. تغييرها: `SUPER+SHIFT+W`.
-- **GTK/Kitty/Mako/Hyprlock:** كلها بالألوان نفسها.
+- **GTK/طرفية زول/Mako/Hyprlock:** كلها بالألوان نفسها.
 
 ---
 
@@ -79,7 +79,7 @@ docker run --privileged --rm -v "$PWD":/zool -w /zool archlinux \
 ├── default/                    ← الافتراضيات → /usr/share/zool/default (menu.conf)
 ├── migrations/                 ← ترحيلات تُنفَّذ مرة واحدة عند zool-update
 ├── bin/                        ← أوامر زول  → /usr/local/bin  (zool-menu · zool-install · zool-prayer · …)
-├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · kitty · gtk · fastfetch)
+├── config/                     ← إعدادات المستخدم → /etc/skel/.config  (hypr · waybar · wofi · mako · gtk · fastfetch)
 ├── etc/                        ← إعدادات النظام → /etc  (الجلسة · systemd · mkinitcpio · plymouth · fonts)
 ├── share/                      ← → /usr/share  (zool: الشعار والخلفيات · plymouth · sddm · fonts · applications)
 ├── local-share/                ← → /usr/local/share

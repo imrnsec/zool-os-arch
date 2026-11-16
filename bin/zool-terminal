@@ -18,7 +18,7 @@ import sys
 
 HOME = os.path.expanduser("~")
 CFG = os.environ.get("XDG_CONFIG_HOME") or os.path.join(HOME, ".config")
-COLORS_FILE = os.path.join(CFG, "zool", "theme", "kitty.conf")      # يكتبه zool-theme
+COLORS_FILE = os.path.join(CFG, "zool", "theme", "terminal.conf")      # يكتبه zool-theme
 LANG_FILE = os.path.join(CFG, "zool", "lang")
 FONT = "JetBrainsMono Nerd Font 11"
 ICON = "/usr/share/zool/logo/zool-logo-128.png"
@@ -39,7 +39,7 @@ def parse_args(argv):
         if a == "--title" and i + 1 < len(argv):
             title = argv[i + 1]; i += 2
         elif a in ("--class", "--name") and i + 1 < len(argv):
-            i += 2                                            # للتوافق مع أوامر kitty القديمة
+            i += 2                                            # خيارات قديمة نتجاهلها
         elif a == "-e":
             cmd = argv[i + 1:]; break
         elif a in ("-h", "--help"):
@@ -77,7 +77,7 @@ def user_shell():
 
 def fallback(title, cmd):
     """إن تعذر تحميل GTK/VTE نفتح أي طرفية أخرى موجودة حتى لا يبقى المستخدم بلا طرفية."""
-    for t, pre in (("kitty", ["--title", title or "Zool"]), ("lxterminal", []), ("foot", []), ("xterm", [])):
+    for t, pre in (("lxterminal", []), ("foot", []), ("xterm", [])):
         path = shutil.which(t)
         if path:
             args = [path] + pre + (["-e"] + cmd if cmd else [])

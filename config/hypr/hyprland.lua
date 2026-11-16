@@ -58,7 +58,7 @@ end)
 -- ── البرامج التي تبدأ مع الجلسة (أولاً، حتى تعمل مهما حدث بعدها) ──
 hl.on("hyprland.start", function()
     for _, cmd in ipairs({
-        "sh -c '[ -e \"$HOME/.config/zool/lock-on-start\" ] && hyprlock'",   -- كلمة المرور عند بدء التشغيل
+        "sh -c '[ -e \"$HOME/.config/zool/lock-on-start\" ] && zool-lock'",   -- كلمة المرور عند بدء التشغيل
         "zool-wallpaper",
         "waybar",
         "mako",
@@ -193,14 +193,13 @@ end)
 local mod = "SUPER"
 
 B(mod .. " + Return", X(terminal))
-B(mod .. " + ALT + Return", X("kitty"))      -- طرفية احتياطية
 B(mod .. " + B",      X(browser))
 B(mod .. " + E",      X(files))
 B(mod .. " + Space",  X(menu))
 B(mod .. " + Z",      X("zool-menu"))
 B(mod .. " + ALT + Space",  X("zool-menu"))            -- كما في Omarchy
 B(mod .. " + CTRL + Space", X("zool-wallpaper next"))  -- الخلفية التالية
-B(mod .. " + L",      X("hyprlock"))
+B(mod .. " + L",      X("zool-lock"))
 B(mod .. " + Escape", X("zool-power"))
 B(mod .. " + F1",     X("zool-keys"))
 B(mod .. " + SHIFT + W", X("zool-wallpaper pick"))

@@ -88,8 +88,8 @@
         "on-click": "hyprctl switchxkblayout all next"
     },
 
-    "cpu": { "format": " {usage}%", "interval": 3, "on-click": "kitty -e btop" },
-    "memory": { "format": " {percentage}%", "interval": 5, "on-click": "kitty -e btop" },
+    "cpu": { "format": " {usage}%", "interval": 3, "on-click": "zool-terminal -e btop" },
+    "memory": { "format": " {percentage}%", "interval": 5, "on-click": "zool-terminal -e btop" },
     "temperature": {
         "critical-threshold": 85,
         "format": "{icon} {temperatureC}°",

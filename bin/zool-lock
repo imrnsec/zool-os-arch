@@ -1,0 +1,5 @@
+#!/bin/sh
+# شاشة القفل/الدخول: نعيد لوحة المفاتيح إلى الإنجليزية أولاً حتى لا تُكتب كلمة المرور بالعربية خطأً
+pidof hyprlock >/dev/null && exit 0
+hyprctl switchxkblayout all 0 >/dev/null 2>&1
+exec hyprlock "$@"

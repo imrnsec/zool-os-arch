@@ -115,8 +115,6 @@ stage1() {
     rm -f /tmp/zool-install.status
     if command -v zool-terminal >/dev/null 2>&1; then
         zool-terminal --title "تثبيت زول" -e sudo "$SELF" --run "$CONF"
-    elif command -v kitty >/dev/null 2>&1; then
-        kitty --title "تثبيت زول" -e sudo "$SELF" --run "$CONF"
     else
         sudo "$SELF" --run "$CONF"
     fi

@@ -129,7 +129,7 @@ sudo dd if=zoolos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 | المجلد | يُنسخ إلى | المحتوى |
 |---|---|---|
 | `bin/` | `/usr/local/bin` | أوامر زول (`zool-install`، `zool-prayer`، `zool-menu`…) |
-| `config/` | `/etc/skel/.config` | إعدادات Hyprland وWaybar وWofi وMako وKitty |
+| `config/` | `/etc/skel/.config` | إعدادات Hyprland وWaybar وWofi وMako |
 | `etc/` | `/etc` | إعدادات النظام (الجلسة، systemd، mkinitcpio، Plymouth) |
 | `share/` | `/usr/share` | الشعار والخلفيات والخطوط وثيم Plymouth |
 | `themes/` | `/usr/share/zool/themes` | الثيمات (صيغة Omarchy: `colors.toml` + `backgrounds/`) |

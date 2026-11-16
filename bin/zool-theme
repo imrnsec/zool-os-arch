@@ -70,8 +70,8 @@ apply() {
     recolor_css "$CFG/waybar/style.css"
     recolor_css "$CFG/wofi/style.css"
 
-    # ── ألوان الطرفية: يقرؤها Zool Terminal مباشرة، ويضمّنها kitty.conf ──
-    cat > "$STATE/kitty.conf" <<EOF
+    # ── ألوان الطرفية: يقرؤها Zool Terminal مباشرة ──
+    cat > "$STATE/terminal.conf" <<EOF
 foreground            #$sand
 background            #$night
 selection_foreground  #$night
@@ -157,8 +157,8 @@ icons=0
 
 [urgency=high]
 border-color=#$red
-default-timeout=0
 EOF
+    rm -f "$STATE/kitty.conf"
 
     # ── الخلفية (أول ملف في backgrounds/) وشاشة القفل ──
     local WALLPAPER
@@ -176,7 +176,6 @@ EOF
         command -v zool-wallpaper >/dev/null && zool-wallpaper
         makoctl reload >/dev/null 2>&1
         pkill -USR2 -x waybar 2>/dev/null || { pkill -x waybar; hyprctl dispatch exec waybar >/dev/null 2>&1; }
-        pkill -USR1 -x kitty 2>/dev/null
         notify-send -i /usr/share/zool/logo/zool-logo-128.png -t 2500 "زول" "الثيم: $NAME" 2>/dev/null
     fi
     echo "✓ $id — $NAME"

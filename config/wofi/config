@@ -13,4 +13,4 @@ insensitive=true
 no_actions=true
 hide_scroll=true
 gtk_dark=true
-term=kitty
+term=zool-terminal

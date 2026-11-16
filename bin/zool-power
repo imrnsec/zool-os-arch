@@ -10,7 +10,7 @@ choice=$(printf '%s\n' \
   | wofi --dmenu --allow-markup --prompt "الطاقة" --width 420 --height 330 --columns 1) || exit 0
 
 case "$choice" in
-    *قفل*)     hyprlock ;;
+    *قفل*)     zool-lock ;;
     *الخروج*)  { command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown; } || hyprctl dispatch 'hl.dsp.exit()' ;;
     *سكون*)    systemctl suspend ;;
     *إعادة*)   systemctl reboot ;;
