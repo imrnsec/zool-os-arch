@@ -94,6 +94,11 @@ system_apply() {
         if bash "$m"; then touch "$STATE/migrations/$n"; ran=$((ran+1)); else echo "  ✗ فشل $n (سيُعاد في التحديث القادم)"; fi
     done
     [ "$ran" = 0 ] && echo "  لا ترحيلات جديدة"
+    # Sublime Text: يُحمَّل من موقعه الرسمي (مرة واحدة)، ولا يُعاد تثبيته إن أزاله المستخدم لاحقاً
+    if [ "$with_pacman" = 1 ] && [ ! -d /run/archiso ] && [ ! -e "$STATE/sublime-done" ]; then
+        say "تثبيت Sublime Text (محرر النصوص الافتراضي)"
+        zool-sublime-setup --after-upgrade || echo "  ✗ تعذر تثبيت Sublime الآن — سيُعاد في التحديث القادم (أو: sudo zool-sublime-setup)"
+    fi
     echo "$sha" > "$STATE/version"
     chmod -R a+rX "$CACHE"
 }
