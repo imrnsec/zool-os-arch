@@ -9,7 +9,12 @@ set -u
 STATE=/var/lib/zool
 KEY_URL=https://download.sublimetext.com/sublimehq-pub.gpg
 KEY_ID=8A8F901A
-REPO_URL=https://download.sublimetext.com/arch/stable/x86_64
+case "$(uname -m)" in
+    x86_64)  ARCH=x86_64 ;;
+    aarch64) ARCH=aarch64 ;;
+    *) echo "معمارية غير مدعومة من Sublime: $(uname -m)" >&2; exit 5 ;;
+esac
+REPO_URL=https://download.sublimetext.com/arch/stable/$ARCH
 DESKTOP=sublime_text.desktop
 
 if ! pacman -Qq sublime-text >/dev/null 2>&1; then
@@ -20,7 +25,14 @@ if ! pacman -Qq sublime-text >/dev/null 2>&1; then
             && pacman-key --add "$tmp" && pacman-key --lsign-key "$KEY_ID" || { rm -f "$tmp"; echo "فشل استيراد مفتاح Sublime" >&2; exit 3; }
         rm -f "$tmp"
     fi
-    grep -q '^\[sublime-text\]' /etc/pacman.conf || printf '\n[sublime-text]\nServer = %s\n' "$REPO_URL" >> /etc/pacman.conf
+    # كتلة واحدة صحيحة فقط: نحذف أي كتل [sublime-text] قديمة أو مكرّرة (قد تكون بمعمارية خاطئة) ثم نكتبها من جديد
+    cur=$(awk '/^\[sublime-text\]/{k=1;next} /^\[/{k=0} k&&/^Server/{print $3}' /etc/pacman.conf | tr '\n' ' ')
+    if [ "$cur" != "$REPO_URL " ]; then
+        tmpc=$(mktemp)
+        awk '/^\[sublime-text\]/{skip=1;next} /^\[/{skip=0} !skip' /etc/pacman.conf > "$tmpc" \
+            && printf '\n[sublime-text]\nServer = %s\n' "$REPO_URL" >> "$tmpc" && cat "$tmpc" > /etc/pacman.conf
+        rm -f "$tmpc"
+    fi
 
     if [ "${1:-}" = "--after-upgrade" ]; then flags=-Sy; else flags=-Syu; fi
     pacman "$flags" --needed --noconfirm sublime-text || { echo "فشل تثبيت sublime-text" >&2; exit 4; }
