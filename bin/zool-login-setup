@@ -11,13 +11,17 @@ case "${1:-}" in
         printf '[terminal]\nvt = 1\n\n[default_session]\ncommand = "/usr/local/bin/zool-greeter-launch"\nuser = "greeter"\n' > /etc/greetd/config.toml
         install -d -o greeter -g greeter -m 755 /var/lib/zool-greeter 2>/dev/null || install -d -m 777 /var/lib/zool-greeter
         rm -f "$DROPIN"
+        # غيّر تحكّم الطرفية الأولى (tty1) بالكامل إلى greetd: لو بقيت خدمة getty عاملة عليها أيضاً
+        # تتسابق الاثنتان على نفس الطرفية، فتظهر أحياناً شاشة دخول نصية بدل شاشة زول الرسومية
+        systemctl disable --now getty@tty1.service >/dev/null 2>&1 || true
         systemctl enable greetd.service >/dev/null 2>&1 || exit 3
         # شاشة الدخول تغني عن قفل الشاشة عند بدء الجلسة
         rm -f /home/*/.config/zool/lock-on-start
         echo "✓ شاشة دخول زول ستظهر عند الإقلاع القادم" ;;
     auto)
         id "${2:-}" >/dev/null 2>&1 || { echo "مستخدم غير موجود: ${2:-}" >&2; exit 2; }
-        systemctl disable greetd.service >/dev/null 2>&1
+        systemctl disable --now greetd.service >/dev/null 2>&1
+        systemctl enable getty@tty1.service >/dev/null 2>&1 || true
         mkdir -p "$(dirname "$DROPIN")"
         printf '[Service]\nExecStart=\nExecStart=-/sbin/agetty -o %s --noclear --autologin %s %%I $TERM\n' "'-p -f -- \\\\u'" "$2" > "$DROPIN"
         echo "✓ سيُفتح سطح المكتب مباشرة للمستخدم $2" ;;
