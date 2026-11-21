@@ -11,9 +11,11 @@ case "${1:-}" in
         printf '[terminal]\nvt = 1\n\n[default_session]\ncommand = "/usr/local/bin/zool-greeter-launch"\nuser = "greeter"\n' > /etc/greetd/config.toml
         install -d -o greeter -g greeter -m 755 /var/lib/zool-greeter 2>/dev/null || install -d -m 777 /var/lib/zool-greeter
         rm -f "$DROPIN"
-        # غيّر تحكّم الطرفية الأولى (tty1) بالكامل إلى greetd: لو بقيت خدمة getty عاملة عليها أيضاً
-        # تتسابق الاثنتان على نفس الطرفية، فتظهر أحياناً شاشة دخول نصية بدل شاشة زول الرسومية
+        # systemd-getty-generator يُنشئ وحدة getty@tty1 تلقائياً عند كل إقلاع من جديد (وحدة "runtime"
+        # تُولَّد ديناميكياً، وليست مجرد تفعيل ثابت)، فمجرد "disable" لا يمنعها من العودة في الإقلاع التالي
+        # ويبقى السباق قائماً. الطريقة الوحيدة التي تمنعها فعلياً وبشكل دائم هي "mask"
         systemctl disable --now getty@tty1.service >/dev/null 2>&1 || true
+        systemctl mask getty@tty1.service >/dev/null 2>&1 || true
         systemctl enable greetd.service >/dev/null 2>&1 || exit 3
         # شاشة الدخول تغني عن قفل الشاشة عند بدء الجلسة
         rm -f /home/*/.config/zool/lock-on-start
@@ -21,6 +23,7 @@ case "${1:-}" in
     auto)
         id "${2:-}" >/dev/null 2>&1 || { echo "مستخدم غير موجود: ${2:-}" >&2; exit 2; }
         systemctl disable --now greetd.service >/dev/null 2>&1
+        systemctl unmask getty@tty1.service >/dev/null 2>&1 || true
         systemctl enable getty@tty1.service >/dev/null 2>&1 || true
         mkdir -p "$(dirname "$DROPIN")"
         printf '[Service]\nExecStart=\nExecStart=-/sbin/agetty -o %s --noclear --autologin %s %%I $TERM\n' "'-p -f -- \\\\u'" "$2" > "$DROPIN"
