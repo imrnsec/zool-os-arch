@@ -262,12 +262,11 @@ pacman-key --init >/dev/null 2>&1 && pacman-key --populate archlinux >/dev/null 
 
 log "النواة وصورة الإقلاع (initramfs)"
 mkdir -p /boot
-for k in /usr/lib/modules/*/vmlinuz; do
-    if [ -f "$(dirname "$k")/pkgbase" ] && [ "$(cat "$(dirname "$k")/pkgbase")" = linux ]; then
-        install -Dm644 "$k" /boot/vmlinuz-linux
-    fi
+# اسم ملف النواة يتبع اسم حزمتها الفعلي (pkgbase) أياً كانت — linux-lts حالياً، وليس "linux" مُفترضاً دائماً
+for d in /usr/lib/modules/*; do
+    [ -f "$d/vmlinuz" ] && [ -f "$d/pkgbase" ] || continue
+    install -Dm644 "$d/vmlinuz" "/boot/vmlinuz-$(cat "$d/pkgbase")"
 done
-[ -f /boot/vmlinuz-linux ] || install -Dm644 "$(ls /usr/lib/modules/*/vmlinuz | head -1)" /boot/vmlinuz-linux
 cat >/etc/mkinitcpio.conf.d/zool.conf <<'EOM'
 HOOKS=(base udev autodetect microcode modconf kms keyboard keymap block filesystems fsck)
 EOM
