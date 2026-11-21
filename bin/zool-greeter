@@ -42,6 +42,7 @@ class Greetd:
 
     def login(self, user, password):
         """يعيد (True, "") عند النجاح، أو (False, سبب)."""
+        print(f"[zool-greeter] create_session username={user!r}", file=sys.stderr)
         r = self.call(type="create_session", username=user)
         for _ in range(8):
             if r.get("type") != "auth_message":
@@ -54,6 +55,7 @@ class Greetd:
             if r.get("type") == "success":
                 return True, ""
             return False, r.get("description", "start_session failed")
+        print(f"[zool-greeter] auth failed for {user!r}: {r!r}", file=sys.stderr)
         try:
             self.call(type="cancel_session")
         except (OSError, ValueError):

@@ -1,8 +1,16 @@
 #!/bin/sh
-# يشغّله greetd: شاشة دخول زول داخل cage. إن تعذّر ذلك لأي سبب نعود إلى دخول نصي (agreety) حتى لا يُقفل الجهاز.
+# يشغّله greetd: شاشة دخول زول داخل cage. إن خرج cage/zool-greeter لأي سبب (فشل مصادقة، خلل مؤقت في
+# كرت الشاشة...) نحاول إعادة تشغيله عدة مرات أولاً بدل التحول فوراً لدخول نصي — حتى لا تظهر شاشة سوداء
+# ميتة لا شيء فيها إلى أن يُعاد تشغيل الجهاز.
 export XKB_DEFAULT_LAYOUT=us,ara XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
 export GDK_BACKEND=wayland XCURSOR_SIZE=24
 if command -v cage >/dev/null 2>&1; then
-    cage -s -d -- /usr/local/bin/zool-greeter && exit 0
+    tries=0
+    while [ "$tries" -lt 5 ]; do
+        cage -s -d -- /usr/local/bin/zool-greeter && exit 0
+        tries=$((tries + 1))
+        sleep 1
+    done
 fi
+# احتياط أخير بعد فشل عدة محاولات: دخول نصي حتى لا يُقفل الجهاز تماماً
 exec agreety --cmd /usr/local/bin/zool-session
