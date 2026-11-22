@@ -1,5 +1,7 @@
 #!/bin/sh
-# الخلفية — تُعرض الصورة كاملة دائماً (بلا قص)؛ ما يزيد عن أبعادها يُملأ بلون الثيم.
+# الخلفية — تُعرض بحجمها الطبيعي في المنتصف دون أي تكبير (fit كانت تكبّر الصورة لتملأ
+# الشاشة فتُظهرها مكبّرة/ضبابية على الشاشات الأعلى دقة من الصورة نفسها)؛ ما يزيد عن
+# أبعادها يُملأ بلون الثيم، ولا يُقصّ منها شيء.
 #   zool-wallpaper          استعادة الخلفية المحفوظة (عند بدء الجلسة)
 #   zool-wallpaper pick     اختيار من خلفيات الثيم الحالي + صورك في ~/Pictures/Wallpapers
 #   zool-wallpaper next     الخلفية التالية في الثيم الحالي
@@ -11,7 +13,7 @@ default="/usr/share/zool/themes/turath/backgrounds/1-meroe-pyramids.jpg"
 apply() {
     night=$(sed -n 's/^night=\([0-9a-fA-F]\{6\}\)$/\1/p' "$CFG/zool/theme/hypr" 2>/dev/null)
     pkill -x swaybg 2>/dev/null
-    setsid swaybg -i "$1" -m fit -c "#${night:-10181c}" >/dev/null 2>&1 &
+    setsid swaybg -i "$1" -m center -c "#${night:-10181c}" >/dev/null 2>&1 &
 }
 save() { mkdir -p "$(dirname "$conf")"; printf '%s\n' "$1" > "$conf"; apply "$1"; }
 images() {
