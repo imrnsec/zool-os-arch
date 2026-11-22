@@ -1,0 +1,25 @@
+# تراث — Turath
+# مستوحى من طوب مروي والنوبة ووادي النيل: ترابي نحاسي، رملي عاجي، أخضر نيلي هادئ
+mode = "dark"
+accent = "#a64b2a"
+selection = "#3b2a1f"
+muted = "#d19c6b"
+
+background = "#1c1714"
+dark_background = "#120d0b"
+darker_background = "#0a0706"
+lighter_background = "#3b2a1f"
+
+foreground = "#f5e6d3"
+dark_foreground = "#d19c6b"
+light_foreground = "#f8eedf"
+bright_foreground = "#ffffff"
+
+red = "#a64b2a"
+yellow = "#d19c6b"
+orange = "#a64b2a"
+green = "#1f7a72"
+cyan = "#1f7a72"
+blue = "#1f7a72"
+magenta = "#8a5a46"
+brown = "#3b2a1f"
