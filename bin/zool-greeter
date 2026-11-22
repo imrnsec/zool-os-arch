@@ -85,6 +85,8 @@ if os.environ.get("ZOOL_GREETER_SELFTEST"):                    # اختبار ا
 
 import gi                                                      # noqa: E402
 gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")        # صراحة: بعض الأنظمة تحمّل GTK4 (Gdk 4.0) أولاً من مكتبة
+gi.require_version("GdkPixbuf", "2.0")  # أخرى في نفس العملية، فيتعارض مع Gtk 3.0 ويُسقِط الشاشة فوراً
 from gi.repository import Gdk, GLib, Gtk                       # noqa: E402
 
 CSS = """
