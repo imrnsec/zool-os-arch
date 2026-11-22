@@ -1,0 +1,26 @@
+# خرطوم — Khartoum Edition
+# مستوحى من أفق الخرطوم (برج الفاتح وجسر النيل الأزرق وملتقى النيلين): رملي، صحراوي،
+# فحمي، زيتوني هادئ، وطوبي دافئ
+mode = "dark"
+accent = "#a66d50"
+selection = "#4a4940"
+muted = "#b8a58b"
+
+background = "#34332f"
+dark_background = "#201f1c"
+darker_background = "#141311"
+lighter_background = "#4a4940"
+
+foreground = "#e9e3d8"
+dark_foreground = "#b8a58b"
+light_foreground = "#f2eee5"
+bright_foreground = "#ffffff"
+
+red = "#a66d50"
+yellow = "#b8a58b"
+orange = "#a66d50"
+green = "#777d68"
+cyan = "#777d68"
+blue = "#5c6b6a"
+magenta = "#8a5a46"
+brown = "#4a4940"
