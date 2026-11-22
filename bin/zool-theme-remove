@@ -6,5 +6,5 @@ if [[ -z $name ]]; then
     name=$(ls -1 "$DIR" 2>/dev/null | fzf --prompt="احذف الثيم> " --height=40% --border) || exit 0
 fi
 (LC_ALL=C; [[ $name =~ ^[a-z0-9_][a-z0-9._+-]*$ ]]) && [[ -d $DIR/$name ]] || { echo "لا يوجد ثيم مثبّت بهذا الاسم: $name" >&2; exit 1; }
-[[ $(zool-theme current) == "$name" ]] && zool-theme set zool
+[[ $(zool-theme current) == "$name" ]] && zool-theme set turath
 rm -rf "${DIR:?}/$name" && echo "✓ حُذف الثيم: $name"

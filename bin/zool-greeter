@@ -14,7 +14,7 @@ import sys
 SESSION_CMD = ["/usr/local/bin/zool-session"]
 SESSION_ENV = ["XDG_SESSION_TYPE=wayland", "XDG_CURRENT_DESKTOP=Hyprland"]
 LAST_USER = "/var/lib/zool-greeter/last-user"
-BG = "/usr/share/zool/themes/zool/backgrounds/1-nile-sunset.jpg"
+BG = "/usr/share/zool/themes/turath/backgrounds/1-meroe-pyramids.jpg"
 LOGO = "/usr/share/zool/logo/zool-logo-128.png"
 
 

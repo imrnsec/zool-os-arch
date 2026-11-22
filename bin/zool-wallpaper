@@ -6,7 +6,7 @@
 #   zool-wallpaper set <ملف>
 CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
 conf="$CFG/zool/wallpaper"
-default="/usr/share/zool/themes/zool/backgrounds/1-nile-sunset.jpg"
+default="/usr/share/zool/themes/turath/backgrounds/1-meroe-pyramids.jpg"
 
 apply() {
     night=$(sed -n 's/^night=\([0-9a-fA-F]\{6\}\)$/\1/p' "$CFG/zool/theme/hypr" 2>/dev/null)

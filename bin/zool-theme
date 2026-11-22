@@ -21,7 +21,7 @@ KEYS="night surface surface2 sand sand_dim gold terracotta teal blue acacia red 
 
 theme_dir() { [ -f "$USR/$1/colors.toml" ] && echo "$USR/$1" || echo "$SYS/$1"; }
 list()      { for d in "$SYS"/*/ "$USR"/*/; do [ -f "$d/colors.toml" ] && basename "$d"; done | sort -u; }
-current()   { cat "$STATE/name" 2>/dev/null || echo zool; }
+current()   { cat "$STATE/name" 2>/dev/null || echo turath; }
 title()     { local d; d=$(theme_dir "$1"); [ -f "$d/name" ] && head -1 "$d/name" || echo "$1" | sed 's/-/ /g'; }
 
 # يقرأ لوناً من colors.toml (أول مفتاح موجود من القائمة)، بلا #
