@@ -1,14 +1,14 @@
 show=drun
 prompt=ابحث عن تطبيق…
 width=860
-height=560
+height=580
 location=center
 columns=3
 orientation=vertical
 halign=fill
 content_halign=fill
 allow_images=true
-image_size=40
+image_size=52
 insensitive=true
 no_actions=true
 hide_scroll=true

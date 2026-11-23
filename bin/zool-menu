@@ -43,8 +43,8 @@ while :; do
     done
     [[ ${#rows[@]} -gt 0 ]] || { route=$(parent "$route"); [[ $route == root && ${#ids[@]} -eq 0 ]] && exit 1; continue; }
     [[ $route != root ]] && rows+=("$BACK")
-    n=${#rows[@]}; h=$(( n * 44 + 90 )); (( h > 620 )) && h=620
-    pick=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --allow-markup --prompt "$title" --width 440 --height "$h" --columns 1 --cache-file /dev/null)
+    n=${#rows[@]}; h=$(( n * 52 + 100 )); (( h > 640 )) && h=640
+    pick=$(printf '%s\n' "${rows[@]}" | wofi --dmenu --allow-markup --prompt "$title" --width 480 --height "$h" --columns 1 --cache-file /dev/null)
     if [[ $? -ne 0 || -z $pick || $(plain "$pick") == "$(plain "$BACK")" ]]; then
         [[ $route == root ]] && exit 0
         route=$(parent "$route"); continue

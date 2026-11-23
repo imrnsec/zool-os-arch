@@ -1,50 +1,63 @@
-/* Zool OS — قائمة التطبيقات (Wofi): بطاقة ناعمة، بحث على شكل حبة، تحديد ذهبي */
-@define-color night    #10181c;
-@define-color surface  #172229;
-@define-color surface2 #213039;
-@define-color sand     #f3e6cc;
-@define-color sand_dim #b9a98a;
-@define-color gold     #e8b04a;
+/* Zool OS — قائمة التطبيقات (Wofi)
+ * يُعاد توليد ألوان @define-color تلقائياً عند تبديل الثيم (zool-theme set …)
+ * لا تعدّل ألوان @define-color مباشرة — استخدم zool-theme.
+ */
+@define-color night      #10181c;
+@define-color surface    #172229;
+@define-color surface2   #213039;
+@define-color sand       #f3e6cc;
+@define-color sand_dim   #b9a98a;
+@define-color gold       #e8b04a;
 @define-color terracotta #d46a43;
-@define-color teal     #3ba5a0;
-@define-color blue     #2d86b4;
-@define-color acacia   #8fb35f;
-@define-color red      #d46a43;
-@define-color yellow   #e8b04a;
-@define-color magenta  #c58bb0;
+@define-color teal       #3ba5a0;
+@define-color blue       #2d86b4;
+@define-color acacia     #8fb35f;
+@define-color red        #d46a43;
+@define-color yellow     #e8b04a;
+@define-color magenta    #c58bb0;
 
+/* ── النافذة الخارجية ── */
 * {
     font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
-    font-size: 14px;
+    font-size: 13px;
+    color: @sand;
 }
 
 window {
     margin: 0;
-    background-color: alpha(@night, 0.92);
-    border: 2px solid alpha(@gold, 0.55);
-    border-radius: 22px;
+    padding: 0;
+    background-color: alpha(@night, 0.94);
+    border: 1.5px solid alpha(@gold, 0.50);
+    border-radius: 24px;
 }
 
+/* ── الصندوق الخارجي ── */
 #outer-box {
-    margin: 22px;
+    padding: 20px 20px 14px 20px;
     background-color: transparent;
 }
 
+/* ── حقل البحث ── */
 #input {
     background-color: @surface2;
     color: @sand;
-    border: 1px solid alpha(@gold, 0.25);
+    caret-color: @gold;
+    border: 1.5px solid alpha(@gold, 0.22);
     border-radius: 999px;
-    padding: 12px 22px;
-    margin-bottom: 18px;
+    padding: 11px 20px;
+    margin-bottom: 16px;
+    font-size: 14px;
     box-shadow: none;
+    outline: none;
 }
 
 #input:focus {
-    border-color: @gold;
+    border-color: alpha(@gold, 0.70);
     box-shadow: none;
+    outline: none;
 }
 
+/* ── منطقة التمرير والصندوق الداخلي ── */
 #scroll {
     margin: 0;
 }
@@ -53,34 +66,49 @@ window {
     background-color: transparent;
 }
 
+/* ── كل بطاقة تطبيق ── */
 #entry {
-    padding: 12px 14px;
-    margin: 4px;
-    border-radius: 14px;
-    background-color: transparent;
-    color: @sand;
-    border: 1px solid transparent;
+    padding: 16px 10px 12px 10px;
+    margin: 5px;
+    border-radius: 16px;
+    background-color: alpha(@surface, 0.60);
+    border: 1.5px solid alpha(@gold, 0.08);
+    /* الأيقونة فوق النص — اتجاه عمودي */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    min-height: 100px;
 }
 
+/* أيقونة التطبيق — فوق النص، هامش سفلي */
 #entry image {
-    margin-right: 12px;
+    margin: 0 0 10px 0;
+    min-width: 52px;
+    min-height: 52px;
 }
 
-#entry:hover {
-    background-color: alpha(@gold, 0.10);
-}
-
-#entry:selected {
-    background-color: alpha(@gold, 0.20);
-    border: 1px solid alpha(@gold, 0.6);
-    outline: none;
-}
-
+/* نص التطبيق — مركّز */
 #text {
     color: @sand;
+    font-size: 12.5px;
+    text-align: center;
+    margin: 0;
+}
+
+/* تأثير التحويم */
+#entry:hover {
+    background-color: alpha(@gold, 0.10);
+    border-color: alpha(@gold, 0.28);
+}
+
+/* البطاقة المحدودة */
+#entry:selected {
+    background-color: alpha(@gold, 0.18);
+    border-color: alpha(@gold, 0.65);
 }
 
 #text:selected {
     color: @gold;
-    font-weight: bold;
+    font-weight: 700;
 }
