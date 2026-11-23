@@ -1,5 +1,5 @@
-/* Zool OS — شريط واحد عائم بألوان الثيم الحالي
-   الأسطر التالية (@define-color) يكتبها الأمر zool-theme تلقائياً عند تغيير الثيم. */
+/* Zool OS — شريط الحالة
+   ألوان @define-color تُكتَب تلقائياً بأمر zool-theme — لا تعدّلها يدوياً. */
 @define-color night      #10181c;
 @define-color surface    #172229;
 @define-color surface2   #213039;
@@ -14,134 +14,137 @@
 @define-color yellow     #e8b04a;
 @define-color magenta    #c58bb0;
 
+/* ── أساسيات ── */
 * {
-    font-family: "JetBrainsMono Nerd Font", "IBM Plex Sans Arabic", "Noto Sans Arabic", "Noto Sans", sans-serif;
+    font-family: "JetBrainsMono Nerd Font", "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
     font-size: 13px;
     border: none;
     border-radius: 0;
     min-height: 0;
 }
 
-/* الشريط نفسه: لوح زجاجي واحد بحواف دائرية */
+/* ── النافذة الرئيسية — شريط رفيع شبه شفاف ── */
 window#waybar {
-    background: alpha(@surface, 0.90);
+    background: alpha(@night, 0.88);
     color: @sand;
-    border-radius: 18px;
-    border: 1px solid alpha(@gold, 0.30);
+    border-radius: 16px;
+    border: 1px solid alpha(@sand_dim, 0.14);
 }
 
 tooltip {
-    background: @night;
-    border: 1px solid alpha(@gold, 0.45);
-    border-radius: 12px;
+    background: @surface;
+    border: 1px solid alpha(@sand_dim, 0.25);
+    border-radius: 10px;
 }
 tooltip label {
     color: @sand;
-    padding: 4px;
+    padding: 4px 6px;
 }
 
-/* ── اليسار: الشعار · مساحات العمل · النوافذ المفتوحة ── */
+/* ── اليسار ── */
+
+/* الشعار: نص ذهبي بسيط بلا خلفية */
 #custom-logo {
-    color: @night;
-    background: linear-gradient(135deg, @gold, @terracotta);
-    border-radius: 12px;
-    margin: 5px 4px 5px 6px;
-    padding: 0 14px;
+    color: @gold;
     font-family: "Reem Kufi", "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
     font-weight: bold;
     font-size: 15px;
+    padding: 0 14px 0 10px;
+    margin: 4px 0;
+    border-right: 1px solid alpha(@sand_dim, 0.18);
 }
+#custom-logo:hover { color: @sand; }
 
+/* مساحات العمل: نقاط أرقام عربية هادئة */
 #workspaces {
-    background: alpha(@surface2, 0.75);
-    border-radius: 12px;
-    margin: 5px 3px;
-    padding: 0 3px;
+    margin: 4px 2px;
+    padding: 0 2px;
 }
 #workspaces button {
     font-family: "Reem Kufi", "JetBrainsMono Nerd Font", sans-serif;
-    font-size: 15px;
-    color: @sand_dim;
+    font-size: 14px;
+    color: alpha(@sand_dim, 0.55);
     background: transparent;
-    border-radius: 10px;
-    padding: 0 9px;
-    margin: 2px 1px;
+    border-radius: 8px;
+    padding: 0 8px;
+    margin: 0 1px;
+    transition: all 0.15s ease;
 }
 #workspaces button:hover {
-    background: alpha(@gold, 0.18);
     color: @sand;
+    background: alpha(@sand, 0.07);
 }
 #workspaces button.active {
-    color: @night;
+    color: @gold;
+    background: alpha(@gold, 0.12);
     font-weight: bold;
-    background: @gold;
 }
 #workspaces button.urgent {
     color: @night;
-    background: @red;
+    background: alpha(@red, 0.75);
 }
 
+/* شريط المهام */
 #taskbar {
-    margin: 5px 2px;
+    margin: 4px 2px;
     padding: 0 2px;
 }
 #taskbar button {
     background: transparent;
-    border-radius: 10px;
-    padding: 0 7px;
-    margin: 2px 1px;
+    border-radius: 8px;
+    padding: 0 6px;
+    margin: 0 1px;
+    opacity: 0.60;
+    transition: all 0.15s ease;
 }
-#taskbar button:hover {
-    background: alpha(@gold, 0.18);
-}
+#taskbar button:hover { opacity: 0.85; background: alpha(@sand, 0.07); }
 #taskbar button.active {
-    background: alpha(@gold, 0.30);
+    opacity: 1;
     border-bottom: 2px solid @gold;
 }
-#taskbar.empty {
-    margin: 0;
-    padding: 0;
-}
+#taskbar.empty { margin: 0; padding: 0; }
 
+/* زر الإغلاق */
 #custom-close {
-    color: @red;
-    font-weight: bold;
-    border-radius: 10px;
-    margin: 7px 2px;
-    padding: 0 9px;
+    color: alpha(@sand_dim, 0.45);
+    padding: 0 8px;
+    margin: 4px 0;
 }
-#custom-close:hover {
-    background: alpha(@red, 0.30);
-    color: @sand;
-}
+#custom-close:hover { color: @red; }
 
-/* ── الوسط: الساعة · الهجري · الصلاة ── */
+/* ── الوسط ── */
+
 #clock {
     color: @sand;
     font-weight: bold;
     font-size: 14px;
     padding: 0 10px;
+    letter-spacing: 0.03em;
 }
 #custom-hijri {
     color: @sand_dim;
-    font-family: "Reem Kufi", "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
-    padding: 0 8px;
+    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+    font-size: 12px;
+    padding: 0 6px;
+    opacity: 0.75;
 }
 #custom-prayer {
-    color: @gold;
-    background: alpha(@gold, 0.13);
-    border-radius: 10px;
-    margin: 6px 4px;
-    padding: 0 12px;
-    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "JetBrainsMono Nerd Font", sans-serif;
+    color: @sand_dim;
+    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+    font-size: 12px;
+    padding: 0 10px;
+    margin: 5px 2px;
+    border-radius: 8px;
 }
+/* وقت الصلاة قريب — نبرز بالذهبي فقط */
 #custom-prayer.soon {
-    color: @night;
+    color: @gold;
     font-weight: bold;
-    background: linear-gradient(135deg, @gold, @terracotta);
+    background: alpha(@gold, 0.10);
 }
 
-/* ── اليمين: الحالة ── */
+/* ── اليمين — لون واحد فقط (@sand) لكل الوحدات ── */
+
 #tray,
 #language,
 #cpu,
@@ -149,30 +152,32 @@ tooltip label {
 #pulseaudio,
 #network,
 #battery {
-    padding: 0 9px;
+    color: @sand;
+    padding: 0 8px;
+    opacity: 0.80;
 }
-#tray { padding: 0 8px; }
-#tray > .needs-attention { background: alpha(@red, 0.35); border-radius: 8px; }
-#language   { color: @sand_dim; }
-#cpu        { color: @teal; }
-#memory     { color: @acacia; }
-#pulseaudio { color: @yellow; }
-#pulseaudio.muted { color: @sand_dim; }
-#network    { color: @blue; }
-#network.disconnected { color: @red; }
-#battery    { color: @acacia; }
-#battery.charging { color: @teal; }
-#battery.warning  { color: @yellow; }
-#battery.critical { color: @red; font-weight: bold; }
+#tray { padding: 0 8px; opacity: 1; }
+#tray > .needs-attention {
+    background: alpha(@red, 0.25);
+    border-radius: 6px;
+}
 
+/* اللغة والصوت والشبكة والبطارية: كلها رملية بدون ألوان مختلفة */
+#language   { font-size: 12px; opacity: 0.60; }
+#pulseaudio.muted { opacity: 0.35; }
+
+/* التحذيرات فقط — ألوان استثنائية */
+#network.disconnected { color: @red; opacity: 1; }
+#battery.warning      { color: @gold; opacity: 1; }
+#battery.critical     { color: @red;  opacity: 1; font-weight: bold; }
+
+/* الطاقة — أيقونة رمادية تتحول حمراء عند التحويم */
 #custom-power {
-    color: @red;
-    border-radius: 12px;
-    margin: 5px 6px 5px 2px;
+    color: alpha(@sand_dim, 0.50);
     padding: 0 12px;
-    background: alpha(@red, 0.14);
+    margin: 4px 4px 4px 0;
+    border-left: 1px solid alpha(@sand_dim, 0.14);
 }
 #custom-power:hover {
-    background: @red;
-    color: @night;
+    color: @red;
 }
