@@ -283,10 +283,9 @@ class Greeter(Gtk.Window):
         content.set_margin_end(44)
         panel.pack_start(content, True, True, 0)
 
-        # الترحيب
+        # الترحيب — "زول" اسم ثابت (هوية النظام)
         user0 = default_user()
-        greeting_text = f"مرحباً بك يا {user0}" if user0 else "مرحباً بك · Welcome"
-        greeting = Gtk.Label(label=greeting_text, name="greeting")
+        greeting = Gtk.Label(label="مرحباً بك يا زول", name="greeting")
         greeting.set_halign(Gtk.Align.END)
         content.pack_start(greeting, False, False, 0)
 
