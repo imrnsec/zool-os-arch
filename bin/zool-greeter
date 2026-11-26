@@ -128,7 +128,6 @@ CSS = f"""
     border-radius: 0;
     border: none;
     box-shadow: none;
-    text-shadow: none;
     -gtk-icon-shadow: none;
 }}
 
@@ -193,7 +192,6 @@ entry image {{ color: {_MUTED}; margin: 0 4px; }}
 checkbutton {{
     color: {_MUTED};
     font-size: 13px;
-    spacing: 8px;
 }}
 checkbutton check {{
     background-color: {_FIELD};
