@@ -4,6 +4,8 @@
 # ميتة لا شيء فيها إلى أن يُعاد تشغيل الجهاز.
 export XKB_DEFAULT_LAYOUT=us,ara XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
 export GDK_BACKEND=wayland XCURSOR_SIZE=24
+# استخدام logind مباشرةً بدل الانتظار على seatd (غير مثبَّت افتراضياً)
+export LIBSEAT_BACKEND=logind
 
 # مجلد مؤقت للـ greeter حتى لا تفشل Mesa في إنشاء shader cache
 # (مستخدم greetd ليس له HOME حقيقي فتظهر "Failed to create //.cache")
