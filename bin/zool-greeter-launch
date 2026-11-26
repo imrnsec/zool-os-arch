@@ -4,6 +4,13 @@
 # ميتة لا شيء فيها إلى أن يُعاد تشغيل الجهاز.
 export XKB_DEFAULT_LAYOUT=us,ara XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
 export GDK_BACKEND=wayland XCURSOR_SIZE=24
+
+# مجلد مؤقت للـ greeter حتى لا تفشل Mesa في إنشاء shader cache
+# (مستخدم greetd ليس له HOME حقيقي فتظهر "Failed to create //.cache")
+export HOME=/var/cache/zool-greeter
+mkdir -p "$HOME/.cache" 2>/dev/null || true
+# تعطيل shader cache لـ Mesa داخل الـ greeter — لا حاجة له في شاشة الدخول
+export MESA_SHADER_CACHE_DISABLE=true
 if command -v cage >/dev/null 2>&1; then
     tries=0
     while [ "$tries" -lt 5 ]; do
