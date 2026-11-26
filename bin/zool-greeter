@@ -119,11 +119,19 @@ class Greeter(Gtk.Window):
         p = Gtk.CssProvider(); p.load_from_data(CSS.encode())
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
+        # Overlay: البطاقة مركّزة تماماً + شريط الطاقة في الأسفل بدون تعارض
+        overlay = Gtk.Overlay()
+        self.add(overlay)
+
+        # صندوق شفاف يملأ الشاشة كاملة، يحمل البطاقة في وسطه
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.add(root)
+        root.set_halign(Gtk.Align.CENTER)
+        root.set_valign(Gtk.Align.CENTER)
+        overlay.add(root)
+
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, name="card")
-        card.set_halign(Gtk.Align.CENTER); card.set_valign(Gtk.Align.CENTER); card.set_size_request(360, -1)
-        root.pack_start(card, True, True, 0)
+        card.set_size_request(360, -1)
+        root.pack_start(card, False, False, 0)
 
         if os.path.exists(LOGO):
             try:
@@ -152,12 +160,17 @@ class Greeter(Gtk.Window):
         card.pack_start(self.btn, False, False, 0)
         hint = Gtk.Label(label="Alt+Shift لتبديل لغة لوحة المفاتيح", name="hint"); card.pack_start(hint, False, False, 0)
 
-        bar = Gtk.Box(spacing=6); bar.set_halign(Gtk.Align.CENTER); bar.set_margin_bottom(18)
+        # شريط الطاقة — طبقة منفصلة في أسفل الشاشة عبر Overlay
+        bar = Gtk.Box(spacing=6)
+        bar.set_halign(Gtk.Align.CENTER)
+        bar.set_valign(Gtk.Align.END)
+        bar.set_margin_bottom(18)
         for text, cmd in (("إعادة التشغيل · Restart", "reboot"), ("إيقاف التشغيل · Shut down", "poweroff")):
             b = Gtk.Button(label=text); b.get_style_context().add_class("flat")
             b.connect("clicked", lambda _b, c=cmd: subprocess.Popen(["systemctl", c]))
             bar.pack_start(b, False, False, 0)
-        root.pack_end(bar, False, False, 0)
+        overlay.add_overlay(bar)
+        overlay.set_overlay_pass_through(bar, True)
 
         self.tick(); GLib.timeout_add_seconds(20, self.tick)
         self.show_all()
