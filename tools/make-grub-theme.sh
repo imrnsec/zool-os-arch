@@ -13,11 +13,14 @@ mkdir -p "$DEST"
 cp "$SRC"/theme.txt "$SRC"/*.png "$DEST"/
 
 mkfonts() {
-  # اسم الخط داخل GRUB = "اسم العائلة + النمط + الحجم" (مثل: Amiri Bold 30) — نستعمل Amiri اللاتيني لأن GRUB لا يشكّل الحروف العربية
-  grub-mkfont -s 30 -o "$DEST/amiri_bold_30.pf2"    "$FONTS/Amiri-Latin-Bold.ttf" &&
-  grub-mkfont -s 20 -o "$DEST/amiri_bold_20.pf2"    "$FONTS/Amiri-Latin-Bold.ttf" &&
-  grub-mkfont -s 20 -o "$DEST/amiri_regular_20.pf2" "$FONTS/Amiri-Latin-Regular.ttf" &&
-  grub-mkfont -s 14 -o "$DEST/amiri_regular_14.pf2" "$FONTS/Amiri-Latin-Regular.ttf"
+  # اسم الخط داخل GRUB = "اسم العائلة + النمط + الحجم" (مثل: Amiri Bold 30 / Reem Kufi Bold 32)
+  # Reem Kufi → شعار الثيم (السطر الذهبي الكبير)
+  # Amiri Latin → بقية عناصر القائمة والتلميحات (GRUB لا يشكّل الحروف العربية)
+  grub-mkfont -s 32 -o "$DEST/reemkufi_bold_32.pf2"  "$FONTS/ReemKufi-Bold.ttf"    &&
+  grub-mkfont -s 30 -o "$DEST/amiri_bold_30.pf2"     "$FONTS/Amiri-Latin-Bold.ttf" &&
+  grub-mkfont -s 20 -o "$DEST/amiri_bold_20.pf2"     "$FONTS/Amiri-Latin-Bold.ttf" &&
+  grub-mkfont -s 20 -o "$DEST/amiri_regular_20.pf2"  "$FONTS/Amiri-Latin-Regular.ttf" &&
+  grub-mkfont -s 14 -o "$DEST/amiri_regular_14.pf2"  "$FONTS/Amiri-Latin-Regular.ttf"
 }
 
 # grub-mkfont يحتاج مكتبة freetype2 (اعتماد اختياري لحزمة grub) — نثبّتها إن غابت ونحن root على Arch

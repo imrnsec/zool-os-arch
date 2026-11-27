@@ -1,89 +1,75 @@
 #!/usr/bin/env python3
-"""يولّد ثيم GRUB الخاص بزول (خلفية + شريط التحديد) في iso/grub/zool-theme/.
+"""يولّد أصول GRUB لثيم Terminal الخاص بزول.
 الاستعمال:  python3 branding/make_grub_assets.py   (يحتاج Pillow و numpy)
-الخطوط (pf2) تُولَّد وقت البناء بـ grub-mkfont — انظر tools/make-grub-theme.sh
+
+التصميم الجديد: خلفية شبه سوداء مع scanlines خفية — لا صور ولا زخارف.
+شريط الاختيار: خط ذهبي رفيع على اليسار (بدل المستطيل الكامل).
 """
 import os
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-OUT = os.path.join(ROOT, "iso/grub/zool-theme")
-LOGO = os.path.join(ROOT, "share/zool/logo")
+OUT  = os.path.join(ROOT, "iso/grub/zool-theme")
 os.makedirs(OUT, exist_ok=True)
 
 W, H = 1920, 1080
-NIGHT, SURFACE = (10, 16, 20), (23, 34, 41)
-GOLD, TERRA, SAND = (232, 176, 74), (212, 106, 67), (243, 230, 204)
 
-# ── سماء ليلية متدرجة مع وهج شمس خلف الشعار ──
-yy, xx = np.mgrid[0:H, 0:W].astype(float)
-t = (yy / H)[..., None]
-sky = np.array(NIGHT) * (1 - t) + np.array(SURFACE) * t
-cx, cy = W * 0.72, H * 0.46
-glow = np.exp(-(((xx - cx) / 520) ** 2 + ((yy - cy) / 420) ** 2))[..., None]
-sky = sky + glow * (np.array(TERRA) * 0.30 + np.array(GOLD) * 0.12)
-rng = np.random.default_rng(3)
-sky += rng.normal(0, 1.6, (H, W, 1))                       # ضجيج خفيف يمنع تدرّج الألوان المتقطع
-img = Image.fromarray(np.clip(sky, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+# ── لوحة الألوان ──────────────────────────────────────────────────────────────
+BG_DARK  = (6,  13,  9)   # #060d09  شبه أسود مع خضرة خافتة
+BG_MID   = (8,  18, 12)   # طبقة وسطى
+GOLD     = (232, 176, 74)  # #e8b04a
 
-# ── نجوم خافتة ──
-d = ImageDraw.Draw(img)
-for _ in range(160):
-    x, y = int(rng.uniform(0, W)), int(rng.uniform(0, H * 0.55))
-    a = int(rng.uniform(40, 150))
-    d.point((x, y), fill=(243, 230, 204, a))
+# ── الخلفية ───────────────────────────────────────────────────────────────────
+# تدرّج عمودي خفيف من الأعلى (أدكن) إلى الأسفل (أضوأ قليلاً)
+rng = np.random.default_rng(7)
+yy  = np.arange(H, dtype=float)[:, None, None] / H                 # (H,1,1)
+row = np.array(BG_DARK) * (1 - yy) + np.array(BG_MID) * yy       # (H,1,3)
+bg  = np.broadcast_to(row, (H, W, 3)).copy().astype(float)
 
-# ── كثبان وأهرامات في الأسفل ──
-land = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-ld = ImageDraw.Draw(land)
-def dune(base, amp, freq, phase, color):
-    pts = [(0, H)] + [(x, base - amp * np.sin(x / freq + phase) - amp * 0.4 * np.sin(x / (freq * 0.37) + phase * 2))
-                      for x in range(0, W + 8, 8)] + [(W, H)]
-    ld.polygon(pts, fill=color)
-for px, ph, pw in ((1660, 120, 96), (1770, 170, 130), (1870, 100, 84)):   # أهرامات مروي الحادة
-    top = H - 190 - ph
-    ld.polygon([(px - pw / 2, H - 170), (px, top), (px + pw / 2, H - 170)], fill=(18, 26, 31, 255))
-    ld.polygon([(px, top), (px + pw / 2, H - 170), (px + pw * 0.12, H - 170)], fill=(13, 19, 23, 255))
-dune(H - 150, 26, 310, 0.6, (16, 24, 28, 255))
-dune(H - 90, 34, 420, 2.1, (12, 18, 22, 255))
-dune(H - 30, 22, 260, 4.0, (8, 13, 16, 255))
-img.alpha_composite(land)
+# ضجيج دقيق يمنع تقطّع تدرّج الألوان
+bg += rng.normal(0, 0.9, (H, W, 3))
 
-# ── بطاقة القائمة (يسار) ──
-card = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-cd = ImageDraw.Draw(card)
-CX0, CY0, CX1, CY1 = 120, 330, 960, 900
-cd.rounded_rectangle((CX0, CY0, CX1, CY1), 28, fill=(16, 24, 28, 205), outline=(232, 176, 74, 110), width=2)
-cd.rounded_rectangle((CX0 + 40, CY0 + 34, CX0 + 46, CY0 + 74), 3, fill=GOLD + (255,))     # شرطة ذهبية بجانب العنوان
-img.alpha_composite(card)
+# scanlines أفقية خفية — تُعطي إحساس شاشة CRT دون مبالغة
+for y in range(0, H, 3):
+    bg[y] *= 0.88
 
-# ── الشعار والاسم (يمين) ──
-logo = Image.open(f"{LOGO}/zool-logo-512.png").convert("RGBA").resize((400, 400), Image.LANCZOS)
-shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-ImageDraw.Draw(shadow).ellipse((1230, 215, 1650, 635), fill=(0, 0, 0, 130))
-img.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(26)))
-img.alpha_composite(logo, (1240, 200))
-wm = Image.open(f"{LOGO}/zool-wordmark.png").convert("RGBA")
-wm = wm.resize((460, round(460 * wm.height / wm.width)), Image.LANCZOS)
-img.alpha_composite(wm, (1440 - wm.width // 2, 630))
-img.convert("RGB").save(f"{OUT}/background.png", optimize=True)
+img = Image.fromarray(np.clip(bg, 0, 255).astype(np.uint8), "RGB")
 
-# ── شريط العنصر المحدد: 9 شرائح (نستعمل الوسط والطرفين فقط) ──
-IH, R = 46, 14
-def piece(w, box):
-    im = Image.new("RGBA", (w, IH), (0, 0, 0, 0))
-    full = Image.new("RGBA", (200, IH), (0, 0, 0, 0))
-    fd = ImageDraw.Draw(full)
-    fd.rectangle((0, 0, 200, IH), fill=GOLD + (255,))
-    mask = Image.new("L", (200, IH), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, 199, IH - 1), R, fill=255)
-    full.putalpha(mask)
-    return full.crop(box)
-piece(R, (0, 0, R, IH)).save(f"{OUT}/select_w.png")
-piece(R, (200 - R, 0, 200, IH)).save(f"{OUT}/select_e.png")
-c = Image.new("RGBA", (8, IH), (0, 0, 0, 0))
-src = piece(200, (0, 0, 200, IH)).crop((96, 0, 104, IH))
-src.save(f"{OUT}/select_c.png")
-print("OK", OUT, "| card:", (CX0, CY0, CX1, CY1))
+# نقطتا ضوء خضراوي فاتح (مثل phosphor glow) في الركن العلوي الأيسر والسفل الأيمن
+gw = np.zeros((H, W), dtype=float)
+cx1, cy1 = int(W * 0.07), int(H * 0.22)
+cx2, cy2 = int(W * 0.80), int(H * 0.78)
+xx, yy2  = np.meshgrid(np.arange(W), np.arange(H))
+gw += 0.08 * np.exp(-(((xx - cx1) / 500) ** 2 + ((yy2 - cy1) / 400) ** 2))
+gw += 0.05 * np.exp(-(((xx - cx2) / 600) ** 2 + ((yy2 - cy2) / 500) ** 2))
+arr = np.array(img).astype(float)
+arr[..., 1] = np.clip(arr[..., 1] + gw * 18, 0, 255)   # قناة Green فقط
+img = Image.fromarray(arr.astype(np.uint8))
+
+img.save(f"{OUT}/background.png", optimize=True)
+print(f"✓ background.png → {OUT}/background.png")
+
+# ── شريط الاختيار: select_*.png ───────────────────────────────────────────────
+# تصميم: خط ذهبي رفيع على اليسار + طبقة شفافة خفيفة على الكل
+# GRUB يستعمل 9-slice: select_w.png | select_c.png | select_e.png
+IH = 46   # ارتفاع العنصر في القائمة
+
+# الشريح الأيسر (W): خط ذهبي 3px + fade ذهبي
+sw = Image.new("RGBA", (14, IH), (0, 0, 0, 0))
+dw = ImageDraw.Draw(sw)
+dw.rectangle((0, 0, 2, IH - 1), fill=GOLD + (220,))                 # خط 3px
+dw.rectangle((3, 0, 13, IH - 1), fill=GOLD + (22,))                  # وهج خفيف
+sw.save(f"{OUT}/select_w.png")
+
+# الشريح الوسط (C): طبقة ذهبية شفافة جداً
+sc = Image.new("RGBA", (8, IH), GOLD + (12,))
+sc.save(f"{OUT}/select_c.png")
+
+# الشريح الأيمن (E): شفاف
+se = Image.new("RGBA", (4, IH), (0, 0, 0, 0))
+se.save(f"{OUT}/select_e.png")
+
+print(f"✓ select_{{w,c,e}}.png → {OUT}/")
+print("OK — ثيم Terminal جاهز")

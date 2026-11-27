@@ -1,62 +1,102 @@
-# ثيم GRUB لـ Zool OS — الخلفية والشعار في background.png (يولّدها branding/make_grub_assets.py)
-# ملاحظة: GRUB يقبل النسب المئوية الصحيحة فقط (لا كسور).
+# Zool OS — ثيم Terminal
+# تصميم CLI سوداني: خلفية داكنة، prompt ذهبي، قائمة كـ terminal list
+# الخطوط (pf2) تُولَّد وقت البناء بـ make-grub-theme.sh
 
 title-text: ""
 desktop-image: "background.png"
-desktop-color: "#10181c"
-terminal-font: "Unifont Regular 16"
-terminal-left: "8%"
-terminal-top: "8%"
-terminal-width: "84%"
-terminal-height: "84%"
-terminal-border: "0"
+desktop-color: "#060d09"
+
+# ─── الشعار — prompt سوداني ─────────────────────────────────────────────────
 
 + label {
-    left = 10%
-    top = 33%
-    width = 38%
-    height = 40
-    font = "Amiri Bold 30"
-    color = "#f3e6cc"
-    align = "left"
-    text = "Z O O L   O S"
+    left   = 7%
+    top    = 24%
+    width  = 56%
+    height = 44
+    font   = "Reem Kufi Bold 32"
+    color  = "#e8b04a"
+    align  = "left"
+    text   = "◉  Z O O L   O S"
 }
 
++ label {
+    left   = 7%
+    top    = 31%
+    width  = 56%
+    height = 20
+    font   = "Amiri Regular 14"
+    color  = "#1a3a28"
+    align  = "left"
+    text   = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+}
+
++ label {
+    left   = 7%
+    top    = 35%
+    width  = 56%
+    height = 22
+    font   = "Amiri Regular 14"
+    color  = "#2e5a40"
+    align  = "left"
+    text   = "boot-entry ▸"
+}
+
+# ─── قائمة الإقلاع ──────────────────────────────────────────────────────────
+
 + boot_menu {
-    left = 8%
-    top = 41%
-    width = 40%
-    height = 34%
-    item_font = "Amiri Regular 20"
-    item_color = "#b9a98a"
+    left = 7%
+    top  = 40%
+    width  = 56%
+    height = 28%
+    item_font          = "Amiri Regular 20"
+    item_color         = "#3a6a50"
     selected_item_font = "Amiri Bold 20"
-    selected_item_color = "#10181c"
-    selected_item_pixmap_style = "select_*.png"
-    item_height = 46
-    item_padding = 16
-    item_spacing = 8
+    selected_item_color         = "#e8b04a"
+    selected_item_pixmap_style  = "select_*.png"
+    icon_width  = 0
+    icon_height = 0
+    item_height   = 44
+    item_padding  = 22
+    item_spacing  = 4
     scrollbar = false
 }
 
-+ progress_bar {
-    id = "__timeout__"
-    left = 8%
-    top = 77%
-    width = 40%
-    height = 6
-    show_text = false
-    bg_color = "#213039"
-    fg_color = "#e8b04a"
-    border_color = "#213039"
-}
+# ─── فاصل ───────────────────────────────────────────────────────────────────
 
 + label {
-    left = 8%
-    top = 79%
-    width = 40%
-    height = 24
-    font = "Amiri Regular 14"
-    color = "#b9a98a"
-    align = "left"
-    text = "ENTER  boot        E  edit        C  command line"
+    left   = 7%
+    top    = 70%
+    width  = 56%
+    height = 16
+    font   = "Amiri Regular 14"
+    color  = "#152a1e"
+    align  = "left"
+    text   = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+}
+
+# ─── شريط الإقلاع التلقائي ──────────────────────────────────────────────────
+
++ progress_bar {
+    id           = "__timeout__"
+    left         = 7%
+    top          = 73%
+    width        = 56%
+    height       = 3
+    show_text    = false
+    bg_color     = "#0c1e14"
+    fg_color     = "#e8b04a"
+    border_color = "#0c1e14"
+}
+
+# ─── تلميحات ─────────────────────────────────────────────────────────────────
+
++ label {
+    left   = 7%
+    top    = 76%
+    width  = 56%
+    height = 20
+    font   = "Amiri Regular 14"
+    color  = "#1e4030"
+    align  = "left"
+    text   = "↑↓  navigate      ENTER  boot      E  edit      C  shell"
 }
